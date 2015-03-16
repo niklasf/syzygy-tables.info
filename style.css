@@ -47,7 +47,9 @@ h2.black-win {
   border: 1px solid black;
 }
 
-footer {
+footer > .inner {
+  width: 300px;
+  text-align: center;
   padding-top: 40px;
 }
 
@@ -58,6 +60,10 @@ footer {
   }
 
   .left-side > .inner {
+    position: fixed;
+  }
+
+  footer > .inner {
     position: fixed;
   }
 
@@ -92,5 +98,10 @@ footer {
   .left-side {
     background: #eee url('triangle-bg.png');
     background-position: center bottom;
+    margin: auto;
+  }
+
+  footer > .inner {
+    margin: auto;
   }
 }
