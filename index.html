@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="main">
+      <div class="left-side">
+        <div class="inner">
+          <h1>Syzygy endgame tablebases</h1>
+
+          <div id="board"><!-- <noscript> --><img src="dummy-board.png"><!-- </noscript> --></div>
+          <div class="board-toolbar"><noscript>JavaScript is required for an interactive board.</noscript></div>
+          <div>
+          </div>
+          <form>
+            <input type="text" name="fen">
+            <input type="submit" value="Set">
+          </form>
+          <p>Powered by this and that</p>
+        </div>
+      </div>
+      <div class="right-side">
+        <div class="inner">
+          <div id="status">Drawn due to insufficient material</div>
+
+          <div id="connection-error">
+            There was a problem contacting the server.
+          </div>
+
+          <div id="invalid-position">
+            The position is not legal.
+          </div>
+
+          <div id="unknown-positon">
+            Syzygy endgame tablebases only contain legal endgame positions with up
+            to 6 pieces and no castling rights.
+          </div>
+
+          <div id="winning">
+            <div class="move">Ke2 <span class="bubble">2</span></div>
+            <div class="move">Kd2 <span class="bubble">4</span></div>
+            <div class="move">Kf2 <span class="bubble">12</span></div>
+            <div class="move">Kf1 <span class="bubble">23</span></div>
+            <div class="move">Kd1 <span class="bubble">32</span></div>
+          </div>
+
+          <div id="drawn">
+            <div class="move">Re1 <span class="bubble">Draw</span></div>
+            <div class="move">Qfh1 <span class="bubble">Draw</span></div>
+          </div>
+
+          <div id="losing">
+            <div class="move">Nxe4 <span class="bubble">-23</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="background-left" aria-hidden="true"></div>
+  </body>
+</html>
