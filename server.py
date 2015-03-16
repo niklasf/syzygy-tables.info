@@ -21,6 +21,13 @@ def query_page():
     except ValueError:
         board = chess.Bitboard(DEFAULT_FEN)
 
+    original_turn = board.turn
+    board.turn = chess.WHITE
+    white_fen = board.fen()
+    board.turn = chess.BLACK
+    black_fen = board.fen()
+    board.turn = original_turn
+
     winning_side = "no"
     losing_side = "no"
     turn = "white" if board.turn == chess.WHITE else "black"
@@ -150,7 +157,9 @@ def query_page():
         winning_moves=winning_moves,
         drawing_moves=drawing_moves,
         turn=turn,
-        losing_moves=losing_moves
+        losing_moves=losing_moves,
+        white_fen=white_fen,
+        black_fen=black_fen
     )
 
 if __name__ == "__main__":

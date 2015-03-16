@@ -3,6 +3,11 @@
 {%block leftside %}
   <h1>Syzygy endgame tablebases</h1>
 
+  <div class="btn-group" role="group" aria-label="Side to move">
+    <a class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen }}">White to move</a>
+    <a class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen }}">Black to move</a>
+  </div>
+
   <form>
     <div class="input-group">
       <input id="fen" type="text" name="fen" value="{{ fen }}" class="form-control" aria-label="FEN" placeholder="4k3/8/8/8/8/8/8/4K3 w - - 0 1">
