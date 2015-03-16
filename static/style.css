@@ -61,6 +61,10 @@ footer > .inner {
   border: 0;
 }
 
+#board {
+  margin: 10px 0;
+}
+
 @media(min-width: 600px) {
   .content {
     width: 600px;

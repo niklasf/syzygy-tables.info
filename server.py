@@ -150,7 +150,8 @@ def query_page():
     losing_moves.sort(key=lambda move: move["dtz"], reverse=True)
 
     return render_template("index.html",
-        fen=board.fen() if board.fen() != DEFAULT_FEN else "",
+        fen_input=board.fen() if board.fen() != DEFAULT_FEN else "",
+        fen=board.fen(),
         status=status,
         winning_side=winning_side,
         losing_side=losing_side,

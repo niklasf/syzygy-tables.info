@@ -8,9 +8,13 @@
     <a class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen }}">Black to move</a>
   </div>
 
+  <div id="board" data-fen="{{ fen }}">
+    <noscript>JavaScript required for interactive board view.</noscript>
+  </div>
+
   <form>
     <div class="input-group">
-      <input id="fen" type="text" name="fen" value="{{ fen }}" class="form-control" aria-label="FEN" placeholder="4k3/8/8/8/8/8/8/4K3 w - - 0 1">
+      <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="4k3/8/8/8/8/8/8/4K3 w - - 0 1">
       <span class="input-group-btn">
         <input type="submit" class="btn btn-default" value="Set FEN">
       </span>
