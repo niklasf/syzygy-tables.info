@@ -37,11 +37,12 @@ h2.black-win {
   padding: 40px 0;
 }
 
-.black-win .badge {
+#losing.white-turn .badge, #winning.black-turn .badge {
   background: black;
+  color: white;
 }
 
-.white-win .badge {
+#losing.black-turn .badge, #winning.white-turn .badge {
   background: white;
   color: black;
   border: 1px solid black;

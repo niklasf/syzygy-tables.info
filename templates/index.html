@@ -15,7 +15,7 @@
 {%block rightside %}
   <h2>{{ status }}</h2>
 
-  <div id="winning" class="list-group white-win">
+  <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}
       <a class="list-group-item" href="/?fen={{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
@@ -27,7 +27,7 @@
     {% endfor %}
   </div>
 
-  <div id="losing" class="list-group">
+  <div id="losing" class="list-group {{ turn }}-turn">
     {% for move in losing_moves %}
       <a class="list-group-item" href="/?fen={{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}

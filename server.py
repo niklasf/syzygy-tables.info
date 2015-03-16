@@ -21,7 +21,9 @@ def query_page():
     except ValueError:
         board = chess.Bitboard(DEFAULT_FEN)
 
-    winning_side = None
+    winning_side = "no"
+    losing_side = "no"
+    turn = "white" if board.turn == chess.WHITE else "black"
     winning_moves = []
     drawing_moves = []
     losing_moves = []
@@ -35,10 +37,12 @@ def query_page():
     elif board.is_checkmate():
         if board.turn == chess.WHITE:
             status = "Black won by checkmate"
-            winning_side="black"
+            winning_side = "black"
+            losing_side = "white"
         else:
             status = "White won by checkmate"
-            winning_side="white"
+            winning_side = "white"
+            losing_side = "black"
     else:
         dtz = tablebases.probe_dtz(board)
         if dtz is None:
@@ -48,15 +52,19 @@ def query_page():
         elif dtz > 0 and board.turn == chess.WHITE:
             status = "White is winning with DTZ %d" % (abs(dtz), )
             winning_side = "white"
+            losing_side = "black"
         elif dtz < 0 and board.turn == chess.WHITE:
             status = "White is losing with DTZ %d" % (abs(dtz), )
             winning_side = "black"
+            losing_side = "white"
         elif dtz > 0 and board.turn == chess.BLACK:
             status = "Black is winning with DTZ %d" % (abs(dtz), )
             winning_side = "black"
+            losing_side = "white"
         elif dtz < 0 and board.turn == chess.BLACK:
             status = "Black is losing with DTZ %d" % (abs(dtz), )
             winning_side = "white"
+            losing_side = "black"
 
         fallback_wdl = tablebases.probe_wdl(board)
         if fallback_wdl is None:
@@ -138,8 +146,10 @@ def query_page():
         fen=board.fen() if board.fen() != DEFAULT_FEN else "",
         status=status,
         winning_side=winning_side,
+        losing_side=losing_side,
         winning_moves=winning_moves,
         drawing_moves=drawing_moves,
+        turn=turn,
         losing_moves=losing_moves
     )
 
