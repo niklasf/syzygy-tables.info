@@ -12,14 +12,15 @@ h1 {
   background: #eee;
   width: 300px;
   text-align: center;
+  padding-bottom: 40px;
 }
 
-.background-left {
-  display: none;
+.right-side > .inner {
+  padding: 40px 0;
 }
 
 @media(min-width: 600px) {
-  .main {
+  .content {
     width: 600px;
     margin: auto;
   }
@@ -28,7 +29,8 @@ h1 {
     position: fixed;
   }
 
-  .background-left {
+  .content::after {
+    content: '';
     display: block;
     position: fixed;
     top: 0;
@@ -38,6 +40,9 @@ h1 {
     background: #eee;
     padding-right: 40px;
     z-index: -1;
+    box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
   }
 
   .right-side {
