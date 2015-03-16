@@ -37,6 +37,9 @@
     {% elif insufficient_material %}
       <p><strong>The game is drawn</strong> because with the remaining
         material no sequence of legal moves can lead to a checkmate.</p>
+    {% elif not_yet_solved %}
+      <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
+        yet solved.</a></p>
     {% elif unknown %}
       <p>Syzygy tables only provide information for positions with up to 6 pieces and
         no castling rights.</p>

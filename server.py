@@ -94,7 +94,7 @@ def query_page():
 
             dtz = tablebases.probe_dtz(board)
 
-            if (dtz is not None and dtz < 0) or (dtz is None and fallback_wdl < 0):
+            if board.is_checkmate() or ((dtz is not None) and dtz < 0):
                 if board.is_checkmate():
                     badge = "Checkmate"
                 elif dtz is None:
@@ -113,7 +113,7 @@ def query_page():
                     "checkmate": board.is_checkmate(),
                     "dtz": dtz,
                 })
-            elif dtz == 0:
+            elif board.is_stalemate() or board.is_insufficient_material() or (dtz == 0 or (dtz is None and fallback_wdl > -2)):
                 if board.is_stalemate():
                     badge = "Stalemate"
                 elif board.is_insufficient_material():
@@ -169,6 +169,7 @@ def query_page():
         blessed_loss=wdl == -1,
         cursed_win=wdl == 1,
         illegal=board.status() != chess.STATUS_VALID,
+        not_yet_solved=board.epd() + " 0 1" == chess.STARTING_FEN,
         unknown=wdl is None,
         turn=turn,
         losing_moves=losing_moves,
