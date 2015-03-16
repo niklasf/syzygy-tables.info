@@ -17,10 +17,17 @@
           <div>
           </div>
           <form>
-            <input type="text" name="fen">
-            <input type="submit" value="Set">
+            <div class="input-group">
+              <input type="text" name="fen" id="fen" class="form-control" aria-label="FEN" placeholder="4k3/8/8/8/8/8/8/4K3 w - - 0 1">
+              <span class="input-group-btn">
+                <input type="submit" class="btn btn-default" value="Set FEN">
+              </span>
+            </div>
           </form>
-          <p>Powered by this and that</p>
+
+          <footer>
+            <p>Powered by Ronald de Man's <a href="https://github.com/syzygy1/tb">Syzygy endgame tablebases</a>, <a href="https://github.com/niklasf/python-chess">python-chess</a> for probing and <a href="http://chessboardjs.com">chessboard.js</a> and <a href="https://github.com/jhlywa/chess.js">chess.js</a> for the client.</p>
+          </footer>
         </div>
       </div>
       <div class="right-side">

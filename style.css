@@ -28,7 +28,6 @@ h2.black-win {
 }
 
 .left-side > .inner {
-  background: #eee;
   width: 300px;
   text-align: center;
   padding-bottom: 40px;
@@ -46,6 +45,10 @@ h2.black-win {
   background: white;
   color: black;
   border: 1px solid black;
+}
+
+footer {
+  padding-top: 40px;
 }
 
 @media(min-width: 600px) {
@@ -87,6 +90,7 @@ h2.black-win {
   }
 
   .left-side {
-    background: #eee;
+    background: #eee url('triangle-bg.png');
+    background-position: center bottom;
   }
 }
