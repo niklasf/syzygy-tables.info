@@ -13,7 +13,7 @@
 {%endblock %}
 
 {%block rightside %}
-  <h2>{{ status }}</h2>
+  <h2 class="{{ winning_side }}-win">{{ status }}</h2>
 
   <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}
