@@ -8,6 +8,25 @@ h1 {
   padding: 1em 0;
 }
 
+h2 {
+  margin: 1em 0;
+  border: 1px solid black;
+  font-size: 1.2em;
+  padding: 10px 15px;
+  background: #777;
+  color: white;
+}
+
+h2.white-win {
+  background: white;
+  color: black;
+}
+
+h2.black-win {
+  background: black;
+  color: white;
+}
+
 .left-side > .inner {
   background: #eee;
   width: 300px;
@@ -17,6 +36,16 @@ h1 {
 
 .right-side > .inner {
   padding: 40px 0;
+}
+
+.black-win .badge {
+  background: black;
+}
+
+.white-win .badge {
+  background: white;
+  color: black;
+  border: 1px solid black;
 }
 
 @media(min-width: 600px) {
@@ -49,11 +78,6 @@ h1 {
     width: 240px;
     margin-left: 360px;
   }
-}
-
-.move {
-  height: 150px;
-  border: 1px solid black;
 }
 
 @media(max-width: 600px) {

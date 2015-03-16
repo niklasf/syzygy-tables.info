@@ -25,36 +25,24 @@
       </div>
       <div class="right-side">
         <div class="inner">
-          <div id="status">Drawn due to insufficient material</div>
+          <h2 class="drawn">Drawn due to insufficient material</h2>
 
-          <div id="connection-error">
-            There was a problem contacting the server.
+          <div id="win" class="list-group white-win">
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Win with DTZ 2</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Win with DTZ 3</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Win with DTZ 12</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Win with DTZ 24</span></a>
           </div>
 
-          <div id="invalid-position">
-            The position is not legal.
+          <div id="draw" class="list-group drawn">
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Draw</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Draw</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Draw</span></a>
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Draw</span></a>
           </div>
 
-          <div id="unknown-positon">
-            Syzygy endgame tablebases only contain legal endgame positions with up
-            to 6 pieces and no castling rights.
-          </div>
-
-          <div id="winning">
-            <div class="move">Ke2 <span class="bubble">2</span></div>
-            <div class="move">Kd2 <span class="bubble">4</span></div>
-            <div class="move">Kf2 <span class="bubble">12</span></div>
-            <div class="move">Kf1 <span class="bubble">23</span></div>
-            <div class="move">Kd1 <span class="bubble">32</span></div>
-          </div>
-
-          <div id="drawn">
-            <div class="move">Re1 <span class="bubble">Draw</span></div>
-            <div class="move">Qfh1 <span class="bubble">Draw</span></div>
-          </div>
-
-          <div id="losing">
-            <div class="move">Nxe4 <span class="bubble">-23</span></div>
+          <div id="loss" class="list-group black-win">
+            <a href="#" class="list-group-item">Ke2 <span class="badge">Loss with DTZ 124</span></a>
           </div>
         </div>
       </div>
