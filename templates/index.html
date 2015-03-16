@@ -14,7 +14,7 @@
 
   <form>
     <div class="input-group">
-      <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="4k3/8/8/8/8/8/8/4K3 w - - 0 1">
+      <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="{{ DEFAULT_FEN }}">
       <span class="input-group-btn">
         <input type="submit" class="btn btn-default" value="Set FEN">
       </span>
@@ -24,6 +24,30 @@
 
 {%block rightside %}
   <h2 class="{{ winning_side }}-win">{{ status }}</h2>
+
+  <div id="info">
+    {% if fen == DEFAULT_FEN %}
+      <p>Syzygy tablebases provide win-draw-loss and distance-to-zero information
+        for all endgame positions with up to 6 pieces.</p>
+      <p>Minmaximg the DTZ values guarantees winning all winning positions and
+        defending all drawn positions.</p>
+      <p><strong>Setup a position on the board to probe the tablebases.</strong></p>
+    {% elif illegal %}
+      <p>The given position is not a legal chess position.</p>
+    {% elif insufficient_material %}
+      <p><strong>The game is drawn</strong> because with the remaining
+        material no sequence of legal moves can lead to a checkmate.</p>
+    {% elif unknown %}
+      <p>Syzygy tables only provide information for positions with up to 6 pieces and
+        no castling rights.</p>
+    {% elif blessed_loss %}
+      <p><strong>This is a blessed loss.</strong> Mate can be forced, but a
+        draw can be achieved under the fifty-move rule.</p>
+    {% elif cursed_win %}
+      <p><strong>This is a cursed win.</strong> Mate can be forced, but a
+        draw can be achieved under the fifty-move rule.</p>
+    {% endif %}
+  </div>
 
   <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}

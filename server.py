@@ -19,7 +19,11 @@ def query_page():
     try:
         board = chess.Bitboard(request.args.get("fen", DEFAULT_FEN))
     except ValueError:
-        board = chess.Bitboard(DEFAULT_FEN)
+        try:
+            board = chess.Bitboard()
+            board.set_epd(request.args.get("fen", DEFAULT_FEN))
+        except ValueError:
+            board = chess.Bitboard(DEFAULT_FEN)
 
     original_turn = board.turn
     board.turn = chess.WHITE
@@ -34,14 +38,18 @@ def query_page():
     winning_moves = []
     drawing_moves = []
     losing_moves = []
+    wdl = None
 
     if board.status() != chess.STATUS_VALID:
         status = "Invalid position"
-    if board.is_insufficient_material():
+    elif board.is_insufficient_material():
+        wdl = 0
         status = "Draw by insufficient material"
     elif board.is_stalemate():
         status = "Draw by stalemate"
+        wdl = 0
     elif board.is_checkmate():
+        wdl = 2
         if board.turn == chess.WHITE:
             status = "Black won by checkmate"
             winning_side = "black"
@@ -73,7 +81,7 @@ def query_page():
             winning_side = "white"
             losing_side = "black"
 
-        fallback_wdl = tablebases.probe_wdl(board)
+        fallback_wdl = wdl = tablebases.probe_wdl(board)
         if fallback_wdl is None:
             fallback_wdl = -2
 
@@ -87,10 +95,10 @@ def query_page():
             dtz = tablebases.probe_dtz(board)
 
             if (dtz is not None and dtz < 0) or (dtz is None and fallback_wdl < 0):
-                if dtz is None:
-                    badge = "Unknown"
-                elif board.is_checkmate():
+                if board.is_checkmate():
                     badge = "Checkmate"
+                elif dtz is None:
+                    badge = "Unknown"
                 elif board.halfmove_clock == 0:
                     badge = "Zeroing"
                 else:
@@ -153,14 +161,20 @@ def query_page():
         fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
         fen=board.epd() + " 0 1",
         status=status,
+        insufficient_material=board.is_insufficient_material(),
         winning_side=winning_side,
         losing_side=losing_side,
         winning_moves=winning_moves,
         drawing_moves=drawing_moves,
+        blessed_loss=wdl == -1,
+        cursed_win=wdl == 1,
+        illegal=board.status() != chess.STATUS_VALID,
+        unknown=wdl is None,
         turn=turn,
         losing_moves=losing_moves,
         white_fen=white_fen,
-        black_fen=black_fen
+        black_fen=black_fen,
+        DEFAULT_FEN=DEFAULT_FEN
     )
 
 if __name__ == "__main__":
