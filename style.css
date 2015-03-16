@@ -53,6 +53,13 @@ footer > .inner {
   padding-top: 40px;
 }
 
+.fork-me {
+  position: absolute;
+  top: 0;
+  right:0;
+  border: 0;
+}
+
 @media(min-width: 600px) {
   .content {
     width: 600px;
@@ -114,8 +121,8 @@ footer > .inner {
   }
 }
 
-@media(min-width: 600px) and (max-height: 600px) {
-  h1, footer {
+@media(min-width: 600px) and (max-height: 590px) {
+  h1, footer, .fork-me {
     display: none;
     visibility: hidden;
   }
