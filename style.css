@@ -65,6 +65,7 @@ footer > .inner {
 
   footer > .inner {
     position: fixed;
+    bottom: 40px;
   }
 
   .content::after {
@@ -103,5 +104,19 @@ footer > .inner {
 
   footer > .inner {
     margin: auto;
+  }
+}
+
+@media(min-width: 600px) and (max-height: 700px) {
+  footer {
+    display: none;
+    visibility: hidden;
+  }
+}
+
+@media(min-width: 600px) and (max-height: 600px) {
+  h1, footer {
+    display: none;
+    visibility: hidden;
   }
 }
