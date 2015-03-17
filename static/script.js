@@ -41,7 +41,15 @@ $(function () {
       data: {
         'fen': fen,
       },
-      error: function (jqXHR, textStatus, errorThrown) {
+      error: function (xhr, textStatus, errorThrown) {
+        if (xhr.status == 400) {
+          $status.text('Invalid position').removeClass('black-win').removeClass('white-win');
+          $info.html('<p>The given position is not a legal chess position.</p>');
+        } else {
+          // TODO: Add retry button
+          $status.text('Network error').removeClass('black-win').removeClass('white-win');
+          $info.text('Request failed: ' + textStatus);
+        }
       },
       success: function (data) {
         if (tmpChess.insufficient_material()) {
