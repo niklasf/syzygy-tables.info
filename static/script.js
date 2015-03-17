@@ -435,4 +435,25 @@ $(function () {
   $('#btn-flip-board').click(function (event) {
     board.flip();
   });
+
+  $('#btn-swap-colors').click(function (event) {
+    event.preventDefault();
+
+    var parts = chess.fen().split(/\s+/);
+    var fen = '';
+
+    for (var i = 0; i < parts[0].length; i++) {
+      if (parts[0][i] === parts[0][i].toLowerCase()) {
+        fen += parts[0][i].toUpperCase();
+      } else {
+        fen += parts[0][i].toLowerCase();
+      }
+    }
+
+    fen += ' ' + parts[1] + ' - - 0 1';
+    $fen.val(fen);
+    board.position(fen);
+    chess.load(fen);
+    probe(fen, true);
+  });
 });
