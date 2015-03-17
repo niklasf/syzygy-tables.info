@@ -431,4 +431,8 @@ $(function () {
     .click(handleMoveClick)
     .mouseover(handleMoveMouseEnter)
     .mouseleave(handleMoveMouseLeave);
+
+  $('#btn-flip-board').click(function (event) {
+    board.flip();
+  });
 });
