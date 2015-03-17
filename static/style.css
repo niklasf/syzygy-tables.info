@@ -77,6 +77,11 @@ footer > .inner {
   margin: 10px 0;
 }
 
+.reload {
+  padding: 20px 0;
+  text-align: center;
+}
+
 /* Device size specifics */
 
 @media(min-width: 600px) {

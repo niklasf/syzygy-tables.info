@@ -55,9 +55,10 @@ $(function () {
       $info.html('<p>The given position is not a legal chess position.</p>');
     } else {
       // Network error.
-      // TODO: Add retry button
       $status.text('Network error').removeClass('black-win').removeClass('white-win');
-      $info.text('Request failed: ' + textStatus);
+      $info
+        .text('Request failed: ' + textStatus)
+        .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + chess.fen() + '">Try again</a></div>');
     }
   }
 
