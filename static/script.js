@@ -458,6 +458,23 @@ $(function () {
     probe(fen, true);
   });
 
+  $('#btn-mirror-horizontal').click(function (event) {
+    event.preventDefault();
+
+    var parts = chess.fen().split(/\s+/);
+    var positionParts = parts[0].split(/\//);
+    for (var i = 0; i < positionParts.length; i++) {
+      positionParts[i] = positionParts[i].split('').reverse().join('');
+    }
+
+    var fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
+
+    $fen.val(fen);
+    board.position(fen);
+    chess.load(fen);
+    probe(fen, true);
+  });
+
   $('#btn-mirror-vertical').click(function (event) {
     event.preventDefault();
 
