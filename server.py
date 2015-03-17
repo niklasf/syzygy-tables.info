@@ -189,7 +189,7 @@ def index():
             move_info = {
                 "uci": move.uci(),
                 "san": san,
-                "fen": board.ep() + " 0 1",
+                "fen": board.epd() + " 0 1",
                 "dtz": tablebases.probe_dtz(board),
                 "zeroing": board.halfmove_clock == 0,
                 "checkmate": board.is_checkmate(),
