@@ -6,6 +6,8 @@ from flask import request
 from flask import abort
 from flask import jsonify
 
+import os.path
+
 import chess
 import chess.syzygy
 
@@ -14,7 +16,7 @@ app = Flask(__name__)
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 tablebases = chess.syzygy.Tablebases()
-tablebases.open_directory("/home/niklas/Projekte/python-chess/data/syzygy")
+tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
 
 @app.route("/api")
 def api():
