@@ -18,10 +18,6 @@ tablebases.open_directory("/home/niklas/Projekte/python-chess/data/syzygy")
 
 @app.route("/api")
 def api():
-    # TODO: Remove delay.
-    import time
-    time.sleep(1.5)
-
     fen = request.args.get("fen")
     if not fen:
         return abort(400)
