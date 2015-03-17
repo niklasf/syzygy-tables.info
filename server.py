@@ -20,10 +20,12 @@ tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
 
 @app.route("/api")
 def api():
+    # Get required fen argument.
     fen = request.args.get("fen")
     if not fen:
         return abort(400)
 
+    # Setup a board with the given FEN or EPD.
     try:
         board = chess.Bitboard(fen)
     except ValueError:
@@ -33,52 +35,56 @@ def api():
         except ValueError:
             return abort(400)
 
+    # Check the position for validity.
     if board.status() != chess.STATUS_VALID:
         return abort(400)
 
     moves = {}
 
-    bestmove = None
-    best_winning_dtz = -9999
-    best_losing_dtz = 9999
-    best_result = -4
+    # The best move will be determined in this order.
+    mating_move = None
+    zeroing_move = None
+    winning_move, winning_dtz = None, -9999
+    stalemating_move = None
+    insuff_material_move = None
+    drawing_move = None
+    losing_move, losing_dtz = None, -9999
 
+    # Look at all moves and probe for the result position.
     for move in board.legal_moves:
         board.push(move)
 
         moves[move.uci()] = dtz = tablebases.probe_dtz(board)
 
+        # Mate.
         if board.is_checkmate():
-            bestmove = move.uci()
-            best_result = 3
+            mating_move = move.uci()
 
-        if dtz is not None:
-            if best_result <= 2 and dtz < 0 and board.halfmove_clock == 0:
-                bestmove = move.uci()
-                best_result = 2
+        # Winning zeroing move.
+        if dtz is not None and dtz < 0 and board.halfmove_clock == 0:
+            zeroing_move = move.uci()
 
-            if best_result <= 1 and dtz < 0 and dtz > best_winning_dtz:
-                bestmove = move.uci()
-                best_result = 1
-                best_winning_dtz = dtz
+        # Winning move.
+        if dtz is not None and dtz < 0 and dtz > winning_dtz:
+            winning_move = move.uci()
+            winning_dtz = dtz
 
-        if best_result <= 0 and board.is_stalemate():
-            bestmove = move.uci()
-            best_result = 0
+        # Stalemating move.
+        if board.is_stalemate():
+            stalemating_move = move.uci()
 
-        if best_result <= -1 and board.is_insufficient_material():
-            bestmove = move.uci()
-            best_result = -1
+        # Insufficient material.
+        if board.is_insufficient_material():
+            insuff_material_move = move.uci()
 
-        if dtz is not None:
-            if best_result <= -2 and dtz == 0:
-                bestmove = move.uci()
-                best_result = -2
+        # Drawing move.
+        if dtz is not None and dtz == 0:
+            drawing_move = move.uci()
 
-            if best_result <= -3 and dtz < best_losing_dtz:
-                bestmove = move.uci()
-                best_result = -3
-                best_losing_dtz = dtz
+        # Losing move.
+        if dtz is not None and dtz > losing_dtz:
+            losing_move = move.uci()
+            losing_dtz = dtz
 
         board.pop()
 
@@ -86,7 +92,7 @@ def api():
         wdl=tablebases.probe_wdl(board),
         dtz=tablebases.probe_dtz(board),
         moves=moves,
-        bestmove=bestmove)
+        bestmove=mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move)
 
 @app.route("/")
 def query_page():
