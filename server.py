@@ -2,23 +2,44 @@
 
 from flask import Flask
 from flask import render_template
+from flask import current_app
 from flask import request
 from flask import abort
 from flask import jsonify
 
-import os.path
-
 import chess
 import chess.syzygy
 
-app = Flask(__name__)
+import functools
+import os.path
+
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
+
+
+app = Flask(__name__)
 
 tablebases = chess.syzygy.Tablebases()
 tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
 
+
+def jsonp(func):
+    """Wraps JSONified output for JSONP requests."""
+    @functools.wraps(func)
+    def decorated_function(*args, **kwargs):
+        callback = request.args.get('callback', False)
+        if callback:
+            data = str(func(*args, **kwargs).data)
+            content = str(callback) + '(' + data + ');'
+            mimetype = 'application/javascript'
+            return current_app.response_class(content, mimetype=mimetype)
+        else:
+            return func(*args, **kwargs)
+    return decorated_function
+
+
 @app.route("/api")
+@jsonp
 def api():
     # Get required fen argument.
     fen = request.args.get("fen")
@@ -93,6 +114,7 @@ def api():
         dtz=tablebases.probe_dtz(board),
         moves=moves,
         bestmove=mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move)
+
 
 @app.route("/")
 def query_page():
@@ -259,6 +281,7 @@ def query_page():
         black_fen=black_fen,
         DEFAULT_FEN=DEFAULT_FEN
     )
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
