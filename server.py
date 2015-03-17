@@ -23,6 +23,17 @@ tablebases = chess.syzygy.Tablebases()
 tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
 
 
+def mirror_vertical(fen):
+    parts = fen.split()
+    position_parts = "/".join(reversed(parts[0].split("/")))
+    return position_parts + " " + parts[1] + " - - 0 1"
+
+def mirror_horizontal(fen):
+    parts = fen.split()
+    position_parts = "/".join("".join(reversed(position_part)) for position_part in parts[0].split("/"))
+    return position_parts + " " + parts[1] + " - - 0 1"
+
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @functools.wraps(func)
@@ -258,6 +269,8 @@ def index():
         turn="white" if board.turn == chess.WHITE else "black",
         white_fen=white_fen,
         black_fen=black_fen,
+        horizontal_fen=mirror_horizontal(fen),
+        vertical_fen=mirror_vertical(fen),
         DEFAULT_FEN=DEFAULT_FEN
     )
 
