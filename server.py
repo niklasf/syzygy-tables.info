@@ -117,7 +117,8 @@ def api():
 
 
 @app.route("/")
-def query_page():
+def index():
+    # Setup a board from the given valid FEN or fall back to the default FEN.
     try:
         board = chess.Bitboard(request.args.get("fen", DEFAULT_FEN))
     except ValueError:
@@ -127,26 +128,26 @@ def query_page():
         except ValueError:
             board = chess.Bitboard(DEFAULT_FEN)
 
+    # Get FENs with the current side to move, black and white to move.
     original_turn = board.turn
     board.turn = chess.WHITE
     white_fen = board.fen()
     board.turn = chess.BLACK
     black_fen = board.fen()
     board.turn = original_turn
+    fen = board.fen()
 
-    winning_side = "no"
-    losing_side = "no"
-    turn = "white" if board.turn == chess.WHITE else "black"
+    wdl = None
+    winning_side = None
     winning_moves = []
     drawing_moves = []
     losing_moves = []
-    wdl = None
 
     if board.status() != chess.STATUS_VALID:
         status = "Invalid position"
     elif board.is_insufficient_material():
-        wdl = 0
         status = "Draw by insufficient material"
+        wdl = 0
     elif board.is_stalemate():
         status = "Draw by stalemate"
         wdl = 0
@@ -155,11 +156,9 @@ def query_page():
         if board.turn == chess.WHITE:
             status = "Black won by checkmate"
             winning_side = "black"
-            losing_side = "white"
         else:
             status = "White won by checkmate"
             winning_side = "white"
-            losing_side = "black"
     else:
         dtz = tablebases.probe_dtz(board)
         if dtz is None:
@@ -183,69 +182,50 @@ def query_page():
             winning_side = "white"
             losing_side = "black"
 
-        fallback_wdl = wdl = tablebases.probe_wdl(board)
-        if fallback_wdl is None:
-            fallback_wdl = -2
-
         for move in board.legal_moves:
             san = board.san(move)
-
             board.push(move)
 
-            next_fen = board.epd() + " 0 1"
+            move_info = {
+                "uci": move.uci(),
+                "san": san,
+                "fen": board.ep() + " 0 1",
+                "dtz": tablebases.probe_dtz(board),
+                "zeroing": board.halfmove_clock == 0,
+                "checkmate": board.is_checkmate(),
+                "stalemate": board.is_stalemate(),
+                "insufficient_material": board.is_insufficient_material(),
+            }
 
-            dtz = tablebases.probe_dtz(board)
+            move_info["winning"] = move_info["checkmate"] or (move_info["dtz"] is not None and move_info["dtz"] < 0)
+            move_info["drawing"] = move_info["stalemate"] or move_info["insufficient_material"] or (move_info["dtz"] == 0 or (move_info["dtz"] is None and wdl is not None and wdl < 0))
 
-            if board.is_checkmate() or ((dtz is not None) and dtz < 0):
-                if board.is_checkmate():
-                    badge = "Checkmate"
-                elif dtz is None:
-                    badge = "Unknown"
-                elif board.halfmove_clock == 0:
-                    badge = "Zeroing"
+            if move_info["winning"]:
+                if move_info["checkmate"]:
+                    move_info["badge"] = "Checkmate"
+                elif move_info["zeroing"]:
+                    move_info["badge"] = "Zeroing"
                 else:
-                    badge = "Win with DTZ %d" % (abs(dtz), )
+                    move_info["badge"] = "Win with DTZ %d" % (abs(dtz), )
 
-                winning_moves.append({
-                    "uci": move.uci(),
-                    "fen": next_fen,
-                    "san": san,
-                    "badge": badge,
-                    "zeroing": board.halfmove_clock == 0,
-                    "checkmate": board.is_checkmate(),
-                    "dtz": dtz,
-                })
-            elif board.is_stalemate() or board.is_insufficient_material() or (dtz == 0 or (dtz is None and fallback_wdl < 0)):
-                if board.is_stalemate():
-                    badge = "Stalemate"
-                elif board.is_insufficient_material():
-                    badge = "Insufficient material"
-                elif dtz == 0:
-                    badge = "Draw"
+                winning_moves.append(move_info)
+            elif move_info["drawing"]:
+                if move_info["stalemate"]:
+                    move_info["badge"] = "Stalemate"
+                elif move_info["insufficient_material"]:
+                    move_info["badge"] = "Insufficient material"
+                elif move_info["dtz"] == 0:
+                    move_info["badge"] = "Draw"
                 else:
-                    badge = "Unknown"
+                    move_info["badge"] = "Unknown"
 
-                drawing_moves.append({
-                    "uci": move.uci(),
-                    "fen": next_fen,
-                    "san": san,
-                    "badge": badge,
-                    "stalemate": board.is_stalemate(),
-                    "insufficient_material": board.is_insufficient_material(),
-                })
+                drawing_moves.append(move_info)
             else:
-                if dtz is None:
-                    badge = "Unknown"
+                if move_info["dtz"] is None:
+                    move_info["badge"] = "Unknown"
                 else:
-                    badge = "Loss with DTZ %d" % (abs(dtz), )
-
-                losing_moves.append({
-                    "uci": move.uci(),
-                    "fen": next_fen,
-                    "san": san,
-                    "badge": badge,
-                    "dtz": dtz
-                })
+                    move_info["badge"] = "Loss with DTZ %d" % (abs(dtz), )
+                losing_moves.append(move_info)
 
             board.pop()
 
@@ -263,20 +243,19 @@ def query_page():
 
     return render_template("index.html",
         fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
-        fen=board.epd() + " 0 1",
+        fen=fen,
         status=status,
         insufficient_material=board.is_insufficient_material(),
         winning_side=winning_side,
-        losing_side=losing_side,
         winning_moves=winning_moves,
         drawing_moves=drawing_moves,
+        losing_moves=losing_moves,
         blessed_loss=wdl == -1,
         cursed_win=wdl == 1,
         illegal=board.status() != chess.STATUS_VALID,
         not_yet_solved=board.epd() + " 0 1" == chess.STARTING_FEN,
         unknown=wdl is None,
-        turn=turn,
-        losing_moves=losing_moves,
+        turn="white" if board.turn == chess.WHITE else "black",
         white_fen=white_fen,
         black_fen=black_fen,
         DEFAULT_FEN=DEFAULT_FEN
