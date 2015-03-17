@@ -4,19 +4,19 @@
   <h1>Syzygy endgame tablebases</h1>
 
   <div class="btn-group" role="group" aria-label="Side to move">
-    <a class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen }}">White to move</a>
-    <a class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen }}">Black to move</a>
+    <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen }}">White to move</a>
+    <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen }}">Black to move</a>
   </div>
 
   <div id="board" data-fen="{{ fen }}">
     <noscript>JavaScript required for interactive board view.</noscript>
   </div>
 
-  <form>
+  <form id="form-set-fen" action="/" method="get">
     <div class="input-group">
       <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="{{ DEFAULT_FEN }}">
       <span class="input-group-btn">
-        <input type="submit" class="btn btn-default" value="Set FEN">
+        <input id="btn-set-fen" type="submit" class="btn btn-default" value="Set FEN">
       </span>
     </div>
   </form>
@@ -54,19 +54,19 @@
 
   <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="drawing" class="list-group">
     {% for move in drawing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="losing" class="list-group {{ turn }}-turn">
     {% for move in losing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 {%endblock %}
