@@ -38,15 +38,55 @@ def api():
 
     moves = {}
 
+    bestmove = None
+    best_winning_dtz = -9999
+    best_losing_dtz = 9999
+    best_result = -4
+
     for move in board.legal_moves:
         board.push(move)
-        moves[move.uci()] = tablebases.probe_dtz(board)
+
+        moves[move.uci()] = dtz = tablebases.probe_dtz(board)
+
+        if board.is_checkmate():
+            bestmove = move.uci()
+            best_result = 3
+
+        if dtz is not None:
+            if best_result <= 2 and dtz < 0 and board.halfmove_clock == 0:
+                bestmove = move.uci()
+                best_result = 2
+
+            if best_result <= 1 and dtz < 0 and dtz > best_winning_dtz:
+                bestmove = move.uci()
+                best_result = 1
+                best_winning_dtz = dtz
+
+        if best_result <= 0 and board.is_stalemate():
+            bestmove = move.uci()
+            best_result = 0
+
+        if best_result <= -1 and board.is_insufficient_material():
+            bestmove = move.uci()
+            best_result = -1
+
+        if dtz is not None:
+            if best_result <= -2 and dtz == 0:
+                bestmove = move.uci()
+                best_result = -2
+
+            if best_result <= -3 and dtz < best_losing_dtz:
+                bestmove = move.uci()
+                best_result = -3
+                best_losing_dtz = dtz
+
         board.pop()
 
     return jsonify(
         wdl=tablebases.probe_wdl(board),
         dtz=tablebases.probe_dtz(board),
-        moves=moves)
+        moves=moves,
+        bestmove=bestmove)
 
 @app.route("/")
 def query_page():
