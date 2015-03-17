@@ -171,11 +171,21 @@ $(function () {
           var moveLink = $('<a class="list-group-item"></a>')
             .attr({
               'data-uci': move.uci,
+              'data-fen': move.fen,
               'href': '/?fen=' + move.fen
             })
             .append(move.san)
             .append(' ')
-            .append($('<span class="badge"></span>').text(badge));
+            .append($('<span class="badge"></span>').text(badge))
+            .click(function (event) {
+              event.preventDefault();
+              var fen = $(this).attr('data-fen');
+              $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
+              $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
+              $fen.val(fen);
+              board.position(fen);
+              probe(fen);
+            });
 
           if (move.winning) {
             moveLink.appendTo($winning);

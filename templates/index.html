@@ -54,19 +54,19 @@
 
   <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="drawing" class="list-group">
     {% for move in drawing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="losing" class="list-group {{ turn }}-turn">
     {% for move in losing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 {%endblock %}
