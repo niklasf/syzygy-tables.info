@@ -17,15 +17,30 @@ $(function () {
   var $drawing = $('#drawing');
   var $losing = $('#losing');
 
+  function handleMoveMouseEnter(event) {
+    var uci = $(this).attr('data-uci');
+    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+  }
+
+  function handleMoveMouseLeave(event) {
+    var uci = $(this).attr('data-uci');
+    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
+    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+  }
+
   function handleMoveClick(event) {
     event.preventDefault();
     var fen = $(this).attr('data-fen');
+    var uci = $(this).attr('data-uci');
     $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
     $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
     $fen.val(fen);
     board.position(fen);
     chess.load(fen);
     probe(fen, true);
+    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
+    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
   }
 
   function handleProbeError(statusCode, textStatus) {
@@ -209,7 +224,9 @@ $(function () {
         .append(move.san)
         .append(' ')
         .append($('<span class="badge"></span>').text(badge))
-        .click(handleMoveClick);
+        .click(handleMoveClick)
+        .mouseenter(handleMoveMouseEnter)
+        .mouseleave(handleMoveMouseLeave);
 
       if (move.winning) {
         moveLink.appendTo($winning);
@@ -410,5 +427,8 @@ $(function () {
     probe('4k3/8/8/8/8/8/8/4K3 w - - 0 1', true);
   });
 
-  $('.list-group-item').click(handleMoveClick);
+  $('.list-group-item')
+    .click(handleMoveClick)
+    .mouseover(handleMoveMouseEnter)
+    .mouseleave(handleMoveMouseLeave);
 });
