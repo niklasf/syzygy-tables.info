@@ -70,6 +70,10 @@ footer > .inner {
 }
 
 #board {
+  margin: 15px 0;
+}
+
+#board-toolbar {
   margin: 10px 0;
 }
 
@@ -143,15 +147,22 @@ footer > .inner {
   }
 }
 
-@media(min-width: 600px) and (max-height: 700px) {
+@media(min-width: 600px) and (max-height: 710px) {
   footer {
     display: none;
     visibility: hidden;
   }
 }
 
-@media(min-width: 600px) and (max-height: 590px) {
+@media(min-width: 600px) and (max-height: 620px) {
   h1, footer, .fork-me {
+    display: none;
+    visibility: hidden;
+  }
+}
+
+@media(min-width: 600px) and (max-height: 530px) {
+  h1, footer, .fork-me, #board-toolbar {
     display: none;
     visibility: hidden;
   }
