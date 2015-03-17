@@ -40,6 +40,11 @@ h2.black-win {
   color: white;
 }
 
+h3 {
+  font-size: 1em;
+  font-weight: bold;
+}
+
 .left-side > .inner {
   width: 300px;
   text-align: center;
