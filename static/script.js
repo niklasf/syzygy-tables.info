@@ -132,6 +132,13 @@ $(function () {
             var insufficient_material = tmpChess.insufficient_material();
             var dtz = data.moves[uci];
 
+            var moveFen = tmpChess.fen();
+            var parts = moveFen.split(/ /);
+            var halfMoves = parseInt(parts[4], 10);
+            parts[4] = '0';
+            parts[5] = '1';
+            moveFen = parts.join(' ');
+
             moves.push({
               uci: uci,
               san: moveInfo.san,
@@ -141,7 +148,8 @@ $(function () {
               dtz: dtz,
               winning: (dtz !== null && dtz < 0) || checkmate,
               drawing: stalemate || insufficient_material || (dtz === 0 || (dtz === null && data.wdl !== null && data.wdl < 0)),
-              fen: tmpChess.fen()
+              zeroing: halfMoves === 0,
+              fen: moveFen
             });
 
             tmpChess.undo();
@@ -167,6 +175,13 @@ $(function () {
           if (a.insufficient_material && !b.insufficient_material) {
             return -1;
           } else if (!a.insufficient_material && b.insufficient_material) {
+            return 1;
+          }
+
+          // Compare by zeroing.
+          if (a.dtz < 0 && b.dtz < 0 && a.zeroing && !b.zeroing) {
+            return -1;
+          } else if (a.dtz < 0 && b.dtz < 0 && !a.zeroing && b.zeroing) {
             return 1;
           }
 
@@ -200,7 +215,9 @@ $(function () {
           } else if (move.dtz === 0) {
             badge = 'Draw';
           } else if (move.dtz !== null) {
-            if (move.dtz < 0) {
+            if (move.zeroing) {
+              badge = 'Zeroing';
+            } else if (move.dtz < 0) {
               badge = 'Win with DTZ ' + Math.abs(move.dtz);
             } else {
               badge = 'Loss with DTZ ' + move.dtz;
