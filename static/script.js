@@ -1,15 +1,47 @@
 $(function () {
   var board, chess = new Chess('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
 
+  var $info = $('#info');
+  var $status = $('#status');
+
   function probe(fen) {
-    console.log(fen);
+    var tmpChess = new Chess(fen);
+
+    if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
+      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+      $info.html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p>');
+      return;
+    } else if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+      $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
+      $info.html('<p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not yet solved.</a></p>');
+    } else if (tmpChess.in_checkmate()) {
+      if (tmpChess.turn() == 'b') {
+        $status.text('White won by checkmate').removeClass('black-win').addClass('white-win');
+      } else {
+        $status.text('Black won by checkmate').removeClass('white-win').addClass('black-win');
+      }
+      $info.empty();
+      return;
+    } else if (tmpChess.in_stalemate()) {
+      $status.text('Draw by stalemate').removeClass('black-win').removeClass('white-win');
+      $info.empty();
+      return;
+    }
+
+    $status.text('Loading ...');
+    $info.html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
+
+    if (tmpChess.insufficient_material()) {
+      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+      $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
+    }
   }
 
   board = new ChessBoard('board', {
     position: $('#board').attr('data-fen'),
     pieceTheme: '/static/chesspieces/wikipedia/{piece}.png',
     draggable: true,
-    dragOffBoard: 'trash',
+    dropOffBoard: 'trash',
     sparePieces: true,
     onDrop: function (source, target, piece, newPos, oldPos, orientation) {
       if (source != 'spare' && target != 'trash' && chess.move({ from: source, to: target })) {
