@@ -278,9 +278,15 @@ def index():
         DEFAULT_FEN=DEFAULT_FEN
     )
 
+
 @app.route("/legal")
 def imprint():
     return render_template("legal.html")
+
+
+@app.route("/apidoc")
+def apidoc():
+    return render_template("apidoc.html")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}Public API – Syzygy endgame tablebases{% endblock %}
+
+{% block leftside %}
+  <h1>Public API</h1>
+
+  <em>This public API is available for free and provided without any guarantees on a best-effort basis.</em>
+
+  <div class="reload"><a class="btn btn-default" href="/?fen=4k3/1P6/7K/8/4n3/8/8/8 w - - 1 1">Back to board</a></div>
+{% endblock %}
+
+{% block rightside %}
+  <h2>JSON and JSONP</h2>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <p>GET <a href="/api?fen=4k3/1P6/7K/8/4n3/8/8/8 w - - 1 1">/api?fen=4k3/1P6/7K/8/4n3/8/8/8 w - - 1 1</a></p>
+      <p>Required <code>fen</code>.</p>
+      <p>Optional <code>callback</code> for JSONP.</p>
+    </div>
+    <div class="panel-body">
+      <pre><code class="language-javascript">{
+  "bestmove": "b7b8q",
+  "dtz": 1,
+  "moves": {
+    "b7b8b": 0,
+    "b7b8n": 0,
+    "b7b8q": -4,
+    "b7b8r": 0,
+    "h6g6": -2,
+    "h6g7": -2,
+    "h6h5": 0,
+    "h6h7": 0
+  },
+  "wdl": 2
+}</code></pre>
+      <p>Status code 400 if the <code>fen</code> argument is missing, invalid or the corresponding position is illegal.</p>
+      <p><code>wdl</code> is 2 if the side to move is winning, 1 for a cursed win (that can not be realized under the fifty-move rule), 0 for a draw, -1 for a blessed loss and -2 for a loss.</p>
+      <p><code>dtz</code> is the distance to zero. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move in winning.</p>
+      <p><code>moves</code> is a dictionary mapping all legal moves in UCI notation to DTZ values of the resulting positions.</p>
+      <p><code>bestmove</code> is a <a href="#ordering">DTZ optimal</a> move.</p>
+      <p><em>Any of the mentioned values might be null if the requested information was not available in the tablebases.</em></p>
+    </div>
+  </div>
+
+  <h2><a name="ordering">Ordering moves</a></h2>
+
+  <p><em>Some additional logic is required to order moves by DTZ optimality, other than looking at the DTZ values.</em></p>
+
+  <p>If the move is a <strong>checkmate</strong> play it.</p>
+  <p>If the move is <strong>a capture or pawn move</strong> and maintains a winning position (DTZ of opponent < 0) play it.</p>
+  <p>If the move is <strong>winning</strong> (DTZ of opponent < 0) play it.</p>
+  <p>If the move is a <strong>stalemate or draw by insufficient material or a draw</strong> (DTZ 0) play it.</p>
+  <p>A <strong>losing</strong> move is forced. Maximize the DTZ of your opponent.</p>
+{% endblock %}
