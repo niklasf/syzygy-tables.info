@@ -82,26 +82,29 @@ $(function () {
           return;
         }
 
-        $info.empty();
-        console.log(data);
-
-        if (data.wdl === null) {
+        if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+          // Pass. Chess is not solved yet.
+          $info.children('.spinner').remove();
+        } else if (data.wdl === null) {
           $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
           $info.html('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
         } else if (data.dtz === 0) {
           $status.text('Tablebase draw').removeClass('black-win').removeClass('white-win');
+          $info.empty();
         } else if (tmpChess.turn() == 'w') {
           if (data.dtz > 0) {
             $status.text('White is winning with DTZ ' + data.dtz).removeClass('black-win').addClass('white-win');
           } else {
             $status.text('White is losing with DTZ ' + Math.abs(data.dtz)).removeClass('white-win').addClass('black-win');
           }
+          $info.empty();
         } else {
           if (data.dtz > 0) {
             $status.text('Black is winning with DTZ ' + data.dtz).removeClass('white-win').addClass('black-win');
           } else {
             $status.text('Black is losing with DTZ ' + Math.abs(data.dtz)).removeClass('black-win').addClass('white-win');
           }
+          $info.empty();
         }
 
         if (data.wdl == -1) {
