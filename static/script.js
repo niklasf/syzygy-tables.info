@@ -190,7 +190,7 @@ $(function () {
       } else if (move.dtz === 0) {
         badge = 'Draw';
       } else if (move.dtz !== null) {
-        if (move.zeroing) {
+        if (move.zeroing && move.dtz < 0) {
           badge = 'Zeroing';
         } else if (move.dtz < 0) {
           badge = 'Win with DTZ ' + Math.abs(move.dtz);

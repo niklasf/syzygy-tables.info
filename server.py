@@ -145,13 +145,15 @@ def query_page():
                     "checkmate": board.is_checkmate(),
                     "dtz": dtz,
                 })
-            elif board.is_stalemate() or board.is_insufficient_material() or (dtz == 0 or (dtz is None and fallback_wdl > -2)):
+            elif board.is_stalemate() or board.is_insufficient_material() or (dtz == 0 or (dtz is None and fallback_wdl < 0)):
                 if board.is_stalemate():
                     badge = "Stalemate"
                 elif board.is_insufficient_material():
                     badge = "Insufficient material"
-                else:
+                elif dtz == 0:
                     badge = "Draw"
+                else:
+                    badge = "Unknown"
 
                 drawing_moves.append({
                     "uci": move.uci(),
