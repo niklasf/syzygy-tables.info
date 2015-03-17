@@ -15,31 +15,41 @@ $(function () {
 
     var tmpChess = new Chess(fen);
 
-    // TODO: Check legality first.
-
+    // Handle the default FEN.
     if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
       $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
       $info.html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p>');
       return;
-    } else if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+    }
+
+    if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+      // Handle the normal chess starting position.
       $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
       $info.html('<p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not yet solved.</a></p>');
     } else if (tmpChess.in_checkmate()) {
+      // Handle checkmate.
       if (tmpChess.turn() == 'b') {
         $status.text('White won by checkmate').removeClass('black-win').addClass('white-win');
       } else {
         $status.text('Black won by checkmate').removeClass('white-win').addClass('black-win');
       }
       $info.empty();
-      return;
     } else if (tmpChess.in_stalemate()) {
+      // Handle stalemate.
       $status.text('Draw by stalemate').removeClass('black-win').removeClass('white-win');
       $info.empty();
-      return;
+    } else if (tmpChess.insufficient_material()) {
+      // Handle insufficient material.
+      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+      $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
+    } else {
+      $status.text('Loading ...');
+      $info.empty();
     }
 
-    $status.text('Loading ...');
-    $info.html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
+    // Show loading spinner.
+    $info.append('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
+
     $winning.empty();
     $drawing.empty();
     $losing.empty();
@@ -66,15 +76,14 @@ $(function () {
         }
       },
       success: function (data) {
-        // We only now know the difference between insufficient material and
-        // and illegal position. TODO: Fix this.
-        if (tmpChess.insufficient_material()) {
-          $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-          $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
+        // If the game is over this has already been handled.
+        if (tmpChess.game_over()) {
+          $info.children('.spinner').remove();
           return;
         }
 
         $info.empty();
+        console.log(data);
 
         if (data.wdl === null) {
           $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
@@ -100,6 +109,8 @@ $(function () {
         } else if (data.wdl == 1) {
           $info.html('<p><strong>This is a cursed win.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
         }
+
+        // TODO: Show moves.
       }
     });
   }
@@ -111,7 +122,9 @@ $(function () {
     dropOffBoard: 'trash',
     sparePieces: true,
     onDrop: function (source, target, piece, newPos, oldPos, orientation) {
-      if (source != 'spare' && target != 'trash' && chess.move({ from: source, to: target })) {
+      if (source != 'spare' && target != 'trash') {
+      // TODO: If legal move, do the move.
+      /*&& chess.move({ from: source, to: target })) {
         $btn_white.toggleClass('active', chess.turn() == 'w');
         $btn_black.toggleClass('active', chess.turn() == 'b');
         var parts = chess.fen().split(/ /);
@@ -120,12 +133,13 @@ $(function () {
         var fen = parts.join(' ');
         $fen.val(fen);
         probe(fen);
-      } else {
-        var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
-        $fen.val(fen);
-        chess.load(fen);
-        probe(fen);
+        console.log(fen); */
       }
+
+      var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
+      $fen.val(fen);
+      chess.load(fen);
+      probe(fen);
     }
   });
 
