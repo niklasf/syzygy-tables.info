@@ -1,7 +1,7 @@
 {%extends "layout.html" %}
 
 {%block leftside %}
-  <h1>Syzygy endgame tablebases</h1>
+  <h1><a href="/">Syzygy endgame tablebases</a></h1>
 
   <div class="btn-group" role="group" aria-label="Side to move">
     <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen }}">White to move</a>
