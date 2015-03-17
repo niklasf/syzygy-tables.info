@@ -22,6 +22,9 @@ app = Flask(__name__)
 tablebases = chess.syzygy.Tablebases()
 tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
 
+def swap_colors(fen):
+    parts = fen.split()
+    return parts[0].swapcase() + " " + parts[1] + " - - 0 1"
 
 def mirror_vertical(fen):
     parts = fen.split()
@@ -271,6 +274,7 @@ def index():
         black_fen=black_fen,
         horizontal_fen=mirror_horizontal(fen),
         vertical_fen=mirror_vertical(fen),
+        swapped_fen=swap_colors(fen),
         DEFAULT_FEN=DEFAULT_FEN
     )
 
