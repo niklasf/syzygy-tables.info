@@ -3,6 +3,9 @@ $(function () {
 
   var $info = $('#info');
   var $status = $('#status');
+  var $winning = $('#winning');
+  var $drawing = $('#drawing');
+  var $losing = $('#losing');
 
   function probe(fen) {
     var tmpChess = new Chess(fen);
@@ -30,11 +33,24 @@ $(function () {
 
     $status.text('Loading ...');
     $info.html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
+    $winning.empty();
+    $drawing.empty();
+    $losing.empty();
 
-    if (tmpChess.insufficient_material()) {
-      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-      $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
-    }
+    $.ajax('/api', {
+      data: {
+        'fen': fen,
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      },
+      success: function (data) {
+        if (tmpChess.insufficient_material()) {
+          $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+          $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
+          return;
+        }
+      }
+    });
   }
 
   board = new ChessBoard('board', {
