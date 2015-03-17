@@ -312,7 +312,7 @@ $(function () {
     $fen.val(fen);
     $btn_white.addClass('active');
     $btn_black.removeClass('active');
-    probe(fen, false);
+    probe(fen, true);
   });
 
   $btn_black.click(function (event) {
@@ -322,7 +322,7 @@ $(function () {
     $fen.val(fen);
     $btn_white.removeClass('active');
     $btn_black.addClass('active');
-    probe(fen);
+    probe(fen, true);
   });
 
   $('#form-set-fen').submit(function (event) {
@@ -353,7 +353,7 @@ $(function () {
 
     board.position(fen);
     $fen.val(fen);
-    probe(fen);
+    probe(fen, true);
   });
 
   window.addEventListener('popstate', function (event) {
