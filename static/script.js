@@ -17,13 +17,13 @@ $(function () {
   var $drawing = $('#drawing');
   var $losing = $('#losing');
 
-  function handleProbeError(statusCode) {
-    if (xhr.status == 0) {
+  function handleProbeError(statusCode, textStatus) {
+    if (statusCode == 0) {
       // Request cancelled.
       $status.text('Request cancelled');
       $info.empty();
       return;
-    } else if (xhr.status == 400) {
+    } else if (statusCode == 400) {
       // Invalid FEN or position.
       $status.text('Invalid position').removeClass('black-win').removeClass('white-win');
       $info.html('<p>The given position is not a legal chess position.</p>');
@@ -199,6 +199,7 @@ $(function () {
         .append(' ')
         .append($('<span class="badge"></span>').text(badge))
         .click(function (event) {
+          console.log('click!');
           event.preventDefault();
           var fen = $(this).attr('data-fen');
           $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
@@ -278,7 +279,7 @@ $(function () {
           'fen': fen,
         },
         error: function (xhr, textStatus, errorThrown) {
-          handleProbeError(xhr.status);
+          handleProbeError(xhr.status, textStatus);
         },
         success: function (data) {
           cache[fen] = data;
