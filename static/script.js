@@ -284,7 +284,6 @@ $(function () {
       $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
       $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
     } else {
-      $status.text('Loading ...');
       $info.empty();
     }
 
