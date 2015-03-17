@@ -50,9 +50,9 @@ $(function () {
     // Show loading spinner.
     $info.append('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
 
-    $winning.empty();
+    $winning.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
     $drawing.empty();
-    $losing.empty();
+    $losing.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
 
     request = $.ajax('/api', {
       data: {
@@ -110,7 +110,81 @@ $(function () {
           $info.html('<p><strong>This is a cursed win.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
         }
 
-        // TODO: Show moves.
+        var moves = [];
+        for (var uci in data.moves) {
+          if (data.moves.hasOwnProperty(uci)) {
+            var moveInfo;
+            if (uci.length == 5) {
+              moveInfo = tmpChess.move({
+                from: uci.substr(0, 2),
+                to: uci.substr(2, 2),
+                promotion: uci[4]
+              });
+            } else {
+              moveInfo = tmpChess.move({
+                from: uci.substr(0, 2),
+                to: uci.substr(2, 2)
+              });
+            }
+
+            var checkmate = tmpChess.in_checkmate();
+            var stalemate = tmpChess.in_stalemate();
+            var insufficient_material = tmpChess.insufficient_material();
+            var dtz = data.moves[uci];
+
+            moves.push({
+              uci: uci,
+              san: moveInfo.san,
+              checkmate: checkmate,
+              stalemate: stalemate,
+              insufficient_material: insufficient_material,
+              dtz: dtz,
+              winning: (dtz !== null && dtz < 0) || checkmate,
+              drawing: stalemate || insufficient_material || (dtz === 0 || (dtz === null && data.wdl !== null && data.wdl < 0)),
+              fen: tmpChess.fen()
+            });
+
+            tmpChess.undo();
+          }
+        }
+
+        for (var i = 0; i < moves.length; i++) {
+          var move = moves[i];
+
+          var badge = 'Unknown';
+          if (move.checkmate) {
+            badge = 'Checkmate';
+          } else if (move.stalemate) {
+            badge = 'Stalemate';
+          } else if (move.insufficient_material) {
+            badge = 'Insufficient material';
+          } else if (move.dtz === 0) {
+            badge = 'Draw';
+          } else if (move.dtz !== null) {
+            if (move.dtz < 0) {
+              badge = 'Win with DTZ ' + Math.abs(move.dtz);
+            } else {
+              badge = 'Loss with DTZ ' + move.dtz;
+            }
+          }
+
+          var moveLink = $('<a class="list-group-item"></a>')
+            .attr({
+              'data-uci': move.uci,
+              'href': '/?fen=' + move.fen
+            })
+            .append(move.san)
+            .append(' ')
+            .append($('<span class="badge"></span>').text(badge));
+
+          if (move.winning) {
+            moveLink.appendTo($winning);
+          } else if (move.drawing) {
+            moveLink.appendTo($drawing);
+          } else {
+            moveLink.appendTo($losing);
+          }
+        }
       }
     });
   }
