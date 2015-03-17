@@ -23,7 +23,7 @@
 {%endblock %}
 
 {%block rightside %}
-  <h2 id="status" class="{{ winning_side }}-win">{{ status }}</h2>
+  <h2 id="status"{% if winning_side %} class="{{ winning_side }}-win"{% endif %}>{{ status }}</h2>
 
   <div id="info">
     {% if fen == DEFAULT_FEN %}
