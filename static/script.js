@@ -17,6 +17,16 @@ $(function () {
   var $drawing = $('#drawing');
   var $losing = $('#losing');
 
+  function handleMoveClick(event) {
+    event.preventDefault();
+    var fen = $(this).attr('data-fen');
+    $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
+    $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
+    $fen.val(fen);
+    board.position(fen);
+    probe(fen, true);
+  }
+
   function handleProbeError(statusCode, textStatus) {
     if (statusCode == 0) {
       // Request cancelled.
@@ -198,16 +208,7 @@ $(function () {
         .append(move.san)
         .append(' ')
         .append($('<span class="badge"></span>').text(badge))
-        .click(function (event) {
-          console.log('click!');
-          event.preventDefault();
-          var fen = $(this).attr('data-fen');
-          $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
-          $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
-          $fen.val(fen);
-          board.position(fen);
-          probe(fen, true);
-        });
+        .click(handleMoveClick);
 
       if (move.winning) {
         moveLink.appendTo($winning);
@@ -387,4 +388,6 @@ $(function () {
     $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
     probe(fen, false);
   });
+
+  $('.list-group-item').click(handleMoveClick);
 });
