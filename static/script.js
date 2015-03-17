@@ -148,6 +148,45 @@ $(function () {
           }
         }
 
+        moves.sort(function (a, b) {
+          // Compare by definite win.
+          if (a.checkmate && !b.checkmate) {
+            return -1;
+          } else if (!a.checkmate && b.checkmate) {
+            return 1;
+          }
+
+          // Compare by stalemate.
+          if (a.stalemate && !b.stalemate) {
+            return -1;
+          } else if (!a.stalemate && b.stalemate) {
+            return 1;
+          }
+
+          // Compare by insufficient material.
+          if (a.insufficient_material && !b.insufficient_material) {
+            return -1;
+          } else if (!a.insufficient_material && b.insufficient_material) {
+            return 1;
+          }
+
+          // Compare by DTZ.
+          if (a.dtz < b.dtz || (a.dtz === null && b.dtz !== null)) {
+            return 1;
+          } else if (a.dtz > b.dtz || (a.dtz !== null && b.dtz === null)) {
+            return -1;
+          }
+
+          // Compare by UCI notation.
+          if (a.uci < b.uci) {
+            return -1;
+          } else if (a.uci > b.uci) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+
         for (var i = 0; i < moves.length; i++) {
           var move = moves[i];
 
