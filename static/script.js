@@ -1,5 +1,5 @@
 $(function () {
-  var board, chess = new Chess('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+  var board, chess = new Chess('4k3/8/8/8/8/8/8/4K3 w - - 0 1'), request;
 
   var $info = $('#info');
   var $status = $('#status');
@@ -8,7 +8,14 @@ $(function () {
   var $losing = $('#losing');
 
   function probe(fen) {
+    if (request) {
+      request.abort();
+      request = null;
+    }
+
     var tmpChess = new Chess(fen);
+
+    // TODO: Check legality first.
 
     if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
       $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
@@ -37,7 +44,7 @@ $(function () {
     $drawing.empty();
     $losing.empty();
 
-    $.ajax('/api', {
+    request = $.ajax('/api', {
       data: {
         'fen': fen,
       },
@@ -52,10 +59,39 @@ $(function () {
         }
       },
       success: function (data) {
+        // We only now know the difference between insufficient material and
+        // and illegal position. TODO: Fix this.
         if (tmpChess.insufficient_material()) {
           $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
           $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
           return;
+        }
+
+        $info.empty();
+
+        if (data.wdl === null) {
+          $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
+          $info.html('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
+        } else if (data.dtz === 0) {
+          $status.text('Tablebase draw').removeClass('black-win').removeClass('white-win');
+        } else if (tmpChess.turn() == 'w') {
+          if (data.dtz > 0) {
+            $status.text('White is winning with DTZ ' + data.dtz).removeClass('black-win').addClass('white-win');
+          } else {
+            $status.text('White is losing with DTZ ' + Math.abs(data.dtz)).removeClass('white-win').addClass('black-win');
+          }
+        } else {
+          if (data.dtz > 0) {
+            $status.text('Black is winning with DTZ ' + data.dtz).removeClass('white-win').addClass('black-win');
+          } else {
+            $status.text('Black is losing with DTZ ' + Math.abs(data.dtz)).removeClass('black-win').addClass('white-win');
+          }
+        }
+
+        if (data.wdl == -1) {
+          $info.html('<p><strong>This is a blessed loss.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
+        } else if (data.wdl == 1) {
+          $info.html('<p><strong>This is a cursed win.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
         }
       }
     });
