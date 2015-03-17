@@ -343,6 +343,7 @@ $(function () {
       probe(fen, true);
     }
   });
+  chess.load($('#board').attr('data-fen'));
 
   var $btn_white = $('#btn-white');
   var $btn_black = $('#btn-black');
@@ -451,6 +452,20 @@ $(function () {
     }
 
     fen += ' ' + parts[1] + ' - - 0 1';
+    $fen.val(fen);
+    board.position(fen);
+    chess.load(fen);
+    probe(fen, true);
+  });
+
+  $('#btn-mirror-vertical').click(function (event) {
+    event.preventDefault();
+
+    var parts = chess.fen().split(/\s+/);
+    var positionParts = parts[0].split(/\//);
+    positionParts.reverse();
+
+    var fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
     $fen.val(fen);
     board.position(fen);
     chess.load(fen);
