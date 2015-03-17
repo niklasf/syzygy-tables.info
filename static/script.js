@@ -1,3 +1,13 @@
+function decodeQuery() {
+  var query = location.search.substr(1);
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+
 $(function () {
   var board, chess = new Chess('4k3/8/8/8/8/8/8/4K3 w - - 0 1'), request;
 
@@ -7,13 +17,22 @@ $(function () {
   var $drawing = $('#drawing');
   var $losing = $('#losing');
 
-  function probe(fen) {
+  function probe(fen, push) {
+    if (push && 'pushState' in history) {
+      history.pushState({ fen: fen }, null, '/?fen=' + fen);
+    }
+
     if (request) {
       request.abort();
       request = null;
     }
 
     var tmpChess = new Chess(fen);
+
+    // Remove outdated moves
+    $winning.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
+    $drawing.empty();
+    $losing.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
 
     // Handle the default FEN.
     if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
@@ -49,10 +68,6 @@ $(function () {
 
     // Show loading spinner.
     $info.append('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
-
-    $winning.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
-    $drawing.empty();
-    $losing.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
 
     request = $.ajax('/api', {
       data: {
@@ -243,7 +258,7 @@ $(function () {
               $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
               $fen.val(fen);
               board.position(fen);
-              probe(fen);
+              probe(fen, true);
             });
 
           if (move.winning) {
@@ -282,7 +297,7 @@ $(function () {
       var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
       $fen.val(fen);
       chess.load(fen);
-      probe(fen);
+      probe(fen, true);
     }
   });
 
@@ -297,7 +312,7 @@ $(function () {
     $fen.val(fen);
     $btn_white.addClass('active');
     $btn_black.removeClass('active');
-    probe(fen);
+    probe(fen, false);
   });
 
   $btn_black.click(function (event) {
@@ -339,5 +354,21 @@ $(function () {
     board.position(fen);
     $fen.val(fen);
     probe(fen);
+  });
+
+  window.addEventListener('popstate', function (event) {
+    var fen = null;
+    if (event.state && event.state.fen) {
+      fen = event.state.fen;
+    } else {
+      var query = decodeQuery();
+      fen = query.fen || '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
+    }
+
+    $fen.val(fen);
+    board.position(fen);
+    $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
+    $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
+    probe(fen, false);
   });
 });
