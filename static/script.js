@@ -24,6 +24,7 @@ $(function () {
     $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
     $fen.val(fen);
     board.position(fen);
+    chess.load(fen);
     probe(fen, true);
   }
 
@@ -297,20 +298,28 @@ $(function () {
     dropOffBoard: 'trash',
     sparePieces: true,
     onDrop: function (source, target, piece, newPos, oldPos, orientation) {
-      if (source != 'spare' && target != 'trash') {
-      // TODO: If legal move, do the move.
-      /*&& chess.move({ from: source, to: target })) {
-        $btn_white.toggleClass('active', chess.turn() == 'w');
-        $btn_black.toggleClass('active', chess.turn() == 'b');
-        var parts = chess.fen().split(/ /);
-        parts[4] = '0';
-        parts[5] = '1';
-        var fen = parts.join(' ');
-        $fen.val(fen);
-        probe(fen);
-        console.log(fen); */
+      // If it is a legal move, do it.
+      var oldFen = ChessBoard.objToFen(oldPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
+      if (source != 'spare' && target != 'trash' && chess.load(oldFen)) {
+        var moves = chess.moves({ verbose: true });
+        for (var i = 0; i < moves.length; i++) {
+          if (!moves[i].promotion && moves[i].from == source && moves[i].to == target) {
+            chess.move(moves[i]);
+            $btn_white.toggleClass('active', chess.turn() == 'w');
+            $btn_black.toggleClass('active', chess.turn() == 'b');
+            var parts = chess.fen().split(/ /);
+            parts[4] = '0';
+            parts[5] = '1';
+            var fen = parts.join(' ');
+            $fen.val(fen);
+            chess.load(fen);
+            probe(fen);
+            return;
+          }
+        }
       }
 
+      // Otherwise just change the position.
       var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
       $fen.val(fen);
       chess.load(fen);
@@ -370,6 +379,7 @@ $(function () {
 
     board.position(fen);
     $fen.val(fen);
+    chess.load(fen);
     probe(fen, true);
   });
 
@@ -384,6 +394,7 @@ $(function () {
 
     $fen.val(fen);
     board.position(fen);
+    chess.load(fen);
     $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
     $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
     probe(fen, false);
@@ -393,6 +404,7 @@ $(function () {
     event.preventDefault();
     $fen.val('');
     board.position('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+    chess.load('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
     $btn_white.addClass('active');
     $btn_black.removeClass('active');
     probe('4k3/8/8/8/8/8/8/4K3 w - - 0 1', true);
