@@ -49,10 +49,17 @@ $(function () {
         'fen': fen,
       },
       error: function (xhr, textStatus, errorThrown) {
-        if (xhr.status == 400) {
+        if (xhr.status == 0) {
+          // Request cancelled.
+          $status.text('Request cancelled');
+          $info.empty();
+          return;
+        } else if (xhr.status == 400) {
+          // Invalid FEN or position.
           $status.text('Invalid position').removeClass('black-win').removeClass('white-win');
           $info.html('<p>The given position is not a legal chess position.</p>');
         } else {
+          // Network error.
           // TODO: Add retry button
           $status.text('Network error').removeClass('black-win').removeClass('white-win');
           $info.text('Request failed: ' + textStatus);
