@@ -3,6 +3,8 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import abort
+from flask import jsonify
 
 import chess
 import chess.syzygy
@@ -13,6 +15,36 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 tablebases = chess.syzygy.Tablebases()
 tablebases.open_directory("/home/niklas/Projekte/python-chess/data/syzygy")
+
+@app.route("/api")
+def api():
+    fen = request.args.get("fen")
+    if not fen:
+        return abort(400)
+
+    try:
+        board = chess.Bitboard(fen)
+    except ValueError:
+        try:
+            board = chess.Bitboard()
+            board.set_epd(fen)
+        except ValueError:
+            return abort(400)
+
+    if board.status() != chess.STATUS_VALID:
+        return abort(400)
+
+    moves = {}
+
+    for move in board.legal_moves:
+        board.push(move)
+        moves[move.uci()] = tablebases.probe_dtz(board)
+        board.pop()
+
+    return jsonify(
+        wdl=tablebases.probe_wdl(board),
+        dtz=tablebases.probe_dtz(board),
+        moves=moves)
 
 @app.route("/")
 def query_page():
