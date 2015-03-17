@@ -6,6 +6,7 @@ from flask import current_app
 from flask import request
 from flask import abort
 from flask import jsonify
+from flask import send_from_directory
 
 import chess
 import chess.syzygy
@@ -287,6 +288,11 @@ def imprint():
 @app.route("/apidoc")
 def apidoc():
     return render_template("apidoc.html")
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(app.root_path, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
 if __name__ == "__main__":
