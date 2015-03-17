@@ -278,6 +278,10 @@ def index():
         DEFAULT_FEN=DEFAULT_FEN
     )
 
+@app.route("/legal")
+def imprint():
+    return render_template("legal.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

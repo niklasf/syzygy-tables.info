@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}Legal – Syzygy endgame tablebases{% endblock %}
+
+{% block leftside %}
+  <h1>Legal</h1>
+
+  <p><em>German law demands this</em></p>
+
+  <div class="reload"><a class="btn btn-default" href="/">Back to home</a></div>
+{% endblock %}
+
+{% block rightside %}
+  <h2>Contact</h2>
+
+  <p>
+    <a href="mailto:niklas.fiekas@tu-clausthal.de">niklas.fiekas@tu-clausthal.de</a>
+    (<a href="https://hkps.pool.sks-keyservers.net/pks/lookup?op=get&search=0x2ECA66C65B255138">OpenPGP</a>)
+  </p>
+
+  <h2>Imprint</h2>
+
+  <p>Niklas Fiekas
+    <br>Reichenberger Straße 3
+    <br>38678 Clausthal-Zellerfeld
+  </p>
+
+  <h2>Privacy policy</h2>
+
+  TODO
+
+  <h2>Software licenses</h2>
+
+  <p>This website itself is licensed under the GPLv3. It also uses the following software:</p>
+
+  <ul>
+    <li><a href="https://github.com/niklasf/python-chess/blob/master/LICENSE">python-chess under GPLv3</a></li>
+    <li><a href="https://github.com/oakmac/chessboardjs/blob/master/LICENSE">chessboard.js under MIT</a></li>
+    <li><a href="https://github.com/jhlywa/chess.js/blob/master/LICENSE">chess.js under MIT</a></li>
+    <li><a href="https://github.com/twbs/bootstrap/blob/master/LICENSE">Bootstrap under MIT</a></li>
+    <li><a href="https://github.com/jquery/jquery/blob/master/LICENSE.txt">jQuery under MIT</a></li>
+    <li><a href="http://flask.pocoo.org/docs/0.10/license/">Flask under BSD</a></li>
+  </ul>
+{% endblock %}

@@ -308,42 +308,44 @@ $(function () {
     }
   }
 
-  board = new ChessBoard('board', {
-    position: $('#board').attr('data-fen'),
-    pieceTheme: '/static/chesspieces/wikipedia/{piece}.png',
-    draggable: true,
-    dropOffBoard: 'trash',
-    sparePieces: true,
-    onDrop: function (source, target, piece, newPos, oldPos, orientation) {
-      // If it is a legal move, do it.
-      var oldFen = ChessBoard.objToFen(oldPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
-      if (source != 'spare' && target != 'trash' && chess.load(oldFen)) {
-        var moves = chess.moves({ verbose: true });
-        for (var i = 0; i < moves.length; i++) {
-          if (!moves[i].promotion && moves[i].from == source && moves[i].to == target) {
-            chess.move(moves[i]);
-            $btn_white.toggleClass('active', chess.turn() == 'w');
-            $btn_black.toggleClass('active', chess.turn() == 'b');
-            var parts = chess.fen().split(/ /);
-            parts[4] = '0';
-            parts[5] = '1';
-            var fen = parts.join(' ');
-            $fen.val(fen);
-            chess.load(fen);
-            probe(fen);
-            return;
+  if ($('#board').length) {
+    board = new ChessBoard('board', {
+      position: $('#board').attr('data-fen'),
+      pieceTheme: '/static/chesspieces/wikipedia/{piece}.png',
+      draggable: true,
+      dropOffBoard: 'trash',
+      sparePieces: true,
+      onDrop: function (source, target, piece, newPos, oldPos, orientation) {
+        // If it is a legal move, do it.
+        var oldFen = ChessBoard.objToFen(oldPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
+        if (source != 'spare' && target != 'trash' && chess.load(oldFen)) {
+          var moves = chess.moves({ verbose: true });
+          for (var i = 0; i < moves.length; i++) {
+            if (!moves[i].promotion && moves[i].from == source && moves[i].to == target) {
+              chess.move(moves[i]);
+              $btn_white.toggleClass('active', chess.turn() == 'w');
+              $btn_black.toggleClass('active', chess.turn() == 'b');
+              var parts = chess.fen().split(/ /);
+              parts[4] = '0';
+              parts[5] = '1';
+              var fen = parts.join(' ');
+              $fen.val(fen);
+              chess.load(fen);
+              probe(fen);
+              return;
+            }
           }
         }
-      }
 
-      // Otherwise just change the position.
-      var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
-      $fen.val(fen);
-      chess.load(fen);
-      probe(fen, true);
-    }
-  });
-  chess.load($('#board').attr('data-fen'));
+        // Otherwise just change the position.
+        var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
+        $fen.val(fen);
+        chess.load(fen);
+        probe(fen, true);
+      }
+    });
+    chess.load($('#board').attr('data-fen'));
+  }
 
   var $btn_white = $('#btn-white');
   var $btn_black = $('#btn-black');
