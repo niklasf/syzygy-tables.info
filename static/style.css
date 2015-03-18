@@ -72,13 +72,6 @@ footer > .inner {
   padding-top: 40px;
 }
 
-.fork-me {
-  position: fixed;
-  top: 0;
-  right:0;
-  border: 0;
-}
-
 #board {
   margin: 15px 0;
 }
@@ -148,7 +141,8 @@ footer > .inner {
   }
 
   .fork-me {
-    position: absolute;
+    display: none;
+    visibility: hidden;
   }
 }
 
