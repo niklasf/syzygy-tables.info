@@ -420,16 +420,6 @@ $(function () {
     probe(fen, false);
   });
 
-  $('h1 a').click(function (event) {
-    event.preventDefault();
-    $fen.val('');
-    board.position('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
-    chess.load('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
-    $btn_white.addClass('active');
-    $btn_black.removeClass('active');
-    probe('4k3/8/8/8/8/8/8/4K3 w - - 0 1', true);
-  });
-
   $('.list-group-item')
     .click(handleMoveClick)
     .mouseover(handleMoveMouseEnter)
