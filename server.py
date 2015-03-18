@@ -24,7 +24,8 @@ tablebases = chess.syzygy.Tablebases()
 num = 0
 num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
 num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"))
 app.logger.info("Loaded %d tablebase files.", num)
 
 def swap_colors(fen):
