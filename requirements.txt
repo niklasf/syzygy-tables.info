@@ -1,0 +1,3 @@
+flask
+flup
+python-chess
