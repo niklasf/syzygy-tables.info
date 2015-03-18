@@ -175,6 +175,7 @@ def index():
             status = "White won by checkmate"
             winning_side = "white"
     else:
+        wdl = tablebases.probe_wdl(board)
         dtz = tablebases.probe_dtz(board)
         if dtz is None:
             status = "Position not found in tablebases"
