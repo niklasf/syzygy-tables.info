@@ -1,1 +1,5 @@
-server.pyc
+*.pyc
+static/client.min.js
+static/client.js
+static/client.min.js.map
+node_modules
