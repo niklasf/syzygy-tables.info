@@ -1,4 +1,3 @@
 flask
-flup
-python-chess
 tornado
+python-chess
