@@ -138,7 +138,7 @@ footer > .inner {
   }
 
   .left-side {
-    background: #fff url('/static/triangle-bg.png');
+    background: #fff url('/static/triangle-bg.svg');
     background-position: center bottom;
     margin: auto;
   }
