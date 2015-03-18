@@ -4,4 +4,4 @@ from flup.server.fcgi import WSGIServer
 from server import app
 
 if __name__ == "__main__":
-    WSGIServer(app, bindAddress="/tmp/syzygy.sock").run()
+    WSGIServer(app, bindAddress="/run/syzygy-tables.org.sock").run()

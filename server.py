@@ -21,7 +21,11 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 app = Flask(__name__)
 
 tablebases = chess.syzygy.Tablebases()
-tablebases.open_directory(os.path.join(os.path.dirname(__file__), "syzygy"))
+num = 0
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men"))
+app.logger.info("Loaded %d tablebase files.", num)
 
 def swap_colors(fen):
     parts = fen.split()
