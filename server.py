@@ -227,7 +227,7 @@ def index():
                 elif move_info["zeroing"]:
                     move_info["badge"] = "Zeroing"
                 else:
-                    move_info["badge"] = "Win with DTZ %d" % (abs(dtz), )
+                    move_info["badge"] = "Win with DTZ %d" % (abs(move_info["dtz"]), )
 
                 winning_moves.append(move_info)
             elif move_info["drawing"]:
@@ -245,7 +245,7 @@ def index():
                 if move_info["dtz"] is None:
                     move_info["badge"] = "Unknown"
                 else:
-                    move_info["badge"] = "Loss with DTZ %d" % (abs(dtz), )
+                    move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
                 losing_moves.append(move_info)
 
             board.pop()
