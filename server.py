@@ -33,6 +33,7 @@ num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-me
 num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
 
+
 def swap_colors(fen):
     parts = fen.split()
     return parts[0].swapcase() + " " + parts[1] + " - - 0 1"
