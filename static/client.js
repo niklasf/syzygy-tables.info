@@ -311,7 +311,7 @@ $(function () {
   if ($('#board').length) {
     board = new ChessBoard('board', {
       position: $('#board').attr('data-fen'),
-      pieceTheme: '/static/chesspieces/wikipedia/{piece}.png',
+      pieceTheme: '/static/chesspieces/wikipedia/{piece}.svg',
       draggable: true,
       dropOffBoard: 'trash',
       sparePieces: true,
