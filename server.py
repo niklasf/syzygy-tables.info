@@ -1,5 +1,10 @@
 #!/usr/bin/python2
 
+import tornado
+import tornado.httpserver
+import tornado.wsgi
+import tornado.ioloop
+
 from flask import Flask
 from flask import render_template
 from flask import current_app
@@ -24,8 +29,8 @@ tablebases = chess.syzygy.Tablebases()
 num = 0
 num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
 num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
 
 def swap_colors(fen):
@@ -302,4 +307,6 @@ def favicon():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+    http_server.listen(5000)
+    tornado.ioloop.IOLoop.instance().start()
