@@ -259,7 +259,7 @@ $(function () {
     // Handle the default FEN.
     if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
       $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-      $info.html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p>');
+      $info.html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p><p>Sample positions:</p><ul><li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li><li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li></ul><h2>Contact</h2><p>Feedback <a href="/legal">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>');
       return;
     }
 
