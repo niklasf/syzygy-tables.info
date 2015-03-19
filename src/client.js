@@ -58,7 +58,7 @@ $(function () {
       $status.text('Network error').removeClass('black-win').removeClass('white-win');
       $info
         .text('Request failed: ' + textStatus)
-        .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + chess.fen() + '">Try again</a></div>');
+        .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + encodeURIComponent(chess.fen()) + '">Try again</a></div>');
     }
   }
 
@@ -220,7 +220,7 @@ $(function () {
         .attr({
           'data-uci': move.uci,
           'data-fen': move.fen,
-          'href': '/?fen=' + move.fen
+          'href': '/?fen=' + encodeURIComponent(move.fen)
         })
         .append(move.san)
         .append(' ')

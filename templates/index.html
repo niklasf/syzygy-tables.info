@@ -4,8 +4,8 @@
   <h1><a href="/">Syzygy endgame tablebases</a></h1>
 
   <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
-    <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen }}">White to move</a>
-    <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen }}">Black to move</a>
+    <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen|urlencode }}">White to move</a>
+    <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|urlencode }}">Black to move</a>
   </div>
 
   <div id="board" data-fen="{{ fen }}">
@@ -20,13 +20,13 @@
     </div>
 
     <div class="btn-group">
-      <a id="btn-swap-colors" href="/?fen={{ swapped_fen }}" class="btn btn-default" title="Swap colors">
+      <a id="btn-swap-colors" href="/?fen={{ swapped_fen|urlencode }}" class="btn btn-default" title="Swap colors">
         <span class="glyphicon glyphicon-adjust" aria-hidden="true"></span>
       </a>
-      <a id="btn-mirror-horizontal" href="/?fen={{ horizontal_fen }}" class="btn btn-default" title="Mirror horizontally">
+      <a id="btn-mirror-horizontal" href="/?fen={{ horizontal_fen|urlencode }}" class="btn btn-default" title="Mirror horizontally">
         <span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span>
       </a>
-      <a id="btn-mirror-vertical" href="/?fen={{ vertical_fen }}" class="btn btn-default" title="Mirror vertically">
+      <a id="btn-mirror-vertical" href="/?fen={{ vertical_fen|urlencode }}" class="btn btn-default" title="Mirror vertically">
         <span class="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
       </a>
     </div>
@@ -85,19 +85,19 @@
 
   <div id="winning" class="list-group {{ turn }}-turn">
     {% for move in winning_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="drawing" class="list-group">
     {% for move in drawing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 
   <div id="losing" class="list-group {{ turn }}-turn">
     {% for move in losing_moves %}
-      <a class="list-group-item" href="/?fen={{ move.fen }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+      <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
 {%endblock %}
