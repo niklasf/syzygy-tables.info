@@ -331,7 +331,7 @@ $(function () {
               var fen = parts.join(' ');
               $fen.val(fen);
               chess.load(fen);
-              probe(fen);
+              probe(fen, true);
               return;
             }
           }
