@@ -8,44 +8,42 @@
   <em>This public API is available for free and provided without any guarantees on a best-effort basis.</em>
 
   <nav>
-    <div class="reload"><a class="btn btn-default" href="/?fen=4k3/1P6/7K/8/4n3/8/8/8%20w%20-%20-%201%201">Back to board</a></div>
+    <div class="reload"><a class="btn btn-default" href="/?fen={{ sanitized_fen|urlencode }}">Back to board</a></div>
   </nav>
 {% endblock %}
 
 {% block rightside %}
   <section id="json">
-    <h2>JSON and JSONP</h2>
+    <h2>JSON</h2>
+    <p>GET argument <code>fen</code> is required.</p>
+    <p>Status code 400 if the <code>fen</code> argument is missing, invalid or the corresponding position is illegal.</p>
     <div class="panel panel-default">
       <div class="panel-heading">
-        <p>GET <a href="/api?fen=4k3/1P6/7K/8/4n3/8/8/8%20w%20-%20-%201%201">/api?fen=4k3/1P6/7K/8/4n3/8/8/8 w - - 1 1</a></p>
-        <p>Required <code>fen</code>.</p>
-        <p><a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> is supported.</p>
-        <p>Optional <code>callback</code> for JSONP.</p>
+        <p><pre>GET <a id="request-uri" href="/api{% if fen is defined %}?fen={{ fen|urlencode }}{% endif %}">/api{% if fen is defined %}?fen={{ fen }}{% endif %}</a></pre></p>
       </div>
       <div class="panel-body">
-        <pre><code class="language-javascript">{
-  "bestmove": "b7b8q",
-  "dtz": 1,
-  "moves": {
-    "b7b8b": 0,
-    "b7b8n": 0,
-    "b7b8q": -4,
-    "b7b8r": 0,
-    "h6g6": -2,
-    "h6g7": -2,
-    "h6h5": 0,
-    "h6h7": 0
-  },
-  "wdl": 2
-}</code></pre>
-        <p>Status code 400 if the <code>fen</code> argument is missing, invalid or the corresponding position is illegal.</p>
-        <p><code>wdl</code> is 2 if the side to move is winning, 1 for a cursed win (that can not be realized under the fifty-move rule), 0 for a draw, -1 for a blessed loss and -2 for a loss.</p>
-        <p><code>dtz</code> is the distance to zero. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move in winning.</p>
-        <p><code>moves</code> is a dictionary mapping all legal moves in UCI notation to DTZ values of the resulting positions.</p>
-        <p><code>bestmove</code> is a <a href="#ordering">DTZ optimal</a> move.</p>
-        <p><em>Any of the mentioned values might be null if the requested information was not available in the tablebases.</em></p>
+        {% if status == 200 %}
+          <pre><code class="language-javascript" id="request-body">{{ request_body }}</code></pre>
+        {% else %}
+          Status {{status}}
+        {% endif %}
       </div>
     </div>
+    <p><code>wdl</code> is 2 if the side to move is winning, 1 for a cursed win (that can not be realized under the fifty-move rule), 0 for a draw, -1 for a blessed loss and -2 for a loss.</p>
+    <p><code>dtz</code> is the distance to zero. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move in winning.</p>
+    <p><code>moves</code> is a dictionary mapping all legal moves in UCI notation to DTZ values of the resulting positions.</p>
+    <p><code>bestmove</code> is a <a href="#ordering">DTZ optimal</a> move.</p>
+    <p><em>Any of the mentioned values might be null if the requested information was not available in the tablebases.</em></p>
+  </section>
+
+  <section id="cors">
+    <h2>CORS</h2>
+    <p><a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> is allowed for all origins.</p>
+  </section>
+
+  <section id="jsonp">
+    <h2>JSONP</h2>
+    <p>There is an optional <code>callback</code> argument for the <a href="#json">normal JSON endpoint</a>.</p>
   </section>
 
   <section id="ordering">
@@ -63,6 +61,6 @@
   <section id="download">
     <h2>Getting local tablebase files</h2>
 
-    <a href="https://github.com/syzygy1/tb">Generating</a> the tablebases requires time and resources. It might be easier to <a href="http://oics.olympuschess.com/tracker/index.php">download the tablebases</a> (combined size about 150GB) with a fast internet connection.
+    <a href="https://github.com/syzygy1/tb">Generating</a> the tablebases requires time and resources. It might be easier to <a href="http://oics.olympuschess.com/tracker/index.php">download the tablebases via BitTorrent</a> or <a href="http://kirill-kryukov.com/chess/tablebases-online/">via eMule</a> or <a href="http://tablebase.sesse.net/syzygy/">via HTTP</a> (combined size about 150GB) with a fast internet connection.
   </section>
 {% endblock %}

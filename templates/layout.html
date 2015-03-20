@@ -28,7 +28,7 @@
         <div class="inner">
           {%block footer %}
             <p>Powered by Ronald de Man's <a href="https://github.com/syzygy1/tb">Syzygy endgame tablebases</a>, <a href="https://github.com/niklasf/python-chess">python-chess</a> for probing and <a href="http://chessboardjs.com">chessboard.js</a> and <a href="https://github.com/jhlywa/chess.js">chess.js</a> for the client.</p>
-            <p><a href="/legal">Legal</a>. <a href="/apidoc">Public API</a>. <a href="https://github.com/niklasf/syzygy-tables.info">GitHub</a>.</p>
+            <p><a href="/legal">Legal</a>. <a id="apidoc" href="/apidoc{% block apidoc_query %}{% endblock %}">Public API</a>. <a href="https://github.com/niklasf/syzygy-tables.info">GitHub</a>.</p>
           {%endblock%}
         </div>
       </footer>

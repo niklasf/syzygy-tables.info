@@ -14,6 +14,7 @@ import chess.syzygy
 import functools
 import os.path
 import warnings
+import json
 
 try:
     from htmlmin import minify as html_minify
@@ -68,28 +69,7 @@ def jsonp(func):
     return decorated_function
 
 
-@app.route("/api")
-@jsonp
-def api():
-    # Get required fen argument.
-    fen = request.args.get("fen")
-    if not fen:
-        return abort(400)
-
-    # Setup a board with the given FEN or EPD.
-    try:
-        board = chess.Bitboard(fen)
-    except ValueError:
-        try:
-            board = chess.Bitboard()
-            board.set_epd(fen)
-        except ValueError:
-            return abort(400)
-
-    # Check the position for validity.
-    if board.status() != chess.STATUS_VALID:
-        return abort(400)
-
+def probe(board):
     moves = {}
 
     # The best move will be determined in this order.
@@ -139,11 +119,37 @@ def api():
 
         board.pop()
 
-    return jsonify(
-        wdl=tablebases.probe_wdl(board),
-        dtz=tablebases.probe_dtz(board),
-        moves=moves,
-        bestmove=mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move)
+    return {
+        "dtz": tablebases.probe_dtz(board),
+        "wdl": tablebases.probe_wdl(board),
+        "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move,
+        "moves": moves,
+    }
+
+
+@app.route("/api")
+@jsonp
+def api():
+    # Get required fen argument.
+    fen = request.args.get("fen")
+    if not fen:
+        return abort(400)
+
+    # Setup a board with the given FEN or EPD.
+    try:
+        board = chess.Bitboard(fen)
+    except ValueError:
+        try:
+            board = chess.Bitboard()
+            board.set_epd(fen)
+        except ValueError:
+            return abort(400)
+
+    # Check the position for validity.
+    if board.status() != chess.STATUS_VALID:
+        return abort(400)
+
+    return jsonify(**probe(board))
 
 
 @app.route("/")
@@ -306,7 +312,35 @@ def imprint():
 
 @app.route("/apidoc")
 def apidoc():
-    return html_minify(render_template("apidoc.html"))
+    render = {}
+    render["status"] = 200
+
+    # Parse the FEN.
+    fen = request.args.get("fen")
+    if not fen:
+        render["status"] = 400
+    else:
+        try:
+            board = chess.Bitboard(fen)
+        except ValueError:
+            try:
+                board = chess.Bitboard()
+                board.set_epd(fen)
+            except ValueError:
+                render["status"] = 400
+
+    # Set the exact given FEN and a sanitized FEN for result.
+    if fen is not None:
+        render["fen"] = fen
+
+    if render["status"] == 400:
+        render["sanitized_fen"] = "8/8/8/8/8/8/8/8 w - - 0 1"
+    else:
+        render["sanitized_fen"] = board.fen()
+        render["request_body"] = json.dumps(probe(board), indent=2, sort_keys=True)
+
+    # Render.
+    return html_minify(render_template("apidoc.html", **render))
 
 
 @app.route("/favicon.ico")
