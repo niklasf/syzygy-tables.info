@@ -310,7 +310,7 @@ $(function () {
 
   board = new ChessBoard('board', {
     position: $('#board').attr('data-fen'),
-    pieceTheme: '/static/chesspieces/wikipedia/{piece}.svg',
+    pieceTheme: '/static/pieces/{piece}.svg',
     draggable: true,
     dropOffBoard: 'trash',
     sparePieces: true,

@@ -1,8 +1,8 @@
 *.pyc
-static/client.min.js
-static/client.min.js.map
-static/style.min.css
-static/style.min.css.map
+static/js/client.min.js
+static/js/client.min.js.map
+static/css/style.min.css
+static/css/style.min.css.map
 node_modules
 five-men
 six-men

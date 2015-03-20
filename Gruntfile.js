@@ -12,7 +12,12 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'static/client.min.js': ['static/jquery-2.1.3.js', 'static/chess.js', 'static/chessboard-0.3.0.js', 'static/client.js']
+          'static/js/client.min.js': [
+            'static/js/jquery-2.1.3.js',
+            'static/js/chess.js',
+            'static/js/chessboard-0.3.0.js',
+            'static/js/client.js'
+          ]
         }
       }
     },
@@ -23,7 +28,11 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'static/style.min.css': ['static/bootstrap.css', 'static/chessboard-0.3.0.css', 'static/style.css']
+          'static/css/style.min.css': [
+            'static/css/bootstrap.css',
+            'static/css/chessboard-0.3.0.css',
+            'static/css/style.css'
+          ]
         }
       }
     }
