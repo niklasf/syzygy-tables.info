@@ -1,5 +1,23 @@
 {
   "name": "syzygy-tables.info",
+  "version": "1.0.0",
+  "private": true,
+  "description": "User interface and public API for probing Syzygy endgame tablebases",
+  "keywords": ["Syzygy", "chess", "endgame", "tablebase"],
+  "homepage": "https://syzygy-tables.info",
+  "bugs": {
+    "url": "https://github.com/niklasf/syzygy-tables.info/issues",
+    "email": "niklas.fiekas@tu-clausthal.de"
+  },
+  "license": "GPL-3.0+",
+  "author": {
+    "name": "Niklas Fiekas",
+    "email": "niklas.fiekas@tu-clausthal.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niklasf/syzygy-tables.info.git"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-cssmin": "^0.12.2",
