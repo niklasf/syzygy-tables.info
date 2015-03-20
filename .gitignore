@@ -1,4 +1,5 @@
 *.pyc
+*.swp
 static/js/client.min.js
 static/js/client.min.js.map
 static/css/style.min.css
