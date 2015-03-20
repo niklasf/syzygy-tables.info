@@ -59,9 +59,8 @@ Controller.prototype.push = function (position) {
       }, null, '/?fen=' + fen);
     }
 
+    this.setPosition(new Chess(fen));
   }
-
-  this.setPosition(new Chess(fen));
 };
 
 Controller.prototype.pushMove = function (from, to) {
