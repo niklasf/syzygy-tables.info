@@ -8,43 +8,45 @@
 {% block leftside %}
   <h1><a href="/">Syzygy endgame tablebases</a></h1>
 
-  <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
-    <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen|urlencode }}">White to move</a>
-    <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|urlencode }}">Black to move</a>
-  </div>
-
-  <div id="board" data-fen="{{ fen }}">
-    <noscript>JavaScript required for interactive board view.</noscript>
-  </div>
-
-  <div id="board-toolbar" role="toolbar">
-    <div class="btn-group">
-      <button id="btn-flip-board" type="button" class="btn btn-default" aria-label="Flip board" title="Flip board">
-        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-      </button>
+  <nav>
+    <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
+      <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen|urlencode }}">White to move</a>
+      <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|urlencode }}">Black to move</a>
     </div>
 
-    <div class="btn-group">
-      <a id="btn-swap-colors" href="/?fen={{ swapped_fen|urlencode }}" class="btn btn-default" title="Swap colors">
-        <span class="glyphicon glyphicon-adjust" aria-hidden="true"></span>
-      </a>
-      <a id="btn-mirror-horizontal" href="/?fen={{ horizontal_fen|urlencode }}" class="btn btn-default" title="Mirror horizontally">
-        <span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span>
-      </a>
-      <a id="btn-mirror-vertical" href="/?fen={{ vertical_fen|urlencode }}" class="btn btn-default" title="Mirror vertically">
-        <span class="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
-      </a>
+    <div id="board" data-fen="{{ fen }}">
+      <noscript>JavaScript required for interactive board view.</noscript>
     </div>
-  </div>
 
-  <form id="form-set-fen" action="/" method="get">
-    <div class="input-group">
-      <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="{{ DEFAULT_FEN }}">
-      <span class="input-group-btn">
-        <input id="btn-set-fen" type="submit" class="btn btn-default" value="Set FEN">
-      </span>
+    <div id="board-toolbar" role="toolbar">
+      <div class="btn-group">
+        <button id="btn-flip-board" type="button" class="btn btn-default" aria-label="Flip board" title="Flip board">
+          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="btn-group">
+        <a id="btn-swap-colors" href="/?fen={{ swapped_fen|urlencode }}" class="btn btn-default" title="Swap colors">
+          <span class="glyphicon glyphicon-adjust" aria-hidden="true"></span>
+        </a>
+        <a id="btn-mirror-horizontal" href="/?fen={{ horizontal_fen|urlencode }}" class="btn btn-default" title="Mirror horizontally">
+          <span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span>
+        </a>
+        <a id="btn-mirror-vertical" href="/?fen={{ vertical_fen|urlencode }}" class="btn btn-default" title="Mirror vertically">
+          <span class="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
+        </a>
+      </div>
     </div>
-  </form>
+
+    <form id="form-set-fen" action="/" method="get">
+      <div class="input-group">
+        <input id="fen" type="text" name="fen" value="{{ fen_input }}" class="form-control" aria-label="FEN" placeholder="{{ DEFAULT_FEN }}">
+        <span class="input-group-btn">
+          <input id="btn-set-fen" type="submit" class="btn btn-default" value="Set FEN">
+        </span>
+      </div>
+    </form>
+  </nav>
 {% endblock %}
 
 {% block rightside %}
@@ -65,27 +67,29 @@
         <li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li>
       </ul>
 
-      <h2>Contact</h2>
+      <section id="contact">
+        <h2>Contact</h2>
 
-      <p>Feedback <a href="/legal">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>
-    {% elif illegal %}
-      <p>The given position is not a legal chess position.</p>
-    {% elif insufficient_material %}
-      <p><strong>The game is drawn</strong> because with the remaining
-        material no sequence of legal moves can lead to a checkmate.</p>
-    {% elif not_yet_solved %}
-      <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
-        yet solved.</a></p>
-    {% elif unknown %}
-      <p>Syzygy tables only provide information for positions with up to 6 pieces and
-        no castling rights.</p>
-    {% elif blessed_loss %}
-      <p><strong>This is a blessed loss.</strong> Mate can be forced, but a
-        draw can be achieved under the fifty-move rule.</p>
-    {% elif cursed_win %}
-      <p><strong>This is a cursed win.</strong> Mate can be forced, but a
-        draw can be achieved under the fifty-move rule.</p>
-    {% endif %}
+        <p>Feedback <a href="/legal#contact">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>
+      {% elif illegal %}
+        <p>The given position is not a legal chess position.</p>
+      {% elif insufficient_material %}
+        <p><strong>The game is drawn</strong> because with the remaining
+          material no sequence of legal moves can lead to a checkmate.</p>
+      {% elif not_yet_solved %}
+        <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
+          yet solved.</a></p>
+      {% elif unknown %}
+        <p>Syzygy tables only provide information for positions with up to 6 pieces and
+          no castling rights.</p>
+      {% elif blessed_loss %}
+        <p><strong>This is a blessed loss.</strong> Mate can be forced, but a
+          draw can be achieved under the fifty-move rule.</p>
+      {% elif cursed_win %}
+        <p><strong>This is a cursed win.</strong> Mate can be forced, but a
+          draw can be achieved under the fifty-move rule.</p>
+      {% endif %}
+    </section>
   </div>
 
   <div id="winning" class="list-group {{ turn }}-turn">
