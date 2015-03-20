@@ -1,6 +1,11 @@
-{%extends "layout.html" %}
+{% extends "layout.html" %}
 
-{%block leftside %}
+{% block head %}
+<script src="/static/client.min.js"></script>
+<meta name="description" content="User interface and public API for probing Syzygy endgame tablebases">
+{% endblock %}
+
+{% block leftside %}
   <h1><a href="/">Syzygy endgame tablebases</a></h1>
 
   <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
@@ -40,9 +45,9 @@
       </span>
     </div>
   </form>
-{%endblock %}
+{% endblock %}
 
-{%block rightside %}
+{% block rightside %}
   <h2 id="status"{% if winning_side %} class="{{ winning_side }}-win"{% endif %}>{{ status }}</h2>
 
   <div id="info">
@@ -100,4 +105,4 @@
       <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
     {% endfor %}
   </div>
-{%endblock %}
+{% endblock %}
