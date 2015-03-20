@@ -3,6 +3,7 @@ static/client.min.js
 static/client.js
 static/client.min.js.map
 static/style.min.css
+static/style.min.css.map
 node_modules
 five-men
 six-men

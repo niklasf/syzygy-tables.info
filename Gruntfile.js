@@ -23,9 +23,13 @@ module.exports = function(grunt) {
       }
     },
     cssmin: {
+      options: {
+        sourceMap: true,
+        keepSpecialComments: 0
+      },
       target: {
         files: {
-          'static/style.min.css': ['src/bootstrap.css', 'src/chessboard-0.3.0.css', 'src/style.css']
+          'static/style.min.css': ['static/bootstrap.css', 'static/chessboard-0.3.0.css', 'static/style.css']
         }
       }
     }
