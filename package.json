@@ -2,7 +2,6 @@
   "name": "syzygy-tables.info",
   "devDependencies": {
     "grunt": "^0.4.5",
-    "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.12.2",
     "grunt-contrib-uglify": "^0.8.0"
   }
