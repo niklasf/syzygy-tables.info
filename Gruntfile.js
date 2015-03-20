@@ -1,6 +1,20 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
+  var js = [
+    'static/js/jquery-2.1.3.js',
+    'static/js/chess.js',
+    'static/js/chessboard-0.3.0.js',
+    'static/js/client.js'
+  ];
+
+  var css = [
+    'static/css/bootstrap.css',
+    'static/css/chessboard-0.3.0.css',
+    'static/css/style.css'
+  ];
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -12,12 +26,7 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'static/js/client.min.js': [
-            'static/js/jquery-2.1.3.js',
-            'static/js/chess.js',
-            'static/js/chessboard-0.3.0.js',
-            'static/js/client.js'
-          ]
+          'static/js/client.min.js': js
         }
       }
     },
@@ -27,13 +36,17 @@ module.exports = function(grunt) {
         keepSpecialComments: 0
       },
       target: {
-        files: {
-          'static/css/style.min.css': [
-            'static/css/bootstrap.css',
-            'static/css/chessboard-0.3.0.css',
-            'static/css/style.css'
-          ]
-        }
+        files: css
+      }
+    },
+    watch: {
+      js: {
+        files: js,
+        tasks: ['uglify']
+      },
+      css: {
+        files: css,
+        tasks: ['cssmin']
       }
     }
   });

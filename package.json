@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "description": "User interface and public API for probing Syzygy endgame tablebases",
-  "keywords": ["Syzygy", "chess", "endgame", "tablebase"],
+  "keywords": [
+    "Syzygy",
+    "chess",
+    "endgame",
+    "tablebase"
+  ],
   "homepage": "https://syzygy-tables.info",
   "bugs": {
     "url": "https://github.com/niklasf/syzygy-tables.info/issues",
@@ -21,6 +26,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-cssmin": "^0.12.2",
-    "grunt-contrib-uglify": "^0.8.0"
+    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-contrib-watch": "^0.6.1"
   }
 }
