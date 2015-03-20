@@ -1,10 +1,5 @@
 #!/usr/bin/python2
 
-import tornado
-import tornado.httpserver
-import tornado.wsgi
-import tornado.ioloop
-
 from flask import Flask
 from flask import render_template
 from flask import current_app
@@ -317,6 +312,15 @@ def favicon():
 
 
 if __name__ == "__main__":
-    http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
-    http_server.listen(5000)
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        import tornado
+        import tornado.httpserver
+        import tornado.wsgi
+        import tornado.ioloop
+
+        http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
+        http_server.listen(5000)
+        tornado.ioloop.IOLoop.instance().start()
+    except ImportError:
+        warnings.warn("Using builtin webserver, tornado not imported.")
+        app.run()
