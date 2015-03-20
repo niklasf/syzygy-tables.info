@@ -36,7 +36,9 @@ module.exports = function(grunt) {
         keepSpecialComments: 0
       },
       target: {
-        files: css
+        files: {
+          'static/css/style.min.css': css
+        }
       }
     },
     watch: {
