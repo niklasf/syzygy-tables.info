@@ -1,111 +1,419 @@
-function decodeQuery() {
-  var query = location.search.substr(1);
-  var result = {};
-  query.split("&").forEach(function(part) {
-    var item = part.split("=");
-    result[item[0]] = decodeURIComponent(item[1]);
+var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
+var STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+
+function Controller(fen) {
+  var self = this;
+
+  this.events = {};
+  this.request = null;
+  this.position = new Chess(fen || DEFAULT_FEN);
+
+  window.addEventListener('popstate', function (event) {
+    var fen = DEFAULT_FEN;
+
+    if (event.state && event.state.fen) {
+      fen = event.state.fen;
+    } else {
+      // Extract the FEN from the query string.
+      var query = location.search.substr(1);
+      query.split('&').forEach(function (part) {
+        var item = part.split('=');
+        if (item[0] == 'fen') {
+          fen = decodeURIComponent(item[1]);
+        }
+      });
+    }
+
+    self.setPosition(new Chess(fen));
   });
-  return result;
 }
 
-$(function () {
-  var board, chess = new Chess('4k3/8/8/8/8/8/8/4K3 w - - 0 1'), request, cache = {};
+Controller.prototype.bind = function (event, cb) {
+  this.events[event] = this.events[event] || [];
+  this.events[event].push(cb);
+};
 
-  var $info = $('#info');
-  var $status = $('#status');
-  var $winning = $('#winning');
-  var $drawing = $('#drawing');
-  var $losing = $('#losing');
-
-  function handleMoveMouseEnter(event) {
-    var uci = $(this).attr('data-uci');
-    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
-    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+Controller.prototype.trigger = function (event) {
+  var self = this;
+  if (!this.events[event]) {
+    return;
   }
 
-  function handleMoveMouseLeave(event) {
-    var uci = $(this).attr('data-uci');
-    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
-    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+  var args = arguments;
+  this.events[event].forEach(function (cb) {
+    cb.apply(self, Array.prototype.slice.call(args, 1));
+  });
+};
+
+Controller.prototype.push = function (position) {
+  var fenParts = position.fen().split(/\s+/);
+  fenParts[4] = '0';
+  fenParts[5] = '1';
+  var fen = fenParts.join(' ');
+
+  if (this.position.fen() != fen) {
+    if ('pushState' in history) {
+      history.pushState({
+        fen: fen
+      }, null, '/?fen=' + fen);
+    }
+
   }
 
-  function handleMoveClick(event) {
+  this.setPosition(new Chess(fen));
+};
+
+Controller.prototype.pushMove = function (from, to) {
+  var tmpBoard = new Chess(this.position.fen());
+  var legalMoves = tmpBoard.moves({ verbose: true });
+
+  for (var i = 0; i < legalMoves.length; i++) {
+    var legalMove = legalMoves[i];
+    if (!legalMove.promotion && legalMove.from === from && legalMove.to === to) {
+      tmpBoard.move(legalMove);
+      this.push(tmpBoard);
+      return true;
+    }
+  }
+
+  return false;
+};
+
+Controller.prototype.setPosition = function (position) {
+  var self = this;
+
+  this.position = position;
+  this.trigger('positionChanged', position);
+
+  if (this.request) {
+    this.request.abort();
+    this.request = null;
+  }
+
+  if (this.position.fen() === DEFAULT_FEN) {
+    return;
+  }
+
+  self.trigger('probeStarted');
+
+  this.request = $.ajax('/api', {
+    data: {
+      fen: this.position.fen(),
+    },
+    error: function (xhr, textStatus, errorThrown) {
+      if (xhr.status === 0) {
+        self.trigger('probeCancelled');
+      } else if (xhr.status === 400) {
+        self.trigger('probeInvalid');
+      } else {
+        self.trigger('probeFailed');
+      }
+    },
+    success: function (data) {
+      self.trigger('probeFinished', data);
+    }
+  });
+};
+
+
+function BoardView(controller) {
+  var self = this;
+
+  this.fenPart = controller.position.fen().split(/\s+/)[0];
+
+  this.board = new ChessBoard('board', {
+    position: self.fenPart,
+    pieceTheme: '/static/pieces/{piece}.svg',
+    draggable: true,
+    dropOffBoard: 'trash',
+    sparePieces: true,
+    onDrop: function (from, to, piece, newPos, oldPos, orientation) {
+      self.fenPart = ChessBoard.objToFen(newPos);
+
+      // If the change is a legal move, do it.
+      if (from != 'spare' && to != 'trash') {
+        if (controller.pushMove(from, to)) {
+          return;
+        }
+      }
+
+      // Otherwise just change to position.
+      var fenParts = controller.position.fen().split(/\s+/);
+      fenParts[0] = ChessBoard.objToFen(newPos);
+      controller.push(new Chess(fenParts.join(' ')));
+    }
+  });
+
+  controller.bind('positionChanged', function (position) {
+    self.setPosition(position);
+  });
+}
+
+BoardView.prototype.setPosition = function (position) {
+  var newFenPart = position.fen().split(/\s+/)[0];
+  if (this.fenPart !== newFenPart) {
+    this.board.position(newFenPart);
+    this.fenPart = newFenPart;
+  }
+};
+
+BoardView.prototype.flip = function () {
+  this.board.flip();
+};
+
+
+function SideToMoveView(controller) {
+  var self = this;
+
+  $('#btn-white').click(function (event) {
     event.preventDefault();
-    var fen = $(this).attr('data-fen');
-    var uci = $(this).attr('data-uci');
-    $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
-    $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
-    $fen.val(fen);
-    board.position(fen);
-    chess.load(fen);
-    probe(fen, true);
-    $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
-    $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
-  }
+    var fenParts = controller.position.fen().split(/\s+/);
+    fenParts[1] = 'w';
+    controller.push(new Chess(fenParts.join(' ')));
+  });
 
-  function handleProbeError(statusCode, textStatus) {
-    if (statusCode == 0) {
-      // Request cancelled.
-      $status.text('Request cancelled');
-      $info.empty();
-      return;
-    } else if (statusCode == 400) {
-      // Invalid FEN or position.
-      $status.text('Invalid position').removeClass('black-win').removeClass('white-win');
-      $info.html('<p>The given position is not a legal chess position.</p>');
+  $('#btn-black').click(function () {
+    event.preventDefault();
+    var fenParts = controller.position.fen().split(/\s+/);
+    fenParts[1] = 'b';
+    controller.push(new Chess(fenParts.join(' ')));
+  });
+
+  this.setPosition(controller.position);
+  controller.bind('positionChanged', function (position) {
+    self.setPosition(position);
+  });
+}
+
+SideToMoveView.prototype.setPosition = function (position) {
+  $('#btn-white').toggleClass('active', position.turn() === 'w');
+  $('#btn-black').toggleClass('active', position.turn() === 'b');
+};
+
+
+function FenInputView(controller) {
+  var self = this;
+
+  $('#form-set-fen').submit(function (event) {
+    event.preventDefault();
+
+    var parts = $('#fen').val().trim().split(/\s+/);
+    if (parts.length === 1) {
+      parts.push(controller.position.turn());
+    }
+    if (parts.length === 2) {
+      parts.push('-');
+    }
+    if (parts.length === 3) {
+      parts.push('-');
+    }
+    if (parts.length === 4) {
+      parts.push('0');
+    }
+    if (parts.length === 5) {
+      parts.push('1');
+    }
+
+    var fen = parts.join(' ');
+    var position = new Chess();
+    if (!position.load(fen)) {
+      controller.push(new Chess(DEFAULT_FEN));
     } else {
-      // Network error.
-      $status.text('Network error').removeClass('black-win').removeClass('white-win');
-      $info
-        .text('Request failed: ' + textStatus)
-        .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + encodeURIComponent(chess.fen()) + '">Try again</a></div>');
+      controller.push(new Chess(fen));
     }
+  });
+
+  this.setPosition(controller.position);
+  controller.bind('positionChanged', function (position) {
+    self.setPosition(position);
+  });
+}
+
+FenInputView.prototype.setPosition = function (position) {
+  var fen = position.fen();
+  if (fen === DEFAULT_FEN) {
+    $('#fen').val('');
+  } else {
+    $('#fen').val(fen);
+  }
+};
+
+
+function ToolBarView(controller, boardView) {
+  $('#btn-flip-board').click(function (event) {
+    boardView.flip();
+  });
+
+  $('#btn-swap-colors').click(function (event) {
+    event.preventDefault();
+
+    var parts = controller.position.fen().split(/\s+/);
+
+    var fenPart = '';
+    for (var i = 0; i < parts[0].length; i++) {
+      if (parts[0][i] === parts[0][i].toLowerCase()) {
+        fenPart += parts[0][i].toUpperCase();
+      } else {
+        fenPart += parts[0][i].toLowerCase();
+      }
+    }
+
+    parts[0] = fenPart;
+    controller.push(new Chess(parts.join(' ')));
+  });
+
+  $('#btn-mirror-horizontal').click(function (event) {
+    event.preventDefault();
+
+    var parts = controller.position.fen().split(/\s+/);
+    var positionParts = parts[0].split(/\//);
+    for (var i = 0; i < positionParts.length; i++) {
+      positionParts[i] = positionParts[i].split('').reverse().join('');
+    }
+
+    var fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
+    controller.push(new Chess(fen));
+  });
+
+  $('#btn-mirror-vertical').click(function (event) {
+    event.preventDefault();
+
+    var parts = controller.position.fen().split(/\s+/);
+    var positionParts = parts[0].split(/\//);
+    positionParts.reverse();
+
+    var fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
+    controller.push(new Chess(fen));
+  });
+}
+
+
+function TablebaseView(controller) {
+  function bindMoveLink(moveLink) {
+    moveLink
+      .click(function (event) {
+        event.preventDefault();
+        var fen = $(this).attr('data-fen');
+        var uci = $(this).attr('data-uci');
+        controller.push(new Chess(fen));
+        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
+        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+      })
+      .mouseenter(function () {
+        var uci = $(this).attr('data-uci');
+        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+      })
+      .mouseleave(function () {
+        var uci = $(this).attr('data-uci');
+        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
+        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+      });
   }
 
-  function handleProbeSuccess(tmpChess, data) {
-    var fen = tmpChess.fen();
+  bindMoveLink($('.list-group-item'));
 
-    // If the game is over this has already been handled.
-    if (tmpChess.in_checkmate() || tmpChess.in_stalemate()) {
-      $info.children('.spinner').remove();
+  controller.bind('positionChanged', function (position) {
+    $('#winning')
+      .empty()
+      .toggleClass('white-turn', position.turn() === 'w')
+      .toggleClass('black-turn', position.turn() === 'b');
+
+    $('#drawing').empty();
+
+    $('#losing')
+      .empty()
+      .toggleClass('white-turn', position.turn() === 'w')
+      .toggleClass('black-turn', position.turn() === 'b');
+
+    $('#info').empty();
+
+    var fen = position.fen();
+
+    if (fen === DEFAULT_FEN) {
+      $('#status').text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+      $('#info').html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p><p>Sample positions:</p><ul><li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li><li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li></ul><h2>Contact</h2><p>Feedback <a href="/legal">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>');
+    } else if (fen === STARTING_FEN) {
+      $('#status').text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
+      $('#info').html('<p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not yet solved.</a></p>');
+    } else if (position.in_checkmate()) {
+      if (position.turn() === 'b') {
+        $('#status').text('White won by checkmate').removeClass('black-win').addClass('white-win');
+      } else {
+        $('#status').text('Black won by checkmate').removeClass('white-win').addClass('black-win');
+      }
+    } else if (position.in_stalemate()) {
+      $('#status').text('Draw by stalemate').removeClass('black-win').removeClass('white-win');
+    } else if (position.insufficient_material()) {
+      $('#status').text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
+      $('#info').html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
+    }
+  });
+
+  controller.bind('probeStarted', function() {
+    $('#info').append('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
+  });
+
+  controller.bind('probeInvalid', function() {
+    $('#status').text('Invalid position').removeClass('black-win').removeClass('white-win');
+    $('#info').html('<p>The given position is not a legal chess position.</p>');
+  });
+
+  controller.bind('probeCancelled', function () {
+    $('#status').text('Request cancelled');
+    $('#info').empty();
+  });
+
+  controller.bind('probeFailed', function (status, textStatus) {
+    $('#status').text('Network error').removeClass('black-win').removeClass('white-win');
+    $('#info')
+      .text('Request failed: ' + textStatus)
+      .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + encodeURIComponent(controller.position.fen()) + '">Try again</a></div>');
+  });
+
+  controller.bind('probeFinished', function (data) {
+    $('#info').children('.spinner').remove();
+
+    if (controller.position.in_checkmate() || controller.position.in_stalemate()) {
+      // No moves need to be displayed.
       return;
     }
 
-    if (tmpChess.insufficient_material()) {
-      // Pass. Inssuficient material.
-      $info.children('.spinner').remove();
-    } else if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
-      // Pass. Chess is not solved yet.
-      $info.children('.spinner').remove();
-    } else if (data.wdl === null) {
-      $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
-      $info.html('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
+    if (data.wdl === null) {
+      $('#status').text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
+      $('#info').html('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
     } else if (data.dtz === 0) {
-      $status.text('Tablebase draw').removeClass('black-win').removeClass('white-win');
-      $info.empty();
-    } else if (tmpChess.turn() == 'w') {
-      if (data.dtz > 0) {
-        $status.text('White is winning with DTZ ' + data.dtz).removeClass('black-win').addClass('white-win');
-      } else {
-        $status.text('White is losing with DTZ ' + Math.abs(data.dtz)).removeClass('white-win').addClass('black-win');
+      // A draw by insufficient material would be already stated. Otherwise
+      // declare the tablebase draw.
+      if (!controller.position.insufficient_material()) {
+        $('#status').text('Tablebase draw').removeClass('black-win').removeClass('white-win');
+        $('#info').empty();
       }
-      $info.empty();
+    } else if (controller.position.turn() === 'w') {
+      if (data.dtz > 0) {
+        $('#status').text('White is winning with DTZ ' + data.dtz).removeClass('black-win').addClass('white-win');
+      } else {
+        $('#status').text('White is losing with DTZ ' + Math.abs(data.dtz)).removeClass('white-win').addClass('black-win');
+      }
+      $('#info').empty();
     } else {
       if (data.dtz > 0) {
-        $status.text('Black is winning with DTZ ' + data.dtz).removeClass('white-win').addClass('black-win');
+        $('#status').text('Black is winning with DTZ ' + data.dtz).removeClass('white-win').addClass('black-win');
       } else {
-        $status.text('Black is losing with DTZ ' + Math.abs(data.dtz)).removeClass('black-win').addClass('white-win');
+        $('#status').text('Black is losing with DTZ ' + Math.abs(data.dtz)).removeClass('black-win').addClass('white-win');
       }
-      $info.empty();
+      $('#info').empty();
     }
 
-    if (data.wdl == -1) {
-      $info.html('<p><strong>This is a blessed loss.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
-    } else if (data.wdl == 1) {
-      $info.html('<p><strong>This is a cursed win.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
+    if (data.wdl === -1) {
+      $('#info').html('<p><strong>This is a blessed loss.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
+    } else if (data.wdl === 1) {
+      $('#info').html('<p><strong>This is a cursed win.</strong> Mate can be forced, but a draw can be achieved under the fifty-move rule.</p>');
     }
 
     var moves = [];
+    var tmpChess = new Chess(controller.position.fen());
     for (var uci in data.moves) {
       if (data.moves.hasOwnProperty(uci)) {
         var moveInfo;
@@ -227,258 +535,28 @@ $(function () {
         })
         .append(move.san)
         .append(' ')
-        .append($('<span class="badge"></span>').text(badge))
-        .click(handleMoveClick)
-        .mouseenter(handleMoveMouseEnter)
-        .mouseleave(handleMoveMouseLeave);
+        .append($('<span class="badge"></span>').text(badge));
+
+      bindMoveLink(moveLink);
 
       if (move.winning) {
-        moveLink.appendTo($winning);
+        moveLink.appendTo('#winning');
       } else if (move.drawing) {
-        moveLink.appendTo($drawing);
+        moveLink.appendTo('#drawing');
       } else {
-        moveLink.appendTo($losing);
+        moveLink.appendTo('#losing');
       }
     }
-  }
-
-  function probe(fen, push) {
-    if (push && 'pushState' in history) {
-      history.pushState({ fen: fen }, null, '/?fen=' + fen);
-    }
-
-    if (request) {
-      request.abort();
-      request = null;
-    }
-
-    var tmpChess = new Chess(fen);
-
-    // Remove outdated moves
-    $winning.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
-    $drawing.empty();
-    $losing.empty().toggleClass('white-turn', tmpChess.turn() == 'w').toggleClass('black-turn', tmpChess.turn() == 'b');
-
-    // Handle the default FEN.
-    if (fen == '4k3/8/8/8/8/8/8/4K3 w - - 0 1') {
-      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-      $info.html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>Minmaxing the DTZ values guarantees winning all winning positions and defending all drawn positions.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p><p>Sample positions:</p><ul><li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li><li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li></ul><h2>Contact</h2><p>Feedback <a href="/legal">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>');
-      return;
-    }
-
-    if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
-      // Handle the normal chess starting position.
-      $status.text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
-      $info.html('<p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not yet solved.</a></p>');
-    } else if (tmpChess.in_checkmate()) {
-      // Handle checkmate.
-      if (tmpChess.turn() == 'b') {
-        $status.text('White won by checkmate').removeClass('black-win').addClass('white-win');
-      } else {
-        $status.text('Black won by checkmate').removeClass('white-win').addClass('black-win');
-      }
-      $info.empty();
-    } else if (tmpChess.in_stalemate()) {
-      // Handle stalemate.
-      $status.text('Draw by stalemate').removeClass('black-win').removeClass('white-win');
-      $info.empty();
-    } else if (tmpChess.insufficient_material()) {
-      // Handle insufficient material.
-      $status.text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-      $info.html('<p><strong>The game is drawn</strong> because with the remaining material no sequence of legal moves can lead to a checkmate.</p>');
-    } else {
-      $info.empty();
-    }
-
-    // Show loading spinner.
-    $info.append('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>');
-
-    if (cache[fen]) {
-      handleProbeSuccess(tmpChess, cache[fen]);
-    } else {
-      request = $.ajax('/api', {
-        data: {
-          'fen': fen,
-        },
-        error: function (xhr, textStatus, errorThrown) {
-          handleProbeError(xhr.status, textStatus);
-        },
-        success: function (data) {
-          cache[fen] = data;
-          handleProbeSuccess(tmpChess, data);
-        }
-      });
-    }
-  }
-
-  board = new ChessBoard('board', {
-    position: $('#board').attr('data-fen'),
-    pieceTheme: '/static/pieces/{piece}.svg',
-    draggable: true,
-    dropOffBoard: 'trash',
-    sparePieces: true,
-    onDrop: function (source, target, piece, newPos, oldPos, orientation) {
-      // If it is a legal move, do it.
-      var oldFen = ChessBoard.objToFen(oldPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
-      if (source != 'spare' && target != 'trash' && chess.load(oldFen)) {
-        var moves = chess.moves({ verbose: true });
-        for (var i = 0; i < moves.length; i++) {
-          if (!moves[i].promotion && moves[i].from == source && moves[i].to == target) {
-            chess.move(moves[i]);
-            $btn_white.toggleClass('active', chess.turn() == 'w');
-            $btn_black.toggleClass('active', chess.turn() == 'b');
-            var parts = chess.fen().split(/ /);
-            parts[4] = '0';
-            parts[5] = '1';
-            var fen = parts.join(' ');
-            $fen.val(fen);
-            chess.load(fen);
-            probe(fen, true);
-            return;
-          }
-        }
-      }
-
-      // Otherwise just change the position.
-      var fen = ChessBoard.objToFen(newPos) + ' ' + ($btn_white.hasClass('active') ? 'w' : 'b') + ' - - 0 1';
-      $fen.val(fen);
-      chess.load(fen);
-      probe(fen, true);
-    }
   });
-  chess.load($('#board').attr('data-fen'));
+}
 
-  var $btn_white = $('#btn-white');
-  var $btn_black = $('#btn-black');
-  var $fen = $('#fen');
 
-  $btn_white.click(function (event) {
-    event.preventDefault();
-    var fen = board.fen() + ' w - - 0 1';
-    chess.load(fen);
-    $fen.val(fen);
-    $btn_white.addClass('active');
-    $btn_black.removeClass('active');
-    probe(fen, true);
-  });
+$(function () {
+  var controller = new Controller($('#board').attr('data-fen'));
+  var boardView = new BoardView(controller);
+  new SideToMoveView(controller);
+  new FenInputView(controller);
+  new ToolBarView(controller, boardView);
 
-  $btn_black.click(function (event) {
-    event.preventDefault();
-    var fen = board.fen() + ' b - - 0 1';
-    chess.load(fen);
-    $fen.val(fen);
-    $btn_white.removeClass('active');
-    $btn_black.addClass('active');
-    probe(fen, true);
-  });
-
-  $('#form-set-fen').submit(function (event) {
-    event.preventDefault();
-
-    var parts = $fen.val().trim().split(/\s+/);
-    if (parts.length == 1) {
-      parts.push($btn_white.hasClass('active') ? 'w' : 'b');
-    }
-    if (parts.length == 2) {
-      parts.push('-');
-    }
-    if (parts.length == 3) {
-      parts.push('-');
-    }
-    if (parts.length == 4) {
-      parts.push('0');
-    }
-    if (parts.length == 5) {
-      parts.push('1');
-    }
-
-    var fen = parts.join(' ');
-    if (!chess.load(fen)) {
-      fen = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
-      chess.load(fen);
-    }
-
-    board.position(fen);
-    $fen.val(fen);
-    chess.load(fen);
-    probe(fen, true);
-  });
-
-  window.addEventListener('popstate', function (event) {
-    var fen = null;
-    if (event.state && event.state.fen) {
-      fen = event.state.fen;
-    } else {
-      var query = decodeQuery();
-      fen = query.fen || '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
-    }
-
-    $fen.val(fen);
-    board.position(fen);
-    chess.load(fen);
-    $btn_white.toggleClass('active', fen.indexOf(' w ') > -1);
-    $btn_black.toggleClass('active', fen.indexOf(' w ') == -1);
-    probe(fen, false);
-  });
-
-  $('.list-group-item')
-    .click(handleMoveClick)
-    .mouseover(handleMoveMouseEnter)
-    .mouseleave(handleMoveMouseLeave);
-
-  $('#btn-flip-board').click(function (event) {
-    board.flip();
-  });
-
-  $('#btn-swap-colors').click(function (event) {
-    event.preventDefault();
-
-    var parts = chess.fen().split(/\s+/);
-    var fen = '';
-
-    for (var i = 0; i < parts[0].length; i++) {
-      if (parts[0][i] === parts[0][i].toLowerCase()) {
-        fen += parts[0][i].toUpperCase();
-      } else {
-        fen += parts[0][i].toLowerCase();
-      }
-    }
-
-    fen += ' ' + parts[1] + ' - - 0 1';
-    $fen.val(fen);
-    board.position(fen);
-    chess.load(fen);
-    probe(fen, true);
-  });
-
-  $('#btn-mirror-horizontal').click(function (event) {
-    event.preventDefault();
-
-    var parts = chess.fen().split(/\s+/);
-    var positionParts = parts[0].split(/\//);
-    for (var i = 0; i < positionParts.length; i++) {
-      positionParts[i] = positionParts[i].split('').reverse().join('');
-    }
-
-    var fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
-
-    $fen.val(fen);
-    board.position(fen);
-    chess.load(fen);
-    probe(fen, true);
-  });
-
-  $('#btn-mirror-vertical').click(function (event) {
-    event.preventDefault();
-
-    var parts = chess.fen().split(/\s+/);
-    var positionParts = parts[0].split(/\//);
-    positionParts.reverse();
-
-    var fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
-    $fen.val(fen);
-    board.position(fen);
-    chess.load(fen);
-    probe(fen, true);
-  });
+  new TablebaseView(controller);
 });
