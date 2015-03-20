@@ -337,7 +337,10 @@ def apidoc():
         render["sanitized_fen"] = "8/8/8/8/8/8/8/8 w - - 0 1"
     else:
         render["sanitized_fen"] = board.fen()
-        render["request_body"] = json.dumps(probe(board), indent=2, sort_keys=True)
+        if board.status() == chess.STATUS_VALID:
+            render["request_body"] = json.dumps(probe(board), indent=2, sort_keys=True)
+        else:
+            render["status"] = 400
 
     # Render.
     return html_minify(render_template("apidoc.html", **render))
