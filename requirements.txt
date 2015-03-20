@@ -1,3 +1,4 @@
 flask
 tornado
 python-chess
+htmlmin

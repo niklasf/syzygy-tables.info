@@ -18,6 +18,15 @@ import chess.syzygy
 
 import functools
 import os.path
+import warnings
+
+try:
+    from htmlmin import minify as html_minify
+except ImportError:
+    warnings.warn("Not using HTML minification, htmlmin not imported.")
+
+    def html_minify(html):
+        return html
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -268,7 +277,7 @@ def index():
     losing_moves.sort(key=lambda move: move["uci"])
     losing_moves.sort(key=lambda move: move["dtz"], reverse=True)
 
-    return render_template("index.html",
+    return html_minify(render_template("index.html",
         fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
         fen=fen,
         status=status,
@@ -289,17 +298,17 @@ def index():
         vertical_fen=mirror_vertical(fen),
         swapped_fen=swap_colors(fen),
         DEFAULT_FEN=DEFAULT_FEN
-    )
+    ))
 
 
 @app.route("/legal")
 def imprint():
-    return render_template("legal.html")
+    return html_minify(render_template("legal.html"))
 
 
 @app.route("/apidoc")
 def apidoc():
-    return render_template("apidoc.html")
+    return html_minify(render_template("apidoc.html"))
 
 
 @app.route("/favicon.ico")
