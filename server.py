@@ -175,9 +175,6 @@ def index():
 
     if board.status() != chess.STATUS_VALID:
         status = "Invalid position"
-    elif board.is_insufficient_material():
-        status = "Draw by insufficient material"
-        wdl = 0
     elif board.is_stalemate():
         status = "Draw by stalemate"
         wdl = 0
@@ -192,6 +189,9 @@ def index():
     else:
         wdl = tablebases.probe_wdl(board)
         dtz = tablebases.probe_dtz(board)
+        if board.is_insufficient_material():
+            status = "Draw by insufficient material"
+            wdl = 0
         if dtz is None:
             status = "Position not found in tablebases"
         elif dtz == 0:

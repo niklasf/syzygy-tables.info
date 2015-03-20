@@ -66,12 +66,15 @@ $(function () {
     var fen = tmpChess.fen();
 
     // If the game is over this has already been handled.
-    if (tmpChess.game_over()) {
+    if (tmpChess.in_checkmate() || tmpChess.in_stalemate()) {
       $info.children('.spinner').remove();
       return;
     }
 
-    if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
+    if (tmpChess.insufficient_material()) {
+      // Pass. Inssuficient material.
+      $info.children('.spinner').remove();
+    } else if (fen == 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1') {
       // Pass. Chess is not solved yet.
       $info.children('.spinner').remove();
     } else if (data.wdl === null) {
