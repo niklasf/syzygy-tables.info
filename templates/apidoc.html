@@ -30,7 +30,7 @@
     <p>Status code 400 if the <code>fen</code> argument is missing, invalid or the corresponding position is illegal.</p>
     <div class="panel panel-default">
       <div class="panel-heading">
-        <p><pre>GET <a id="request-uri" href="/api{% if fen is defined %}?fen={{ fen|urlencode }}{% endif %}">/api{% if fen is defined %}?fen={{ fen }}{% endif %}</a></pre></p>
+        <pre>GET <a id="request-uri" href="/api{% if fen is defined %}?fen={{ fen|urlencode }}{% endif %}">/api{% if fen is defined %}?fen={{ fen }}{% endif %}</a></pre>
       </div>
       <div class="panel-body">
         {% if status == 200 %}
