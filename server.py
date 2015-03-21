@@ -313,6 +313,7 @@ def imprint():
 @app.route("/apidoc")
 def apidoc():
     render = {}
+    render["DEFAULT_FEN"] = DEFAULT_FEN
     render["status"] = 200
 
     # Parse the FEN.

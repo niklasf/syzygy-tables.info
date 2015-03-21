@@ -2,6 +2,8 @@
 
 {% block title %}Public API – Syzygy endgame tablebases{% endblock %}
 
+{% block apidoc_query %}?fen={{ fen|urlencode }}{% endblock %}
+
 {% block leftside %}
   <h1>Public API</h1>
 
@@ -9,6 +11,15 @@
 
   <nav>
     <div class="reload"><a class="btn btn-default" href="/?fen={{ sanitized_fen|urlencode }}">Back to board</a></div>
+
+    <form id="form-set-fen" action="/apidoc" method="get">
+      <div class="input-group">
+        <input id="fen" type="text" name="fen" value="{{ fen }}" class="form-control" aria-label="FEN" placeholder="{{ DEFAULT_FEN }}">
+        <span class="input-group-btn">
+          <input type="submit" class="btn btn-default" value="Probe FEN">
+        </span>
+      </div>
+    </form>
   </nav>
 {% endblock %}
 
