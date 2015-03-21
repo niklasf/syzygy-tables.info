@@ -28,7 +28,7 @@ Start the server on port 5000:
 Tablebase files
 ---------------
 
-Only the small four-men tablebases are in this Git repository. Optionally [generate](https://github.com/syzygy1/tb) or [download](http://oics.olympuschess.com/tracker/index.php) five-men and six-men tablebases and place them in a corresponding directories.
+Only the small four-men tablebases are in this Git repository. Optionally [generate](https://github.com/syzygy1/tb) or [download](http://oics.olympuschess.com/tracker/index.php) five-men and six-men tablebases and place them in the corresponding directories.
 
 API
 ---
