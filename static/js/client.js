@@ -381,7 +381,10 @@ function TablebaseView(controller) {
 
     if (data.wdl === null) {
       $('#status').text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
-      $('#info').html('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
+      if (controller.position.fen() !== STARTING_FEN) {
+        $('#info').empty();
+      }
+      $('#info').append('<p>Syzygy tables only provide information for positions with up to 6 pieces and no castling rights.</p>');
     } else if (data.dtz === 0) {
       // A draw by insufficient material would be already stated. Otherwise
       // declare the tablebase draw.
