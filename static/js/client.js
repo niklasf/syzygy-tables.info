@@ -257,8 +257,11 @@ function ToolBarView(controller, boardView) {
         fenPart += parts[0][i].toLowerCase();
       }
     }
-
     parts[0] = fenPart;
+
+    parts[2] = '-';
+    parts[3] = '-';
+
     controller.push(new Chess(parts.join(' ')));
   });
 
