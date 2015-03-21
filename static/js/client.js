@@ -550,12 +550,22 @@ function TablebaseView(controller) {
 }
 
 
+function ApidocLink(controller) {
+  controller.bind('positionChanged', function (position) {
+    $('#apidoc').attr({
+      href: '/apidoc?fen=' + position.fen()
+    });
+  });
+}
+
+
 $(function () {
   var controller = new Controller($('#board').attr('data-fen'));
   var boardView = new BoardView(controller);
   new SideToMoveView(controller);
   new FenInputView(controller);
   new ToolBarView(controller, boardView);
+  new ApidocLink(controller);
 
   new TablebaseView(controller);
 });
