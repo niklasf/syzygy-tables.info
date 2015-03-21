@@ -553,7 +553,7 @@ function TablebaseView(controller) {
 function ApidocLink(controller) {
   controller.bind('positionChanged', function (position) {
     $('#apidoc').attr({
-      href: '/apidoc?fen=' + position.fen()
+      href: '/apidoc?fen=' + encodeURIComponent(position.fen())
     });
   });
 }
