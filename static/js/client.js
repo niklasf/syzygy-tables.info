@@ -172,7 +172,7 @@ function SideToMoveView(controller) {
     controller.push(new Chess(fenParts.join(' ')));
   });
 
-  $('#btn-black').click(function () {
+  $('#btn-black').click(function (event) {
     event.preventDefault();
     var fenParts = controller.position.fen().split(/\s+/);
     fenParts[1] = 'b';
