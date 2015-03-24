@@ -1,5 +1,5 @@
-syzygy-tables.info
-==================
+[syzygy-tables.info](https://syzygy-tables.info)
+================================================
 
 User interface and public API for probing Syzygy endgame tablebases.
 
@@ -33,7 +33,7 @@ Only the small four-men tablebases are in this Git repository. Optionally [gener
 API
 ---
 
-See https://syzygy-tables.info/apidoc for information about the JSON API.
+See [https://syzygy-tables.info/apidoc](https://syzygy-tables.info/apidoc?fen=4k3/8/8/8/8/8/8/4K3%20w%20-%20-%200%201) for information about the JSON API.
 
 License
 -------
