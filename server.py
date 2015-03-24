@@ -352,6 +352,21 @@ def favicon():
     return send_from_directory(app.root_path, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
+@app.route("/sitemap.txt")
+def sitemap():
+    entries = [
+        "",
+        "?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6 w - - 0 1",
+        "?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201",
+        "?fen=8/8/5k2/8/8/3KN3/8/8 w - - 0 1",
+        "?fen=8/8/4bk2/6n1/8/3K4/8/8 w - - 0 1",
+        "apidoc?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
+        "legal",
+    ]
+
+    return current_app.response_class("\n".join(request.url_root + entry for entry in entries), mimetype="text/plain")
+
+
 if __name__ == "__main__":
     try:
         import tornado
