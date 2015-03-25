@@ -137,10 +137,10 @@ def api():
 
     # Setup a board with the given FEN or EPD.
     try:
-        board = chess.Bitboard(fen)
+        board = chess.Board(fen)
     except ValueError:
         try:
-            board = chess.Bitboard()
+            board = chess.Board()
             board.set_epd(fen)
         except ValueError:
             return abort(400)
@@ -156,13 +156,13 @@ def api():
 def index():
     # Setup a board from the given valid FEN or fall back to the default FEN.
     try:
-        board = chess.Bitboard(request.args.get("fen", DEFAULT_FEN))
+        board = chess.Board(request.args.get("fen", DEFAULT_FEN))
     except ValueError:
         try:
-            board = chess.Bitboard()
+            board = chess.Board()
             board.set_epd(request.args.get("fen", DEFAULT_FEN))
         except ValueError:
-            board = chess.Bitboard(DEFAULT_FEN)
+            board = chess.Board(DEFAULT_FEN)
 
     # Get FENs with the current side to move, black and white to move.
     original_turn = board.turn
@@ -322,10 +322,10 @@ def apidoc():
         render["status"] = 400
     else:
         try:
-            board = chess.Bitboard(fen)
+            board = chess.Board(fen)
         except ValueError:
             try:
-                board = chess.Bitboard()
+                board = chess.Board()
                 board.set_epd(fen)
             except ValueError:
                 render["status"] = 400
