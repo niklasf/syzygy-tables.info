@@ -34,6 +34,7 @@ app = Flask(__name__)
 try:
     with open("/tmp/tablebasestate") as statefile:
         tablebases = pickle.load(statefile)
+
     app.logger.info("Restored tablebase state.")
 except (IOError, EOFError):
     tablebases = chess.syzygy.Tablebases()
@@ -45,7 +46,7 @@ except (IOError, EOFError):
     app.logger.info("Loaded %d tablebase files.", num)
 
     with open("/tmp/tablebasestate", "w") as statefile:
-        pickle.dump(tablebases, statefile)
+        pickle.dump(tablebases, statefile, pickle.HIGHEST_PROTOCOL)
 
 
 def swap_colors(fen):
