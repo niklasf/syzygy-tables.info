@@ -15,6 +15,7 @@ import functools
 import os.path
 import warnings
 import json
+import cPickle as pickle
 
 try:
     from htmlmin import minify as html_minify
@@ -30,13 +31,20 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 app = Flask(__name__)
 
-tablebases = chess.syzygy.Tablebases()
-num = 0
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
-app.logger.info("Loaded %d tablebase files.", num)
+try:
+    tablebases = pickle.load(open("/tmp/tablebasestate"))
+    app.logger.info("Restored tablebase state.")
+except (IOError, EOFError):
+    tablebases = chess.syzygy.Tablebases()
+    num = 0
+    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
+    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
+    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
+    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
+    app.logger.info("Loaded %d tablebase files.", num)
+
+    with open("/tmp/tablebasestate", "w") as statefile:
+        pickle.dump(tablebases, statefile)
 
 
 def swap_colors(fen):
