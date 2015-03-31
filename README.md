@@ -5,8 +5,8 @@ User interface and public API for probing Syzygy endgame tablebases.
 
 [![Screenshot of the longest winning 6 piece endgame](/screenshot.png)](https://syzygy-tables.info/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201)
 
-Installing
-----------
+Running
+-------
 
 Dependencies:
 
