@@ -581,7 +581,7 @@ function ApidocLink(controller) {
 
 function DocumentTitle(controller) {
   controller.bind('positionChanged', function (position) {
-    var fen = position.fen();
+    var fen = position.fen().split(/\s/)[0];
 
     document.title = (
       strRepeat('K', strCount(fen, 'K')) +
