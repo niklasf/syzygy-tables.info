@@ -395,7 +395,7 @@ def sitemap():
         "legal",
     ]
 
-    return current_app.response_class("\n".join(request.url_root + entry for entry in entries), mimetype="text/plain")
+    return current_app.response_class("\n".join("https://syzygy-tables.info/" + entry for entry in entries), mimetype="text/plain")
 
 
 if __name__ == "__main__":
