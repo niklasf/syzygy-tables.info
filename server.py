@@ -66,6 +66,24 @@ def mirror_horizontal(fen):
     return position_parts + " " + parts[1] + " - - 0 1"
 
 
+def material(board):
+    name = ""
+    name += "K" * chess.pop_count(board.kings & board.occupied_co[chess.WHITE])
+    name += "Q" * chess.pop_count(board.queens & board.occupied_co[chess.WHITE])
+    name += "R" * chess.pop_count(board.rooks & board.occupied_co[chess.WHITE])
+    name += "B" * chess.pop_count(board.bishops & board.occupied_co[chess.WHITE])
+    name += "N" * chess.pop_count(board.knights & board.occupied_co[chess.WHITE])
+    name += "P" * chess.pop_count(board.pawns & board.occupied_co[chess.WHITE])
+    name += "v"
+    name += "K" * chess.pop_count(board.kings & board.occupied_co[chess.BLACK])
+    name += "Q" * chess.pop_count(board.queens & board.occupied_co[chess.BLACK])
+    name += "R" * chess.pop_count(board.rooks & board.occupied_co[chess.BLACK])
+    name += "B" * chess.pop_count(board.bishops & board.occupied_co[chess.BLACK])
+    name += "N" * chess.pop_count(board.knights & board.occupied_co[chess.BLACK])
+    name += "P" * chess.pop_count(board.pawns & board.occupied_co[chess.BLACK])
+    return name
+
+
 def jsonp(func):
     """Wraps JSONified output for JSONP requests."""
     @functools.wraps(func)
@@ -313,7 +331,8 @@ def index():
         horizontal_fen=mirror_horizontal(fen),
         vertical_fen=mirror_vertical(fen),
         swapped_fen=swap_colors(fen),
-        DEFAULT_FEN=DEFAULT_FEN
+        DEFAULT_FEN=DEFAULT_FEN,
+        material=material(board)
     ))
 
 

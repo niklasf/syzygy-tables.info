@@ -2,6 +2,20 @@ var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 var STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 
+function strRepeat(str, num) {
+  var r = '';
+  for (var i = 0; i < num; i++) {
+    r += str;
+  }
+  return r;
+}
+
+
+function strCount(haystack, needle) {
+  return haystack.split(needle).length - 1;
+}
+
+
 function Controller(fen) {
   var self = this;
 
@@ -565,6 +579,29 @@ function ApidocLink(controller) {
 }
 
 
+function DocumentTitle(controller) {
+  controller.bind('positionChanged', function (position) {
+    var fen = position.fen();
+
+    document.title = (
+      strRepeat('K', strCount(fen, 'K')) +
+      strRepeat('Q', strCount(fen, 'Q')) +
+      strRepeat('R', strCount(fen, 'R')) +
+      strRepeat('B', strCount(fen, 'B')) +
+      strRepeat('N', strCount(fen, 'N')) +
+      strRepeat('P', strCount(fen, 'P')) +
+      'v' +
+      strRepeat('K', strCount(fen, 'k')) +
+      strRepeat('Q', strCount(fen, 'q')) +
+      strRepeat('R', strCount(fen, 'r')) +
+      strRepeat('B', strCount(fen, 'b')) +
+      strRepeat('N', strCount(fen, 'n')) +
+      strRepeat('P', strCount(fen, 'p')) +
+      ' – Syzygy endgame tablebases');
+  });
+}
+
+
 $(function () {
   var controller = new Controller($('#board').attr('data-fen'));
   var boardView = new BoardView(controller);
@@ -573,5 +610,6 @@ $(function () {
   new ToolBarView(controller, boardView);
   new ApidocLink(controller);
 
+  new DocumentTitle(controller);
   new TablebaseView(controller);
 });
