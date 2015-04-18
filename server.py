@@ -31,24 +31,13 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 app = Flask(__name__)
 
-try:
-    # Try a fast restore of the known tablebase files.
-    # Delete /tmp/tablebasestate to force a fresh load.
-    with open("/tmp/tablebasestate") as statefile:
-        tablebases = pickle.load(statefile)
-
-    app.logger.info("Restored tablebase state.")
-except (IOError, EOFError):
-    tablebases = chess.syzygy.Tablebases()
-    num = 0
-    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
-    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
-    num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
-    app.logger.info("Loaded %d tablebase files.", num)
-
-    with open("/tmp/tablebasestate", "w") as statefile:
-        pickle.dump(tablebases, statefile, pickle.HIGHEST_PROTOCOL)
+tablebases = chess.syzygy.Tablebases()
+num = 0
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
+num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
+app.logger.info("Loaded %d tablebase files.", num)
 
 
 def swap_colors(fen):
