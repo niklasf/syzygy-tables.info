@@ -60,8 +60,10 @@
     {% if fen == DEFAULT_FEN %}
       <p>Syzygy tablebases provide win-draw-loss and distance-to-zero information
         for all endgame positions with up to 6 pieces.</p>
-      <p>Minmaxing the DTZ values guarantees winning all winning positions and
-        defending all drawn positions.</p>
+      <p>This means they will not always find the shortest way to checkmate.
+        Instead they allow you to make progress (pawn moves or captures)
+        keeping your win or draw in hand. Unlike the shortest way to mate this
+        accounts for the fifty-move drawing rule.</p>
       <p><strong>Setup a position on the board to probe the tablebases.</strong></p>
 
       <p>Sample positions:</p>

@@ -49,6 +49,7 @@ This project is licensed under the GPLv3 with the following dependencies:
  * [Bootstrap under MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * [jQuery under MIT](https://github.com/jquery/jquery/blob/master/LICENSE.txt)
  * [Flask under BSD](http://flask.pocoo.org/docs/0.10/license/)
+ * [htmlmin under BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE)
  * [Tornado under the Apache License Version 2.0](https://github.com/tornadoweb/tornado/blob/master/LICENSE)
 
 Thanks to all of them and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
