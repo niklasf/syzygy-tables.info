@@ -11,8 +11,11 @@ Running
 Dependencies:
 
     pip install flask
-    pip install tornado
     pip install python-chess
+    pip install tornado # Required for dealing with many
+                        # open file descriptors
+                        # when serving six-men tablebases.
+    pip install htmlmin # Recommended.
 
     npm install -g grunt-cli
     npm install
