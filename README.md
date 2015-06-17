@@ -43,13 +43,13 @@ License
 
 This project is licensed under the GPLv3 with the following dependencies:
 
- * [python-chess under GPLv3](https://github.com/niklasf/python-chess/blob/master/LICENSE)
- * [chessboard.js under MIT](https://github.com/oakmac/chessboardjs/blob/master/LICENSE)
- * [chess.js under MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE)
- * [Bootstrap under MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * [jQuery under MIT](https://github.com/jquery/jquery/blob/master/LICENSE.txt)
- * [Flask under BSD](http://flask.pocoo.org/docs/0.10/license/)
- * [htmlmin under BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE)
- * [Tornado under the Apache License Version 2.0](https://github.com/tornadoweb/tornado/blob/master/LICENSE)
+* [python-chess](https://github.com/niklasf/python-chess) ([GPL3](https://github.com/niklasf/python-chess/blob/master/LICENSE))
+* [chessboard.js](http://chessboardjs.com/) ([MIT](https://github.com/oakmac/chessboardjs/blob/master/LICENSE))
+* [chess.js](https://github.com/jhlywa/chess.js) ([MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE))
+* [Bootstrap](http://getbootstrap.com/) ([MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE))
+* [jQuery](https://jquery.com/) ([MIT](https://github.com/jquery/jquery/blob/master/LICENSE.txt))
+* [Flask](http://flask.pocoo.org/) ([BSD](http://flask.pocoo.org/docs/0.10/license/">BSD</a>))
+* [htmlmin](https://htmlmin.readthedocs.org/en/latest/) ([BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE))
+* [Tornado](http://www.tornadoweb.org/en/stable/) ([Apache License Version 2.0](https://github.com/tornadoweb/tornado/blob/master/LICENSE))
 
 Thanks to all of them and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
