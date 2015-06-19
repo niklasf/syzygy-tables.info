@@ -165,7 +165,7 @@ def api():
             return abort(400)
 
     # Check the position for validity.
-    if board.status() != chess.STATUS_VALID:
+    if not board.is_valid(allow_chess960=False):
         return abort(400)
 
     return jsonify(**probe(board))
@@ -198,7 +198,7 @@ def index():
     drawing_moves = []
     losing_moves = []
 
-    if board.status() != chess.STATUS_VALID:
+    if not board.is_valid(allow_chess960=False):
         status = "Invalid position"
     elif board.fen() == DEFAULT_FEN:
         status = "Draw by insufficient material"
@@ -311,7 +311,7 @@ def index():
         losing_moves=losing_moves,
         blessed_loss=wdl == -1,
         cursed_win=wdl == 1,
-        illegal=board.status() != chess.STATUS_VALID,
+        illegal=not board.is_valid(allow_chess960=False),
         not_yet_solved=board.epd() + " 0 1" == chess.STARTING_FEN,
         unknown=wdl is None,
         turn="white" if board.turn == chess.WHITE else "black",
@@ -358,7 +358,7 @@ def apidoc():
         render["sanitized_fen"] = "8/8/8/8/8/8/8/8 w - - 0 1"
     else:
         render["sanitized_fen"] = board.fen()
-        if board.status() == chess.STATUS_VALID:
+        if board.is_valid(allow_chess960=False):
             render["request_body"] = json.dumps(probe(board), indent=2, sort_keys=True)
         else:
             render["status"] = 400
