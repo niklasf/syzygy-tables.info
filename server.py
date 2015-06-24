@@ -102,9 +102,9 @@ def probe(board):
 
     # Look at all moves and probe for the result position.
     for move in board.legal_moves:
+        uci_move = board.uci(move, chess960=False)
         board.push(move)
 
-        uci_move = board.uci(move, chess960=False)
         moves[uci_move] = dtz = tablebases.probe_dtz(board)
 
         # Mate.
@@ -244,10 +244,11 @@ def index():
 
         for move in board.legal_moves:
             san = board.san(move)
+            uci = board.uci(move, chess960=False)
             board.push(move)
 
             move_info = {
-                "uci": board.uci(move, chess960=False),
+                "uci": uci,
                 "san": san,
                 "fen": board.epd() + " 0 1",
                 "dtz": tablebases.probe_dtz(board),
