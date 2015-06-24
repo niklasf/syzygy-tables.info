@@ -104,36 +104,37 @@ def probe(board):
     for move in board.legal_moves:
         board.push(move)
 
-        moves[move.uci()] = dtz = tablebases.probe_dtz(board)
+        uci_move = board.uci(move, chess960=False)
+        moves[uci_move] = dtz = tablebases.probe_dtz(board)
 
         # Mate.
         if board.is_checkmate():
-            mating_move = move.uci()
+            mating_move = uci_move
 
         # Winning zeroing move.
         if dtz is not None and dtz < 0 and board.halfmove_clock == 0:
-            zeroing_move = move.uci()
+            zeroing_move = uci_move
 
         # Winning move.
         if dtz is not None and dtz < 0 and dtz > winning_dtz:
-            winning_move = move.uci()
+            winning_move = uci_move
             winning_dtz = dtz
 
         # Stalemating move.
         if board.is_stalemate():
-            stalemating_move = move.uci()
+            stalemating_move = uci_move
 
         # Insufficient material.
         if board.is_insufficient_material():
-            insuff_material_move = move.uci()
+            insuff_material_move = uci_move
 
         # Drawing move.
         if dtz is not None and dtz == 0:
-            drawing_move = move.uci()
+            drawing_move = uci_move
 
         # Losing move.
         if dtz is not None and dtz > losing_dtz:
-            losing_move = move.uci()
+            losing_move = uci_move
             losing_dtz = dtz
 
         board.pop()
@@ -246,7 +247,7 @@ def index():
             board.push(move)
 
             move_info = {
-                "uci": move.uci(),
+                "uci": board.uci(move, chess960=False),
                 "san": san,
                 "fen": board.epd() + " 0 1",
                 "dtz": tablebases.probe_dtz(board),
