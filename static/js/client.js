@@ -501,10 +501,10 @@ function TablebaseView(controller) {
       }
 
       // Compare by zeroing.
-      if (a.dtz < 0 && b.dtz < 0 && a.zeroing && !b.zeroing) {
-        return -1;
-      } else if (a.dtz < 0 && b.dtz < 0 && !a.zeroing && b.zeroing) {
-        return 1;
+      if (a.zeroing && !b.zeroing) {
+        return (a.dtz < 0 && b.dtz < 0) ? -1 : 1;
+      } else if (!a.zeroing && b.zeroing) {
+        return (a.dtz < 0 && b.dtz < 0) ? 1 : -1;
       }
 
       // Compare by DTZ.
@@ -537,7 +537,7 @@ function TablebaseView(controller) {
       } else if (move.dtz === 0) {
         badge = 'Draw';
       } else if (move.dtz !== null) {
-        if (move.zeroing && move.dtz < 0) {
+        if (move.zeroing) {
           badge = 'Zeroing';
         } else if (move.dtz < 0) {
           badge = 'Win with DTZ ' + Math.abs(move.dtz);

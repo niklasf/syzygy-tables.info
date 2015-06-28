@@ -99,6 +99,7 @@ def probe(board):
     insuff_material_move = None
     drawing_move = None
     losing_move, losing_dtz = None, -9999
+    losing_zeroing_move, losing_zeroing_dtz = None, -9999
 
     # Look at all moves and probe for the result position.
     for move in board.legal_moves:
@@ -133,16 +134,21 @@ def probe(board):
             drawing_move = uci_move
 
         # Losing move.
-        if dtz is not None and dtz > losing_dtz:
+        if dtz is not None and board.halfmove_clock != 0 and dtz > losing_dtz:
             losing_move = uci_move
             losing_dtz = dtz
+
+        # Losing move.
+        if dtz is not None and dtz > losing_zeroing_dtz:
+            losing_zeroing_move = uci_move
+            losing_zeroing_dtz = dtz
 
         board.pop()
 
     return {
         "dtz": tablebases.probe_dtz(board),
         "wdl": tablebases.probe_wdl(board),
-        "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move,
+        "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move or losing_zeroing_move,
         "moves": moves,
     }
 
@@ -284,6 +290,8 @@ def index():
             else:
                 if move_info["dtz"] is None:
                     move_info["badge"] = "Unknown"
+                elif move_info["zeroing"]:
+                    move_info["badge"] = "Zeroing"
                 else:
                     move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
                 losing_moves.append(move_info)
@@ -301,6 +309,7 @@ def index():
 
     losing_moves.sort(key=lambda move: move["uci"])
     losing_moves.sort(key=lambda move: move["dtz"], reverse=True)
+    losing_moves.sort(key=lambda move: move["zeroing"])
 
     return html_minify(render_template("index.html",
         fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
