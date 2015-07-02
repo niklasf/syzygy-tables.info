@@ -165,11 +165,7 @@ def api():
     try:
         board = chess.Board(fen)
     except ValueError:
-        try:
-            board = chess.Board()
-            board.set_epd(fen)
-        except ValueError:
-            return abort(400)
+        return abort(400)
 
     # Check the position for validity.
     if not board.is_valid(allow_chess960=False):
@@ -355,11 +351,7 @@ def apidoc():
         try:
             board = chess.Board(fen)
         except ValueError:
-            try:
-                board = chess.Board()
-                board.set_epd(fen)
-            except ValueError:
-                render["status"] = 400
+            render["status"] = 400
 
     # Set the exact given FEN and a sanitized FEN for result.
     if fen is not None:
