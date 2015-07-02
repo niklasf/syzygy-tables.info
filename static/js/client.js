@@ -120,7 +120,7 @@ Controller.prototype.setPosition = function (position) {
       } else if (xhr.status === 400) {
         self.trigger('probeInvalid');
       } else {
-        self.trigger('probeFailed');
+        self.trigger('probeFailed', xhr.status, textStatus);
       }
     },
     success: function (data) {
@@ -384,7 +384,7 @@ function TablebaseView(controller) {
   controller.bind('probeFailed', function (status, textStatus) {
     $('#status').text('Network error').removeClass('black-win').removeClass('white-win');
     $('#info')
-      .text('Request failed: ' + textStatus)
+      .text('Request failed: [' + status + '] ' + textStatus)
       .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + encodeURIComponent(controller.position.fen()) + '">Try again</a></div>');
   });
 
