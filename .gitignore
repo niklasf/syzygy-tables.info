@@ -1,5 +1,6 @@
 *.pyc
 *.swp
+venv
 static/js/client.min.js
 static/js/client.min.js.map
 static/css/purified.css
