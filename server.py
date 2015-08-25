@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/env python
 
 from flask import Flask
 from flask import render_template
@@ -15,7 +15,6 @@ import functools
 import os.path
 import warnings
 import json
-import cPickle as pickle
 
 try:
     from htmlmin import minify as html_minify
