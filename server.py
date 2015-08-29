@@ -338,6 +338,7 @@ def index():
             board.pop()
 
     winning_moves.sort(key=lambda move: move["uci"])
+    winning_moves.sort(key=lambda move: move["dtm"])
     winning_moves.sort(key=lambda move: move["dtz"], reverse=True)
     winning_moves.sort(key=lambda move: move["zeroing"], reverse=True)
     winning_moves.sort(key=lambda move: move["checkmate"], reverse=True)
@@ -347,6 +348,7 @@ def index():
     drawing_moves.sort(key=lambda move: move["stalemate"], reverse=True)
 
     losing_moves.sort(key=lambda move: move["uci"])
+    losing_moves.sort(key=lambda move: move["dtm"], reverse=True)
     losing_moves.sort(key=lambda move: move["dtz"], reverse=True)
     losing_moves.sort(key=lambda move: move["zeroing"])
 

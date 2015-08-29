@@ -524,6 +524,15 @@ function TablebaseView(controller) {
         return -1;
       }
 
+      // Compare by DTM.
+      if (a.dtm && b.dtm) {
+        if (a.dtm < b.dtm) {
+          return 1;
+        } else if (a.dtm > b.dtm) {
+          return -1;
+        }
+      }
+
       // Compare by UCI notation.
       if (a.uci < b.uci) {
         return -1;
