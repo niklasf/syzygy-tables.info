@@ -41,7 +41,15 @@ num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", 
 num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
 
-gaviota = chess.gaviota.open_tablebases(os.path.join(os.path.dirname(__file__), "gaviota"))
+try:
+    gaviota = chess.gaviota.open_tablebases(os.path.join(os.path.dirname(__file__), "gaviota"))
+except (OSError, RuntimeError):
+    class FakeTablebases(object):
+        def probe_dtm(self, board):
+            return None
+
+    warnings.warn("Not using Gaviota tablebases, libgtb could not be loaded.")
+    gaviota = FakeTablebases()
 
 
 def swap_colors(fen):

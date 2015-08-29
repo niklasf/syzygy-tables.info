@@ -28,10 +28,15 @@ Start the server on port 5000:
 
     python server.py
 
-Tablebase files
----------------
+Syzygy tablebase files
+----------------------
 
 Only the small four-men tablebases are in this Git repository. Optionally [generate](https://github.com/syzygy1/tb) or [download](http://oics.olympuschess.com/tracker/index.php) five-men and six-men tablebases and place them in the corresponding directories.
+
+Gaviota tablebases
+------------------
+
+Optionally build and install [libgtb](https://github.com/michiguel/Gaviota-Tablebases) and [download](http://www.olympuschess.com/egtb/gaviota/filelist.txt) Gaviota tablebase files. Put them into the `gaviota` directory.
 
 API
 ---
