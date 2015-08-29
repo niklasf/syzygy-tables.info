@@ -110,7 +110,7 @@ Controller.prototype.setPosition = function (position) {
 
   self.trigger('probeStarted');
 
-  this.request = $.ajax('/api', {
+  this.request = $.ajax('/api/v2', {
     data: {
       fen: this.position.fen(),
     },
@@ -452,7 +452,8 @@ function TablebaseView(controller) {
         var checkmate = tmpChess.in_checkmate();
         var stalemate = tmpChess.in_stalemate();
         var insufficient_material = tmpChess.insufficient_material();
-        var dtz = data.moves[uci];
+        var dtz = data.moves[uci].dtz;
+        var dtm = data.moves[uci].dtm;
 
         var moveFen = tmpChess.fen();
         var parts = moveFen.split(/ /);
@@ -468,6 +469,7 @@ function TablebaseView(controller) {
           stalemate: stalemate,
           insufficient_material: insufficient_material,
           dtz: dtz,
+          dtm: dtm,
           winning: (dtz !== null && dtz < 0) || checkmate,
           drawing: stalemate || insufficient_material || (dtz === 0 || (dtz === null && data.wdl !== null && data.wdl < 0)),
           zeroing: halfMoves === 0,
@@ -502,9 +504,17 @@ function TablebaseView(controller) {
 
       // Compare by zeroing.
       if (a.zeroing && !b.zeroing) {
-        return (a.dtz < 0 && b.dtz < 0) ? -1 : 1;
+        if (a.dtz < 0 && b.dtz < 0) {
+          return -1;
+        } else if (a.dtz > 0 && b.dtz > 0) {
+          return 1;
+        }
       } else if (!a.zeroing && b.zeroing) {
-        return (a.dtz < 0 && b.dtz < 0) ? 1 : -1;
+        if (a.dtz < 0 && b.dtz < 0) {
+          return 1;
+        } else if (a.dtz < 0 && b.dtz < 0) {
+          return -1;
+        }
       }
 
       // Compare by DTZ.
@@ -512,6 +522,15 @@ function TablebaseView(controller) {
         return 1;
       } else if (a.dtz > b.dtz || (a.dtz !== null && b.dtz === null)) {
         return -1;
+      }
+
+      // Compare by DTM.
+      if (a.dtm && b.dtm) {
+        if (a.dtm < b.dtm) {
+          return 1;
+        } else if (a.dtm > b.dtm) {
+          return -1;
+        }
       }
 
       // Compare by UCI notation.
@@ -553,8 +572,13 @@ function TablebaseView(controller) {
           'href': '/?fen=' + encodeURIComponent(move.fen)
         })
         .append(move.san)
-        .append(' ')
-        .append($('<span class="badge"></span>').text(badge));
+        .append(' ');
+
+      if (move.dtm && !move.drawing) {
+        moveLink.append($('<span class="badge"></span>').text('DTM ' + Math.abs(move.dtm)));
+      }
+
+      moveLink.append($('<span class="badge"></span>').text(badge));
 
       bindMoveLink(moveLink);
 

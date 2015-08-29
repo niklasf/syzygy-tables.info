@@ -3,13 +3,16 @@
 from flask import Flask
 from flask import render_template
 from flask import current_app
+from flask import redirect
 from flask import request
 from flask import abort
+from flask import url_for
 from flask import jsonify
 from flask import send_from_directory
 
 import chess
 import chess.syzygy
+import chess.gaviota
 
 import functools
 import os.path
@@ -30,13 +33,15 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 app = Flask(__name__)
 
-tablebases = chess.syzygy.Tablebases()
+syzygy = chess.syzygy.Tablebases()
 num = 0
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
+
+gaviota = chess.gaviota.open_tablebases(os.path.join(os.path.dirname(__file__), "gaviota"))
 
 
 def swap_colors(fen):
@@ -105,7 +110,13 @@ def probe(board):
         uci_move = board.uci(move, chess960=False)
         board.push(move)
 
-        moves[uci_move] = dtz = tablebases.probe_dtz(board)
+        dtz = syzygy.probe_dtz(board)
+        dtm = gaviota.probe_dtm(board)
+
+        moves[uci_move] = {
+            "dtz": dtz,
+            "dtm": dtm,
+        }
 
         # Mate.
         if board.is_checkmate():
@@ -145,22 +156,52 @@ def probe(board):
         board.pop()
 
     return {
-        "dtz": tablebases.probe_dtz(board),
-        "wdl": tablebases.probe_wdl(board),
+        "dtz": syzygy.probe_dtz(board),
+        "wdl": syzygy.probe_wdl(board),
+        "dtm": gaviota.probe_dtm(board),
         "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move or losing_zeroing_move,
         "moves": moves,
     }
 
-
 @app.route("/api")
-@jsonp
+@app.route("/api/")
 def api():
+    return redirect(url_for(".api_v1", fen=request.args.get("fen")))
+
+@app.route("/api/v1")
+@jsonp
+def api_v1():
     # Get required fen argument.
     fen = request.args.get("fen")
     if not fen:
         return abort(400)
 
-    # Setup a board with the given FEN or EPD.
+    # Setup a board with the given FEN.
+    try:
+        board = chess.Board(fen)
+    except ValueError:
+        return abort(400)
+
+    # Check the position for validity.
+    if not board.is_valid(allow_chess960=False):
+        return abort(400)
+
+    # Remove DTM information to produce legacy API output.
+    result = probe(board)
+    for move in result["moves"]:
+        result["moves"][move] = result["moves"][move]["dtz"]
+
+    return jsonify(**result)
+
+@app.route("/api/v2")
+@jsonp
+def api_v2():
+    # Get required fen argument.
+    fen = request.args.get("fen")
+    if not fen:
+        return abort(400)
+
+    # Setup a board with the given FEN.
     try:
         board = chess.Board(fen)
     except ValueError:
@@ -217,8 +258,8 @@ def index():
             status = "White won by checkmate"
             winning_side = "white"
     else:
-        wdl = tablebases.probe_wdl(board)
-        dtz = tablebases.probe_dtz(board)
+        wdl = syzygy.probe_wdl(board)
+        dtz = syzygy.probe_dtz(board)
         if board.is_insufficient_material():
             status = "Draw by insufficient material"
             wdl = 0
@@ -252,12 +293,15 @@ def index():
                 "uci": uci,
                 "san": san,
                 "fen": board.epd() + " 0 1",
-                "dtz": tablebases.probe_dtz(board),
+                "dtz": syzygy.probe_dtz(board),
+                "dtm": gaviota.probe_dtm(board),
                 "zeroing": board.halfmove_clock == 0,
                 "checkmate": board.is_checkmate(),
                 "stalemate": board.is_stalemate(),
                 "insufficient_material": board.is_insufficient_material(),
             }
+
+            move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
 
             move_info["winning"] = move_info["checkmate"] or (move_info["dtz"] is not None and move_info["dtz"] < 0)
             move_info["drawing"] = move_info["stalemate"] or move_info["insufficient_material"] or (move_info["dtz"] == 0 or (move_info["dtz"] is None and wdl is not None and wdl < 0))
@@ -294,7 +338,8 @@ def index():
             board.pop()
 
     winning_moves.sort(key=lambda move: move["uci"])
-    winning_moves.sort(key=lambda move: move["dtz"], reverse=True)
+    winning_moves.sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
+    winning_moves.sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     winning_moves.sort(key=lambda move: move["zeroing"], reverse=True)
     winning_moves.sort(key=lambda move: move["checkmate"], reverse=True)
 
@@ -303,7 +348,8 @@ def index():
     drawing_moves.sort(key=lambda move: move["stalemate"], reverse=True)
 
     losing_moves.sort(key=lambda move: move["uci"])
-    losing_moves.sort(key=lambda move: move["dtz"], reverse=True)
+    losing_moves.sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
+    losing_moves.sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     losing_moves.sort(key=lambda move: move["zeroing"])
 
     return html_minify(render_template("index.html",
@@ -399,5 +445,5 @@ if __name__ == "__main__":
     else:
         http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
         http_server.listen(5000)
-        print("Listening on http://127.0.0.1:5000/  ...")
+        print("Listening on http://127.0.0.1:5000/ ...")
         tornado.ioloop.IOLoop.instance().start()

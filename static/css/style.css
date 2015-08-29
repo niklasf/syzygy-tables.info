@@ -87,7 +87,7 @@ footer > .inner {
 
 /* Device size specifics */
 
-@media(min-width: 600px) {
+@media(min-width: 660px) {
   .content {
     width: 600px;
     margin: auto;
@@ -119,12 +119,12 @@ footer > .inner {
   }
 
   .right-side {
-    width: 240px;
+    width: 260px;
     margin-left: 360px;
   }
 }
 
-@media(max-width: 600px) {
+@media(max-width: 660px) {
   .left-side > .inner, .right-side > .inner {
     margin: auto;
     width: 300px;
@@ -146,7 +146,7 @@ footer > .inner {
   }
 }
 
-@media(min-width: 600px) and (max-height: 820px) {
+@media(min-width: 660px) and (max-height: 820px) {
   h1 {
     padding: 10px 0;
   }
@@ -156,15 +156,15 @@ footer > .inner {
   }
 }
 
-@media(min-width: 600px) and (max-height: 730px) {
+@media(min-width: 660px) and (max-height: 730px) {
   footer > .inner {
     position: relative;
-    width: 240px;
+    width: 260px;
     margin-left: 360px;
   }
 }
 
-@media(min-width: 600px) and (max-height: 630px) {
+@media(min-width: 660px) and (max-height: 630px) {
   h1, .fork-me {
     display: none;
     visibility: hidden;
@@ -175,7 +175,7 @@ footer > .inner {
   }
 }
 
-@media(min-width: 600px) and (max-height: 540px) {
+@media(min-width: 660px) and (max-height: 540px) {
   h1, .fork-me, #board-toolbar {
     display: none;
     visibility: hidden;
