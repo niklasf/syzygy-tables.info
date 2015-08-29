@@ -10,6 +10,7 @@ from flask import send_from_directory
 
 import chess
 import chess.syzygy
+import chess.gaviota
 
 import functools
 import os.path
@@ -37,6 +38,8 @@ num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "five-men")
 num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
 num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
+
+gaviota = chess.gaviota.open_tablebases(os.path.join(os.path.dirname(__file__), "gaviota"))
 
 
 def swap_colors(fen):
@@ -253,11 +256,14 @@ def index():
                 "san": san,
                 "fen": board.epd() + " 0 1",
                 "dtz": syzygy.probe_dtz(board),
+                "dtm": gaviota.probe_dtm(board),
                 "zeroing": board.halfmove_clock == 0,
                 "checkmate": board.is_checkmate(),
                 "stalemate": board.is_stalemate(),
                 "insufficient_material": board.is_insufficient_material(),
             }
+
+            move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
 
             move_info["winning"] = move_info["checkmate"] or (move_info["dtz"] is not None and move_info["dtz"] < 0)
             move_info["drawing"] = move_info["stalemate"] or move_info["insufficient_material"] or (move_info["dtz"] == 0 or (move_info["dtz"] is None and wdl is not None and wdl < 0))
