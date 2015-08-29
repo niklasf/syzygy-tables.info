@@ -30,7 +30,7 @@
     <p>Status code 400 if the <code>fen</code> argument is missing, invalid or the corresponding position is illegal.</p>
     <div class="panel panel-default">
       <div class="panel-heading">
-        <pre>GET <a id="request-uri" href="/api{% if fen is defined %}?fen={{ fen|urlencode }}{% endif %}">/api{% if fen is defined %}?fen={{ fen }}{% endif %}</a></pre>
+        <pre>GET <a id="request-uri" href="/api/v2{% if fen is defined %}?fen={{ fen|urlencode }}{% endif %}">/api/v2{% if fen is defined %}?fen={{ fen }}{% endif %}</a></pre>
       </div>
       <div class="panel-body">
         {% if status == 200 %}
@@ -42,6 +42,7 @@
     </div>
     <p><code>wdl</code> is 2 if the side to move is winning, 1 for a cursed win (that can not be realized under the fifty-move rule), 0 for a draw, -1 for a blessed loss and -2 for a loss.</p>
     <p><code>dtz</code> is the distance to zero. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move in winning.</p>
+    <p><code>dtm</code> is the distance to mate as found in 5 piece <a href="https://github.com/michiguel/Gaviota-Tablebases">Gaviota tablebases</a>.</p>
     <p><code>moves</code> is a dictionary mapping all legal moves in UCI notation to DTZ values of the resulting positions.</p>
     <p><code>bestmove</code> is a <a href="#ordering">DTZ optimal</a> move.</p>
     <p><em>Any of the mentioned values might be null if the requested information was not available in the tablebases.</em></p>

@@ -108,7 +108,13 @@ def probe(board):
         uci_move = board.uci(move, chess960=False)
         board.push(move)
 
-        moves[uci_move] = dtz = syzygy.probe_dtz(board)
+        dtz = syzygy.probe_dtz(board)
+        dtm = gaviota.probe_dtm(board)
+
+        moves[uci_move] = {
+            "dtz": dtz,
+            "dtm": dtm,
+        }
 
         # Mate.
         if board.is_checkmate():
@@ -150,20 +156,46 @@ def probe(board):
     return {
         "dtz": syzygy.probe_dtz(board),
         "wdl": syzygy.probe_wdl(board),
+        "dtm": gaviota.probe_dtm(board),
         "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move or losing_zeroing_move,
         "moves": moves,
     }
 
-
 @app.route("/api")
+@app.route("/api/v1")
 @jsonp
-def api():
+def api_v1():
     # Get required fen argument.
     fen = request.args.get("fen")
     if not fen:
         return abort(400)
 
-    # Setup a board with the given FEN or EPD.
+    # Setup a board with the given FEN.
+    try:
+        board = chess.Board(fen)
+    except ValueError:
+        return abort(400)
+
+    # Check the position for validity.
+    if not board.is_valid(allow_chess960=False):
+        return abort(400)
+
+    # Remove DTM information to produce legacy API output.
+    result = probe(board)
+    for move in result["moves"]:
+        result["moves"][move] = result["moves"][move]["dtz"]
+
+    return jsonify(**result)
+
+@app.route("/api/v2")
+@jsonp
+def api_v2():
+    # Get required fen argument.
+    fen = request.args.get("fen")
+    if not fen:
+        return abort(400)
+
+    # Setup a board with the given FEN.
     try:
         board = chess.Board(fen)
     except ValueError:
