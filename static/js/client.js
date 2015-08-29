@@ -110,7 +110,7 @@ Controller.prototype.setPosition = function (position) {
 
   self.trigger('probeStarted');
 
-  this.request = $.ajax('/api', {
+  this.request = $.ajax('/api/v2', {
     data: {
       fen: this.position.fen(),
     },
@@ -452,7 +452,8 @@ function TablebaseView(controller) {
         var checkmate = tmpChess.in_checkmate();
         var stalemate = tmpChess.in_stalemate();
         var insufficient_material = tmpChess.insufficient_material();
-        var dtz = data.moves[uci];
+        var dtz = data.moves[uci].dtz;
+        var dtm = data.moves[uci].dtm;
 
         var moveFen = tmpChess.fen();
         var parts = moveFen.split(/ /);
@@ -468,6 +469,7 @@ function TablebaseView(controller) {
           stalemate: stalemate,
           insufficient_material: insufficient_material,
           dtz: dtz,
+          dtm: dtm,
           winning: (dtz !== null && dtz < 0) || checkmate,
           drawing: stalemate || insufficient_material || (dtz === 0 || (dtz === null && data.wdl !== null && data.wdl < 0)),
           zeroing: halfMoves === 0,
@@ -553,8 +555,13 @@ function TablebaseView(controller) {
           'href': '/?fen=' + encodeURIComponent(move.fen)
         })
         .append(move.san)
-        .append(' ')
-        .append($('<span class="badge"></span>').text(badge));
+        .append(' ');
+
+      if (move.dtm && !move.drawing) {
+        moveLink.append($('<span class="badge"></span>').text('DTM ' + Math.abs(move.dtm)));
+      }
+
+      moveLink.append($('<span class="badge"></span>').text(badge));
 
       bindMoveLink(moveLink);
 
