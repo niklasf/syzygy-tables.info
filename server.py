@@ -30,12 +30,12 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 app = Flask(__name__)
 
-tablebases = chess.syzygy.Tablebases()
+syzygy = chess.syzygy.Tablebases()
 num = 0
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
-num += tablebases.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "four-men"))
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "five-men"))
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "wdl"), load_dtz=False)
+num += syzygy.open_directory(os.path.join(os.path.dirname(__file__), "six-men", "dtz"), load_wdl=False)
 app.logger.info("Loaded %d tablebase files.", num)
 
 
@@ -105,7 +105,7 @@ def probe(board):
         uci_move = board.uci(move, chess960=False)
         board.push(move)
 
-        moves[uci_move] = dtz = tablebases.probe_dtz(board)
+        moves[uci_move] = dtz = syzygy.probe_dtz(board)
 
         # Mate.
         if board.is_checkmate():
@@ -145,8 +145,8 @@ def probe(board):
         board.pop()
 
     return {
-        "dtz": tablebases.probe_dtz(board),
-        "wdl": tablebases.probe_wdl(board),
+        "dtz": syzygy.probe_dtz(board),
+        "wdl": syzygy.probe_wdl(board),
         "bestmove": mating_move or zeroing_move or winning_move or stalemating_move or insuff_material_move or drawing_move or losing_move or losing_zeroing_move,
         "moves": moves,
     }
@@ -217,8 +217,8 @@ def index():
             status = "White won by checkmate"
             winning_side = "white"
     else:
-        wdl = tablebases.probe_wdl(board)
-        dtz = tablebases.probe_dtz(board)
+        wdl = syzygy.probe_wdl(board)
+        dtz = syzygy.probe_dtz(board)
         if board.is_insufficient_material():
             status = "Draw by insufficient material"
             wdl = 0
@@ -252,7 +252,7 @@ def index():
                 "uci": uci,
                 "san": san,
                 "fen": board.epd() + " 0 1",
-                "dtz": tablebases.probe_dtz(board),
+                "dtz": syzygy.probe_dtz(board),
                 "zeroing": board.halfmove_clock == 0,
                 "checkmate": board.is_checkmate(),
                 "stalemate": board.is_stalemate(),
