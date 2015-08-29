@@ -399,4 +399,5 @@ if __name__ == "__main__":
     else:
         http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
         http_server.listen(5000)
+        print("Listening on http://127.0.0.1:5000/  ...")
         tornado.ioloop.IOLoop.instance().start()
