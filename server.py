@@ -3,8 +3,10 @@
 from flask import Flask
 from flask import render_template
 from flask import current_app
+from flask import redirect
 from flask import request
 from flask import abort
+from flask import url_for
 from flask import jsonify
 from flask import send_from_directory
 
@@ -162,6 +164,10 @@ def probe(board):
     }
 
 @app.route("/api")
+@app.route("/api/")
+def api():
+    return redirect(url_for(".api_v1", fen=request.args.get("fen")))
+
 @app.route("/api/v1")
 @jsonp
 def api_v1():
@@ -437,5 +443,5 @@ if __name__ == "__main__":
     else:
         http_server = tornado.httpserver.HTTPServer(tornado.wsgi.WSGIContainer(app))
         http_server.listen(5000)
-        print("Listening on http://127.0.0.1:5000/  ...")
+        print("Listening on http://127.0.0.1:5000/ ...")
         tornado.ioloop.IOLoop.instance().start()
