@@ -504,9 +504,17 @@ function TablebaseView(controller) {
 
       // Compare by zeroing.
       if (a.zeroing && !b.zeroing) {
-        return (a.dtz < 0 && b.dtz < 0) ? -1 : 1;
+        if (a.dtz < 0 && b.dtz < 0) {
+          return -1;
+        } else if (a.dtz > 0 && b.dtz > 0) {
+          return 1;
+        }
       } else if (!a.zeroing && b.zeroing) {
-        return (a.dtz < 0 && b.dtz < 0) ? 1 : -1;
+        if (a.dtz < 0 && b.dtz < 0) {
+          return 1;
+        } else if (a.dtz < 0 && b.dtz < 0) {
+          return -1;
+        }
       }
 
       // Compare by DTZ.
