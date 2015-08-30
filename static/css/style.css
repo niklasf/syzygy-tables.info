@@ -87,9 +87,9 @@ footer > .inner {
 
 /* Device size specifics */
 
-@media(min-width: 660px) {
+@media(min-width: 640px) {
   .content {
-    width: 600px;
+    width: 640px;
     margin: auto;
   }
 
@@ -111,20 +111,16 @@ footer > .inner {
     bottom: 0;
     width: 50%;
     background: #eee;
-    padding-right: 40px;
     z-index: -1;
-    box-sizing: content-box;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
   }
 
   .right-side {
-    width: 260px;
-    margin-left: 360px;
+    width: 300px;
+    margin-left: 340px;
   }
 }
 
-@media(max-width: 660px) {
+@media(max-width: 640px) {
   .left-side > .inner, .right-side > .inner {
     margin: auto;
     width: 300px;
@@ -146,7 +142,7 @@ footer > .inner {
   }
 }
 
-@media(min-width: 660px) and (max-height: 820px) {
+@media(min-width: 640px) and (max-height: 820px) {
   h1 {
     padding: 10px 0;
   }
@@ -156,15 +152,15 @@ footer > .inner {
   }
 }
 
-@media(min-width: 660px) and (max-height: 730px) {
+@media(min-width: 640px) and (max-height: 730px) {
   footer > .inner {
     position: relative;
-    width: 260px;
-    margin-left: 360px;
+    width: 300px;
+    margin-left: 340px;
   }
 }
 
-@media(min-width: 660px) and (max-height: 630px) {
+@media(min-width: 640px) and (max-height: 630px) {
   h1, .fork-me {
     display: none;
     visibility: hidden;
@@ -175,7 +171,7 @@ footer > .inner {
   }
 }
 
-@media(min-width: 660px) and (max-height: 540px) {
+@media(min-width: 640px) and (max-height: 540px) {
   h1, .fork-me, #board-toolbar {
     display: none;
     visibility: hidden;
