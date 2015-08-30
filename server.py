@@ -251,9 +251,6 @@ def index():
 
     if not board.is_valid(allow_chess960=False):
         status = "Invalid position"
-    elif board.fen() == DEFAULT_FEN:
-        status = "Draw by insufficient material"
-        wdl = 0
     elif board.is_stalemate():
         status = "Draw by stalemate"
         wdl = 0

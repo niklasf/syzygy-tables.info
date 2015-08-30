@@ -104,10 +104,6 @@ Controller.prototype.setPosition = function (position) {
     this.request = null;
   }
 
-  if (this.position.fen() === DEFAULT_FEN) {
-    return;
-  }
-
   self.trigger('probeStarted');
 
   this.request = $.ajax('/api/v2', {
@@ -348,9 +344,12 @@ function TablebaseView(controller) {
     var fen = position.fen();
 
     if (fen === DEFAULT_FEN) {
-      $('#status').text('Draw by insufficient material').removeClass('black-win').removeClass('white-win');
-      $('#info').html('<p>Syzygy tablebases provide win-draw-loss and distance-to-zero information for all endgame positions with up to 6 pieces.</p><p>This means they will not always find the shortest way to checkmate. Instead they allow you to make progress (pawn moves or captures) keeping your win or draw in hand. Unlike the shortest way to mate this accounts for the fifty-move drawing rule.</p><p><strong>Setup a position on the board to probe the tablebases.</strong></p><p>Sample positions:</p><ul><li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li><li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li></ul><h2>Contact</h2><p>Feedback <a href="/legal">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p>');
-    } else if (fen === STARTING_FEN) {
+      $('#start-info').html('<p>Put a position on the board to probe the tablebases.</p><p>Syzygy tablebases provide <abbr title="win-draw-loss">WDL</abbr> and <abbr title="distance-to-zero (a capture or pawn move)">DTZ</abbr> information for all endgame positions with up to 6 pieces, allowing you to make progress, keeping a win in hand, winning all won positions, bringing all drawn positions over the fifty-move line.</p><p>This is unlike the shortest way to mate (<abbr title="depth-to-mate">DTM</abbr>), that does not account for the fifty-move drawing rule.</p><p>Intresting positions:</p><ul><li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li><li><a href="/?fen=8/8/8/8/1p2P3/4P3/1k6/3K4%20w%20-%20-%200%201">The longest five piece endgame</a></li><li><a href="/?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201">Black is just about saved by the fifty-move rule in this KQvKRP endgame</a></li></ul><section id="contact"><h2>Contact</h2><p>Feedback <a href="/legal#contact">via mail</a>, bug reports and <a href="https://github.com/niklasf/syzygy-tables.info">pull requests</a> are welcome.</p></section>');
+    } else {
+      $('#start-info').empty();
+    }
+
+    if (fen === STARTING_FEN) {
       $('#status').text('Position not found in tablebases').removeClass('black-win').removeClass('white-win');
       $('#info').html('<p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not yet solved.</a></p>');
     } else if (position.in_checkmate()) {
