@@ -5,10 +5,11 @@ from flask import render_template
 from flask import current_app
 from flask import redirect
 from flask import request
-from flask import abort
 from flask import url_for
 from flask import jsonify
 from flask import send_from_directory
+
+from werkzeug.exceptions import BadRequest
 
 import chess
 import chess.syzygy
@@ -115,7 +116,7 @@ def probe(board):
 
     # Look at all moves and probe for the result position.
     for move in board.legal_moves:
-        uci_move = board.uci(move, chess960=False)
+        uci_move = board.uci(move)
         board.push(move)
 
         dtz = syzygy.probe_dtz(board)
@@ -179,20 +180,20 @@ def api():
 @app.route("/api/v1")
 @jsonp
 def api_v1():
-    # Get required fen argument.
+    # Get required FEN argument.
     fen = request.args.get("fen")
     if not fen:
-        return abort(400)
+        raise BadRequest("fen required")
 
     # Setup a board with the given FEN.
     try:
         board = chess.Board(fen)
     except ValueError:
-        return abort(400)
+        raise BadRequest("invalid fen")
 
     # Check the position for validity.
-    if not board.is_valid(allow_chess960=False):
-        return abort(400)
+    if not board.is_valid():
+        raise BadRequest("illegal fen")
 
     # Remove DTM information to produce legacy API output.
     result = probe(board)
@@ -204,20 +205,20 @@ def api_v1():
 @app.route("/api/v2")
 @jsonp
 def api_v2():
-    # Get required fen argument.
+    # Get required FEN argument.
     fen = request.args.get("fen")
     if not fen:
-        return abort(400)
+        raise BadRequest("fen required")
 
     # Setup a board with the given FEN.
     try:
         board = chess.Board(fen)
     except ValueError:
-        return abort(400)
+        raise BadRequest("invalid fen")
 
     # Check the position for validity.
-    if not board.is_valid(allow_chess960=False):
-        return abort(400)
+    if not board.is_valid():
+        raise BadRequest("illegal fen")
 
     return jsonify(**probe(board))
 
@@ -229,8 +230,7 @@ def index():
         board = chess.Board(request.args.get("fen", DEFAULT_FEN))
     except ValueError:
         try:
-            board = chess.Board()
-            board.set_epd(request.args.get("fen", DEFAULT_FEN))
+            board, _ = chess.Board.from_epd(request.args.get("fen", DEFAULT_FEN))
         except ValueError:
             board = chess.Board(DEFAULT_FEN)
 
@@ -249,7 +249,7 @@ def index():
     drawing_moves = []
     losing_moves = []
 
-    if not board.is_valid(allow_chess960=False):
+    if not board.is_valid():
         status = "Invalid position"
     elif board.is_stalemate():
         status = "Draw by stalemate"
@@ -291,7 +291,7 @@ def index():
 
         for move in board.legal_moves:
             san = board.san(move)
-            uci = board.uci(move, chess960=False)
+            uci = board.uci(move)
             board.push(move)
 
             move_info = {
@@ -368,7 +368,7 @@ def index():
         losing_moves=losing_moves,
         blessed_loss=wdl == -1,
         cursed_win=wdl == 1,
-        illegal=not board.is_valid(allow_chess960=False),
+        illegal=not board.is_valid(),
         not_yet_solved=board.epd() + " 0 1" == chess.STARTING_FEN,
         unknown=wdl is None,
         turn="white" if board.turn == chess.WHITE else "black",
@@ -397,11 +397,13 @@ def apidoc():
     fen = request.args.get("fen")
     if not fen:
         render["status"] = 400
+        render["error"] = "fen required"
     else:
         try:
             board = chess.Board(fen)
         except ValueError:
             render["status"] = 400
+            render["error"] = "invalid fen"
 
     # Set the exact given FEN and a sanitized FEN for result.
     if fen is not None:
@@ -411,10 +413,11 @@ def apidoc():
         render["sanitized_fen"] = "8/8/8/8/8/8/8/8 w - - 0 1"
     else:
         render["sanitized_fen"] = board.fen()
-        if board.is_valid(allow_chess960=False):
+        if board.is_valid():
             render["request_body"] = json.dumps(probe(board), indent=2, sort_keys=True)
         else:
             render["status"] = 400
+            render["error"] = "illegal fen"
 
     # Render.
     return html_minify(render_template("apidoc.html", **render))

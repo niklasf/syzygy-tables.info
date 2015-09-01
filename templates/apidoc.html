@@ -36,7 +36,7 @@
         {% if status == 200 %}
           <pre><code class="language-javascript" id="request-body">{{ request_body }}</code></pre>
         {% else %}
-          Status {{status}}
+          <p>Status {{ status }}: {{ error }}</p>
         {% endif %}
       </div>
     </div>
