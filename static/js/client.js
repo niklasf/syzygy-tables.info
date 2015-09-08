@@ -254,6 +254,11 @@ function ToolBarView(controller, boardView) {
     boardView.flip();
   });
 
+  $('#btn-clear-board').click(function (event) {
+    event.preventDefault();
+    controller.push(new Chess(DEFAULT_FEN));
+  });
+
   $('#btn-swap-colors').click(function (event) {
     event.preventDefault();
 
