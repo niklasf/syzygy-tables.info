@@ -378,11 +378,13 @@ function TablebaseView(controller) {
   controller.bind('probeInvalid', function() {
     $('#status').text('Invalid position').removeClass('black-win').removeClass('white-win');
     $('#info').html('<p>The given position is not a legal chess position.</p>');
+    $('#start-info').empty();
   });
 
   controller.bind('probeCancelled', function () {
     $('#status').text('Request cancelled');
     $('#info').empty();
+    $('#start-info').empty();
   });
 
   controller.bind('probeFailed', function (status, textStatus) {
@@ -390,6 +392,7 @@ function TablebaseView(controller) {
     $('#info')
       .text('Request failed: [' + status + '] ' + textStatus)
       .append('<div class="reload"><a class="btn btn-default" href="/?fen=' + encodeURIComponent(controller.position.fen()) + '">Try again</a></div>');
+    $('#start-info').empty();
   });
 
   controller.bind('probeFinished', function (data) {
