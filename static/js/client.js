@@ -256,7 +256,12 @@ function ToolBarView(controller, boardView) {
 
   $('#btn-clear-board').click(function (event) {
     event.preventDefault();
-    controller.push(new Chess(DEFAULT_FEN));
+
+    var parts = controller.position.fen().split(/\s+/);
+    var defaultParts = DEFAULT_FEN.split(/\s+/);
+    var fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
+
+    controller.push(new Chess(fen));
   });
 
   $('#btn-swap-colors').click(function (event) {

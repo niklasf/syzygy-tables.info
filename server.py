@@ -67,6 +67,10 @@ def mirror_horizontal(fen):
     position_parts = "/".join("".join(reversed(position_part)) for position_part in parts[0].split("/"))
     return position_parts + " " + parts[1] + " - - 0 1"
 
+def clear_fen(fen):
+    parts = fen.split()
+    return DEFAULT_FEN.replace("w", parts[1])
+
 
 def material(board):
     name = ""
@@ -377,6 +381,7 @@ def index():
         horizontal_fen=mirror_horizontal(fen),
         vertical_fen=mirror_vertical(fen),
         swapped_fen=swap_colors(fen),
+        clear_fen=clear_fen(fen),
         DEFAULT_FEN=DEFAULT_FEN,
         material=material(board)
     ))
