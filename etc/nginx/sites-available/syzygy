@@ -1,0 +1,110 @@
+upstream api_backend {  
+        server 127.0.0.1:5000;  
+}  
+  
+server {  
+        listen 443 ssl spdy;  
+  
+        server_name www.syzygy-tables.info;  
+  
+        ssl_certificate /etc/ssl/certs/syzygy-tables.info.pem;  
+        ssl_certificate_key /etc/ssl/private/syzygy-tables.info.key;  
+  
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;  
+        ssl_session_cache shared:SSL:10m;  
+  
+        ssl_prefer_server_ciphers on;  
+        ssl_dhparam /etc/ssl/dhparam.pem;  
+        ssl_ciphers AES128+EECDH:AES128+EDH:!aNULL;  
+  
+        ssl_stapling on;  
+        ssl_stapling_verify on;  
+        ssl_trusted_certificate /etc/ssl/stapling.pem;  
+        resolver 8.8.4.4 8.8.8.8 valid=300s;  
+        resolver_timeout 10s;  
+  
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload"; 
+        add_header Access-Control-Allow-Origin "*";  
+        add_header X-Content-Type-Options "nosniff";  
+        add_header Cache-Control "public";  
+  
+        return 301 https://syzygy-tables.info$request_uri;  
+}  
+  
+server {  
+        listen 80;  
+  
+        server_name ~^(www\.)?syzygy-tables.info$;  
+  
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload"; 
+        add_header Access-Control-Allow-Origin "*";  
+        add_header X-Content-Type-Options "nosniff";  
+        add_header Cache-Control "public";  
+  
+        location = /api {  
+                expires 7d;  
+                proxy_pass http://api_backend;  
+        }  
+  
+        location / {  
+                return 301 https://syzygy-tables.info$request_uri;  
+        }  
+}
+
+server {
+        listen 443 ssl spdy;
+
+        server_name syzygy-tables.info;
+
+        ssl_certificate /etc/ssl/certs/syzygy-tables.info.pem;
+        ssl_certificate_key /etc/ssl/private/syzygy-tables.info.key;
+
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_session_cache shared:SSL:10m;
+
+        ssl_prefer_server_ciphers on;
+        ssl_dhparam /etc/ssl/dhparam.pem;
+        ssl_ciphers AES128+EECDH:AES128+EDH:!aNULL;
+
+        ssl_stapling on;
+        ssl_stapling_verify on;
+        ssl_trusted_certificate /etc/ssl/stapling.pem;
+        resolver 8.8.4.4 8.8.8.8 valid=300s;
+        resolver_timeout 10s;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+        add_header Access-Control-Allow-Origin "*";
+        add_header X-Content-Type-Options "nosniff";
+        add_header Cache-Control "public";
+
+        location /static/ {
+                root /srv/syzygy-tables.info/;
+                expires 1M;
+                access_log off;
+        }
+
+        location = /favicon.ico {
+                root /srv/syzygy-tables.info/;
+                expires 1M;
+                access_log off;
+        }
+
+        location = /google675e347e646e7c68.html {
+                return 200 "google-site-verification: google675e347e646e7c68.html";
+        }
+
+        location = /api {
+                expires 7d;
+                proxy_pass http://api_backend;
+        }
+
+        location / {
+                expires 7d;
+                proxy_pass http://127.0.0.1:5000;
+        }
+
+        #location /gaviota/ {
+        #        root /srv/syzygy-tables.info/;
+        #        autoindex on;
+        #}
+}
