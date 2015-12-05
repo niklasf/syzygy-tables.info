@@ -115,13 +115,9 @@ def probe(board):
         uci_move = board.uci(move)
         board.push(move)
 
+        wdl = syzygy.probe_wdl(board)
         dtz = syzygy.probe_dtz(board)
         dtm = gaviota.probe_dtm(board)
-
-        moves[uci_move] = {
-            "dtz": dtz,
-            "dtm": dtm,
-        }
 
         # Mate.
         if board.is_checkmate():
@@ -159,6 +155,12 @@ def probe(board):
             losing_zeroing_dtz = dtz
 
         board.pop()
+
+        moves[uci_move] = {
+            "wdl": wdl,
+            "dtz": dtz,
+            "dtm": dtm,
+        }
 
     return {
         "dtz": syzygy.probe_dtz(board),
