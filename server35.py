@@ -1,14 +1,32 @@
-import asyncio
 import aiohttp.web
-import configparser
-import os
+
+import jinja2
+
 import chess
 import chess.syzygy
 import chess.gaviota
 import chess.pgn
+
+import asyncio
+import configparser
+import os
 import json
 import logging
 import random
+import warnings
+
+try:
+    from htmlmin import minify as html_minify
+except ImportError:
+    warnings.warn("Not using HTML minification, htmlmin not imported.")
+
+    def html_minify(html):
+        return html
+
+
+DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
+
+EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
 def static(url, path):
@@ -164,10 +182,65 @@ def sitemap(config):
     return aiohttp.web.Response(text=content)
 
 
+class Frontend(object):
+
+    def __init__(self, config, api, loop):
+        self.config = config
+        self.api = api
+        self.loop = loop
+
+        self.jinja = jinja2.Environment(
+            loader=jinja2.FileSystemLoader("templates"))
+
+    async def index(self, request):
+        return "hello"
+
+    async def apidoc(self, request):
+        render = {}
+        render["DEFAULT_FEN"] = DEFAULT_FEN
+        render["status"] = 200
+
+        # Pass the raw unchanged FEN.
+        if "fen" in request.GET:
+            render["fen"] = request.GET["fen"]
+
+        try:
+            board = chess.Board(request.GET["fen"])
+        except KeyError:
+            render["status"] = 400
+            render["error"] = "fen required"
+            render["sanitized_fen"] = EMPTY_FEN
+        except ValueError:
+            render["status"] = 400
+            render["error"] = "invalid fen"
+            render["sanitized_fen"] = EMPTY_FEN
+        else:
+            render["sanitized_fen"] = board.fen()
+
+            if board.is_valid():
+                result = await self.api.probe_async(board, load_root=True, load_dtz=True)
+                render["request_body"] = json.dumps(result, indent=2, sort_keys=True)
+            else:
+                render["status"] = 400
+                render["error"] = "illegal fen"
+
+        template = self.jinja.get_template("apidoc.html")
+        return aiohttp.web.Response(
+            text=html_minify(template.render(render)),
+            content_type="text/html")
+
+    async def legal(self, request):
+        template = self.jinja.get_template("legal.html")
+        return aiohttp.web.Response(
+            text=html_minify(template.render()),
+            content_type="text/html")
+
+
 async def init(config, loop):
     print("---")
 
     api = Api(config, loop)
+    frontend = Frontend(config, api, loop)
 
     # Setup routes.
     app = aiohttp.web.Application(loop=loop)
@@ -176,6 +249,10 @@ async def init(config, loop):
     app.router.add_route("GET", "/api/v1", api.v1)
     app.router.add_route("GET", "/api/v2", api.v2)
     app.router.add_route("GET", "/api/pgn", api.pgn)
+    app.router.add_route("GET", "/", frontend.index)
+    app.router.add_route("GET", "/apidoc", frontend.apidoc)
+    app.router.add_route("GET", "/legal", frontend.legal)
+    app.router.add_static("/static/", "static")
 
     # Create server.
     bind = config.get("server", "bind")
