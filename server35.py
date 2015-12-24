@@ -169,19 +169,6 @@ class Api(object):
         return aiohttp.web.Response(text=str(game))
 
 
-def sitemap(config):
-    entries = [
-        "",
-        "?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
-        "?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201",
-        "apidoc?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
-        "legal",
-    ]
-
-    content = "\n".join("https://syzygy-tables.info/" + entry for entry in entries)
-    return aiohttp.web.Response(text=content)
-
-
 class Frontend(object):
 
     def __init__(self, config, api, loop):
@@ -229,11 +216,25 @@ class Frontend(object):
             text=html_minify(template.render(render)),
             content_type="text/html")
 
-    async def legal(self, request):
+    def legal(self, request):
         template = self.jinja.get_template("legal.html")
         return aiohttp.web.Response(
             text=html_minify(template.render()),
             content_type="text/html")
+
+    def sitemap(self, request):
+        entries = [
+            "",
+            "?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
+            "?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201",
+            "apidoc?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
+            "legal",
+        ]
+
+        base_url = self.config.get("server", "base_url")
+
+        content = "\n".join(base_url + entry for entry in entries)
+        return aiohttp.web.Response(text=content)
 
 
 async def init(config, loop):
@@ -242,16 +243,20 @@ async def init(config, loop):
     api = Api(config, loop)
     frontend = Frontend(config, api, loop)
 
+    # Check configured base url.
+    assert config.get("server", "base_url").startswith("http")
+    assert config.get("server", "base_url").endswith("/")
+
     # Setup routes.
     app = aiohttp.web.Application(loop=loop)
-    app.router.add_route("GET", "/favicon.ico", static("/favicon.ico", "favicon.ico"))
-    app.router.add_route("GET", "/sitemap.txt", sitemap)
-    app.router.add_route("GET", "/api/v1", api.v1)
-    app.router.add_route("GET", "/api/v2", api.v2)
-    app.router.add_route("GET", "/api/pgn", api.pgn)
     app.router.add_route("GET", "/", frontend.index)
     app.router.add_route("GET", "/apidoc", frontend.apidoc)
     app.router.add_route("GET", "/legal", frontend.legal)
+    app.router.add_route("GET", "/favicon.ico", static("/favicon.ico", "favicon.ico"))
+    app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
+    app.router.add_route("GET", "/api/v1", api.v1)
+    app.router.add_route("GET", "/api/v2", api.v2)
+    app.router.add_route("GET", "/api/pgn", api.pgn)
     app.router.add_static("/static/", "static")
 
     # Create server.
