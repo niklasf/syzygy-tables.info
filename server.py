@@ -199,7 +199,11 @@ class Api(object):
 
     def dtz_bestmove(self, board, probe_result):
         def result(move, key, default=None):
-            return probe_result["moves"][move.uci()].get(key, default)
+            res = probe_result["moves"][move.uci()].get(key)
+            if res is None:
+                return default
+            else:
+                return res
 
         def zeroing(move):
             try:
@@ -544,7 +548,7 @@ async def init(config, loop):
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/api/v1", api.v1)
     app.router.add_route("GET", "/api/v2", api.v2)
-    app.router.add_route("GET", "/api/syzygy-vs-syzygy.pgn", api.syzygy_vs_syzygy_pgn)
+    app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", api.syzygy_vs_syzygy_pgn)
     app.router.add_static("/static/", "static")
 
     # Create server.

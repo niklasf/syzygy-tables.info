@@ -75,7 +75,12 @@
 {% endif %}
 </div>
 
-<a href="/api/syzygy-vs-syzygy.pgn?fen={{ fen|urlencode }}">syzygy-vs-syzygy.pgn</a>
+{% if not illegal %}
+<a class="" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|urlencode }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
+  <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+  {{ material }}.pgn
+</a>
+{% endif %}
 
 {% if fen == DEFAULT_FEN %}
 <div id="start-info">
