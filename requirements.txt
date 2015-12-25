@@ -1,4 +1,6 @@
-flask
-tornado
-python-chess
-htmlmin
+Jinja2==2.8
+MarkupSafe==0.23
+aiohttp==0.19.0
+chardet==2.3.0
+htmlmin==0.1.10
+python-chess==0.13.1
