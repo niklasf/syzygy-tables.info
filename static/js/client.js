@@ -315,8 +315,10 @@ function TablebaseView(controller) {
       .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
       .load('/?fen=' + encodeURIComponent(position.fen()) + '&xhr=1', function (url, status, xhr) {
         if (status == 'error') {
-          $('.right-side > .inner').html('<h2 id="status">Network error</h2><div id="info"></div>');
-          $('#info').text(xhr.status + ' ' + xhr.statusText);
+          $('.right-side > .inner')
+            .empty()
+            .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
+            .append($('<div id="info"></div>').text(xhr.statusText));
         } else {
           bindMoveLink($('.list-group-item'));
         }
