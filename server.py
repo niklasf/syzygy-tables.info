@@ -14,6 +14,7 @@ import json
 import logging
 import random
 import warnings
+import datetime
 
 try:
     from htmlmin import minify as html_minify
@@ -177,6 +178,9 @@ class Api(object):
         board = self.get_board(request)
         result = await self.probe_async(board, load_root=True, load_dtz=True)
 
+        bm = self.dtz_bestmove(board, result)
+        result["bestmove"] = bm.uci() if bm else None
+
         # Collapse move information to produce legacy API output.
         for move in result["moves"]:
             result["moves"][move] = result["moves"][move]["dtz"]
@@ -185,24 +189,99 @@ class Api(object):
 
     async def v2(self, request):
         board = self.get_board(request)
+
         result = await self.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
+
+        bm = self.dtz_bestmove(board, result)
+        result["bestmove"] = bm.uci() if bm else None
+
         return jsonp(request, result)
 
-    async def pgn(self, request):
-        board = chess.Board()
+    def dtz_bestmove(self, board, probe_result):
+        def result(move, key, default=None):
+            return probe_result["moves"][move.uci()].get(key, default)
+
+        def zeroing(move):
+            try:
+                board.push(move)
+                return board.halfmove_clock == 0
+            finally:
+                board.pop()
+
+        def checkmate(move):
+            try:
+                board.push(move)
+                return board.is_checkmate()
+            finally:
+                board.pop()
+
+        def definite_draw(move):
+            try:
+                board.push(move)
+                return board.is_insufficient_material() or board.is_stalemate()
+            finally:
+                board.pop()
+
+        moves = list(board.legal_moves)
+        moves.sort(key=lambda move: move.uci())
+        moves.sort(key=lambda move: (result(move, "dtm") is None, result(move, "dtm")), reverse=True)
+        moves.sort(key=lambda move: (result(move, "dtz") is None, result(move, "dtz")), reverse=True)
+        moves.sort(key=lambda move: zeroing(move) if result(move, "wdl", 0) > 0 else not zeroing(move))
+        moves.sort(key=lambda move: definite_draw(move))
+        moves.sort(key=lambda move: (result(move, "wdl") is None, result(move, "wdl")))
+        moves.sort(key=lambda move: checkmate(move), reverse=True)
+
+        if moves and result(moves[0], "dtz") is not None:
+            return moves[0]
+
+    async def syzygy_vs_syzygy_pgn(self, request):
+        board = self.get_board(request)
 
         game = chess.pgn.Game()
+        game.setup(board)
+        game.headers["Event"] = ""
+        game.headers["Site"] = self.config.get("server", "base_url") + "?fen=" + board.fen().replace(" ", "%20")
+        game.headers["Date"] = datetime.datetime.now().strftime("%Y.%m.%d")
+        del game.headers["Round"]
+        game.headers["White"] = "Syzygy"
+        game.headers["Black"] = "Syzygy"
+        game.headers["Annotator"] = self.config.get("server", "name")
+
+        result = await self.probe_async(board, load_root=True)
+        if result["dtz"] is not None:
+            game.comment = "DTZ %d" % (result["dtz"], )
+        else:
+            game.comment = "Position not in tablebases"
+
         node = game
+        while not board.is_game_over(claim_draw=True):
+            result = await self.probe_async(board, load_dtz=True, load_wdl=True)
+            move = self.dtz_bestmove(board, result)
+            if not move:
+                break
 
-        for _ in range(100):
-            await self.probe_async(board, load_root=True, load_dtz=True)
-            move = random.choice(list(board.legal_moves))
-            node = node.add_variation(move)
             board.push(move)
+            node = node.add_variation(move)
 
-        game.headers["Result"] = board.result()
+            if board.halfmove_clock == 0:
+                result = await self.probe_async(board, load_root=True)
+                node.comment = "%s with DTZ %d" % (material(board), result["dtz"])
 
-        return aiohttp.web.Response(text=str(game))
+        if board.is_checkmate():
+            node.comment = "Checkmate"
+        elif board.is_stalemate():
+            node.comment = "Stalemate"
+        elif board.is_insufficient_material():
+            node.comment = "Insufficient material"
+        elif board.can_claim_draw():
+            result = await self.probe_async(board, load_root=True)
+            node.comment = "Draw claimed at DTZ %d" % (result["dtz"], )
+
+        game.headers["Result"] = board.result(claim_draw=True)
+
+        return aiohttp.web.Response(
+            text=str(game),
+            content_type="application/x-chess-pgn")
 
 
 class Frontend(object):
@@ -351,6 +430,7 @@ class Frontend(object):
         grouped_moves[-1].sort(key=lambda move: move["uci"])
         grouped_moves[-1].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
         grouped_moves[-1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        grouped_moves[-1].sort(key=lambda move: move["zeroing"], reverse=True)
         render["cursed_moves"] = grouped_moves[-1]
 
         # Sort drawing moves.
@@ -363,6 +443,7 @@ class Frontend(object):
         grouped_moves[1].sort(key=lambda move: move["uci"])
         grouped_moves[1].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
         grouped_moves[1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        grouped_moves[1].sort(key=lambda move: move["zeroing"])
         render["blessed_moves"] = grouped_moves[1]
 
         # Sort losing moves.
@@ -409,6 +490,10 @@ class Frontend(object):
 
             if board.is_valid():
                 result = await self.api.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
+
+                bm = self.api.dtz_bestmove(board, result)
+                result["bestmove"] = bm.uci() if bm else None
+
                 render["request_body"] = json.dumps(result, indent=2, sort_keys=True)
             else:
                 render["status"] = 400
@@ -459,7 +544,7 @@ async def init(config, loop):
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/api/v1", api.v1)
     app.router.add_route("GET", "/api/v2", api.v2)
-    app.router.add_route("GET", "/api/pgn", api.pgn)
+    app.router.add_route("GET", "/api/syzygy-vs-syzygy.pgn", api.syzygy_vs_syzygy_pgn)
     app.router.add_static("/static/", "static")
 
     # Create server.
