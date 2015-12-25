@@ -216,6 +216,10 @@ class Frontend(object):
             loader=jinja2.FileSystemLoader("templates"))
 
     async def index(self, request):
+        render = {}
+        render["DEFAULT_FEN"] = DEFAULT_FEN
+        render["STARTING_FEN"] = chess.STARTING_FEN
+
         # Setup a board from the given valid FEN or fall back to the default FEN.
         try:
             board = chess.Board(request.GET.get("fen", DEFAULT_FEN))
@@ -228,58 +232,67 @@ class Frontend(object):
         # Get FENs with the current side to move, black and white to move.
         original_turn = board.turn
         board.turn = chess.WHITE
-        white_fen = board.fen()
+        render["white_fen"] = board.fen()
         board.turn = chess.BLACK
-        black_fen = board.fen()
+        render["black_fen"] = board.fen()
         board.turn = original_turn
-        fen = board.fen()
+        render["fen"] = fen = board.fen()
 
-        wdl = None
-        winning_side = None
-        winning_moves = []
-        drawing_moves = []
-        losing_moves = []
+        # Mirrored and color swapped FENs for the toolbar.
+        render["turn"] = "white" if board.turn == chess.WHITE else "black"
+        render["horizontral_fen"] = mirror_horizontal(fen)
+        render["vertical_fen"] = mirror_vertical(fen)
+        render["swapped_fen"] = swap_colors(fen)
+        render["clear_fen"] = clear_fen(fen)
+        render["fen_input"] = "" if board.epd() + " 0 1" == DEFAULT_FEN else board.epd() + " 0 1"
+
+        # Material key for the page title.
+        render["material"] = material(board)
+
+        # Moves are going to be grouped by WDL.
+        grouped_moves = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
 
         if not board.is_valid():
-            status = "Invalid position"
+            render["status"] = "Invalid position"
+            render["illegal"] = True
         elif board.is_stalemate():
-            status = "Draw by stalemate"
-            wdl = 0
+            render["status"] = "Draw by stalemate"
         elif board.is_checkmate():
-            wdl = 2
             if board.turn == chess.WHITE:
-                status = "Black won by checkmate"
-                winning_side = "black"
+                render["status"] = "Black won by checkmate"
+                render["winning_side"] = "black"
             else:
-                status = "White won by checkmate"
-                winning_side = "white"
+                render["status"] = "White won by checkmate"
+                render["winning_side"] = "white"
         else:
-            wdl = self.api.syzygy.probe_wdl(board)
-            dtz = self.api.syzygy.probe_dtz(board)
-            if board.is_insufficient_material():
-                status = "Draw by insufficient material"
-                wdl = 0
-            elif dtz is None:
-                status = "Position not found in tablebases"
-            elif dtz == 0:
-                status = "Tablebase draw"
-            elif dtz > 0 and board.turn == chess.WHITE:
-                status = "White is winning with DTZ %d" % (abs(dtz), )
-                winning_side = "white"
-                losing_side = "black"
-            elif dtz < 0 and board.turn == chess.WHITE:
-                status = "White is losing with DTZ %d" % (abs(dtz), )
-                winning_side = "black"
-                losing_side = "white"
-            elif dtz > 0 and board.turn == chess.BLACK:
-                status = "Black is winning with DTZ %d" % (abs(dtz), )
-                winning_side = "black"
-                losing_side = "white"
-            elif dtz < 0 and board.turn == chess.BLACK:
-                status = "Black is losing with DTZ %d" % (abs(dtz), )
-                winning_side = "white"
-                losing_side = "black"
+            # Probe.
+            probe = await self.api.probe_async(board, load_root=True, load_dtz=True, load_wdl=True, load_dtm=True)
+            render["blessed_loss"] = probe["wdl"] == -1
+            render["cursed_win"] = probe["wdl"] == 1
 
+            # Set status line.
+            if board.is_insufficient_material():
+                render["status"] = "Draw by insufficient material"
+                render["insufficient_material"] = True
+            elif probe["wdl"] is None or probe["dtz"] is None:
+                render["status"] = "Position not found in tablebases"
+                render["unknown"] = True
+            elif probe["wdl"] == 0:
+                render["status"] = "Tablebase draw"
+            elif probe["dtz"] > 0 and board.turn == chess.WHITE:
+                render["status"] = "White is winning with DTZ %d" % (abs(probe["dtz"]), )
+                render["winning_side"] = "white"
+            elif probe["dtz"] < 0 and board.turn == chess.WHITE:
+                render["status"] = "White is losing with DTZ %d" % (abs(probe["dtz"]), )
+                render["winning_side"] = "black"
+            elif probe["dtz"] > 0 and board.turn == chess.BLACK:
+                render["status"] = "Black is winning with DTZ %d" % (abs(probe["dtz"]), )
+                render["winning_side"] = "black"
+            elif probe["dtz"] < 0 and board.turn == chess.BLACK:
+                render["status"] = "Black is losing with DTZ %d" % (abs(probe["dtz"]), )
+                render["winning_side"] = "white"
+
+            # Label and group all legal moves.
             for move in board.legal_moves:
                 san = board.san(move)
                 uci = board.uci(move)
@@ -289,8 +302,9 @@ class Frontend(object):
                     "uci": uci,
                     "san": san,
                     "fen": board.epd() + " 0 1",
-                    "dtz": self.api.syzygy.probe_dtz(board),
-                    "dtm": self.api.gaviota.probe_dtm(board),
+                    "wdl": probe["moves"][uci]["wdl"],
+                    "dtz": probe["moves"][uci]["dtz"],
+                    "dtm": probe["moves"][uci]["dtm"],
                     "zeroing": board.halfmove_clock == 0,
                     "checkmate": board.is_checkmate(),
                     "stalemate": board.is_stalemate(),
@@ -299,54 +313,68 @@ class Frontend(object):
 
                 move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
 
-                move_info["winning"] = move_info["checkmate"] or (move_info["dtz"] is not None and move_info["dtz"] < 0)
-                move_info["drawing"] = move_info["stalemate"] or move_info["insufficient_material"] or (move_info["dtz"] == 0 or (move_info["dtz"] is None and wdl is not None and wdl < 0))
+                if move_info["checkmate"]:
+                    move_info["wdl"] = -2
+                elif move_info["stalemate"] or move_info["insufficient_material"]:
+                    move_info["wdl"] = 0
 
-                if move_info["winning"]:
-                    if move_info["checkmate"]:
-                        move_info["badge"] = "Checkmate"
-                    elif move_info["zeroing"]:
-                        move_info["badge"] = "Zeroing"
-                    else:
-                        move_info["badge"] = "Win with DTZ %d" % (abs(move_info["dtz"]), )
+                if move_info["checkmate"]:
+                    move_info["badge"] = "Checkmate"
+                elif move_info["stalemate"]:
+                    move_info["badge"] = "Stalemate"
+                elif move_info["insufficient_material"]:
+                    move_info["badge"] = "Insufficient material"
+                elif move_info["dtz"] == 0:
+                    move_info["badge"] = "Draw"
+                elif move_info["dtz"] is None:
+                    move_info["badge"] = "Unknown"
+                elif move_info["zeroing"]:
+                    move_info["badge"] = "Zeroing"
+                elif move_info["dtz"] < 0:
+                    move_info["badge"] = "Win with DTZ %d" % (abs(move_info["dtz"]), )
+                elif move_info["dtz"] > 0:
+                    move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
 
-                    winning_moves.append(move_info)
-                elif move_info["drawing"]:
-                    if move_info["stalemate"]:
-                        move_info["badge"] = "Stalemate"
-                    elif move_info["insufficient_material"]:
-                        move_info["badge"] = "Insufficient material"
-                    elif move_info["dtz"] == 0:
-                        move_info["badge"] = "Draw"
-                    else:
-                        move_info["badge"] = "Unknown"
-
-                    drawing_moves.append(move_info)
-                else:
-                    if move_info["dtz"] is None:
-                        move_info["badge"] = "Unknown"
-                    elif move_info["zeroing"]:
-                        move_info["badge"] = "Zeroing"
-                    else:
-                        move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
-                    losing_moves.append(move_info)
+                grouped_moves[move_info["wdl"]].append(move_info)
 
                 board.pop()
 
-        winning_moves.sort(key=lambda move: move["uci"])
-        winning_moves.sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
-        winning_moves.sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
-        winning_moves.sort(key=lambda move: move["zeroing"], reverse=True)
-        winning_moves.sort(key=lambda move: move["checkmate"], reverse=True)
+        # Sort winning moves.
+        grouped_moves[-2].sort(key=lambda move: move["uci"])
+        grouped_moves[-2].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
+        grouped_moves[-2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        grouped_moves[-2].sort(key=lambda move: move["zeroing"], reverse=True)
+        grouped_moves[-2].sort(key=lambda move: move["checkmate"], reverse=True)
+        render["winning_moves"] = grouped_moves[-2]
 
-        drawing_moves.sort(key=lambda move: move["uci"])
-        drawing_moves.sort(key=lambda move: move["insufficient_material"], reverse=True)
-        drawing_moves.sort(key=lambda move: move["stalemate"], reverse=True)
+        # Sort moves leading to cursed wins.
+        grouped_moves[-1].sort(key=lambda move: move["uci"])
+        grouped_moves[-1].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
+        grouped_moves[-1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        render["cursed_moves"] = grouped_moves[-1]
 
-        losing_moves.sort(key=lambda move: move["uci"])
-        losing_moves.sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
-        losing_moves.sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
-        losing_moves.sort(key=lambda move: move["zeroing"])
+        # Sort drawing moves.
+        grouped_moves[0].sort(key=lambda move: move["uci"])
+        grouped_moves[0].sort(key=lambda move: move["insufficient_material"], reverse=True)
+        grouped_moves[0].sort(key=lambda move: move["stalemate"], reverse=True)
+        render["drawing_moves"] = grouped_moves[0]
+
+        # Sort moves leading to a blessed loss.
+        grouped_moves[1].sort(key=lambda move: move["uci"])
+        grouped_moves[1].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
+        grouped_moves[1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        render["blessed_moves"] = grouped_moves[1]
+
+        # Sort losing moves.
+        grouped_moves[2].sort(key=lambda move: move["uci"])
+        grouped_moves[2].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
+        grouped_moves[2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+        grouped_moves[2].sort(key=lambda move: move["zeroing"])
+        render["losing_moves"] = grouped_moves[2]
+
+        # Sort unknown moves.
+        grouped_moves[None].sort(key=lambda move: move["uci"])
+        render["unknown_moves"] = grouped_moves[None]
 
         if "xhr" in request.GET:
             template = self.jinja.get_template("probe.html")
@@ -354,30 +382,7 @@ class Frontend(object):
             template = self.jinja.get_template("index.html")
 
         return aiohttp.web.Response(
-            text=html_minify(template.render(
-                fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
-                fen=fen,
-                status=status,
-                insufficient_material=board.is_insufficient_material(),
-                winning_side=winning_side,
-                winning_moves=winning_moves,
-                drawing_moves=drawing_moves,
-                losing_moves=losing_moves,
-                blessed_loss=wdl == -1,
-                cursed_win=wdl == 1,
-                illegal=not board.is_valid(),
-                not_yet_solved=board.epd() + " 0 1" == chess.STARTING_FEN,
-                unknown=wdl is None,
-                turn="white" if board.turn == chess.WHITE else "black",
-                white_fen=white_fen,
-                black_fen=black_fen,
-                horizontal_fen=mirror_horizontal(fen),
-                vertical_fen=mirror_vertical(fen),
-                swapped_fen=swap_colors(fen),
-                clear_fen=clear_fen(fen),
-                DEFAULT_FEN=DEFAULT_FEN,
-                material=material(board)
-            )),
+            text=html_minify(template.render(render)),
             content_type="text/html")
 
     async def apidoc(self, request):
