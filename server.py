@@ -216,7 +216,6 @@ class Frontend(object):
             loader=jinja2.FileSystemLoader("templates"))
 
     async def index(self, request):
-        await asyncio.sleep(2.0)
         # Setup a board from the given valid FEN or fall back to the default FEN.
         try:
             board = chess.Board(request.GET.get("fen", DEFAULT_FEN))
