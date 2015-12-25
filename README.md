@@ -8,13 +8,11 @@ User interface and public API for probing Syzygy endgame tablebases.
 Running
 -------
 
-Dependencies:
+Dependencies (Python 3.5):
 
-    pip install flask
+    pip install aiohttp
+    pip install jinja2
     pip install python-chess
-    pip install tornado # Required for dealing with many
-                        # open file descriptors
-                        # when serving six-men tablebases.
     pip install htmlmin # Recommended.
 
     npm install -g grunt-cli
@@ -59,8 +57,8 @@ This project is licensed under the GPLv3 with the following dependencies:
 * [chess.js](https://github.com/jhlywa/chess.js) ([MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE))
 * [Bootstrap](http://getbootstrap.com/) ([MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE))
 * [jQuery](https://jquery.com/) ([MIT](https://github.com/jquery/jquery/blob/master/LICENSE.txt))
-* [Flask](http://flask.pocoo.org/) ([BSD](http://flask.pocoo.org/docs/0.10/license/">BSD</a>))
+* [aiohttp](http://aiohttp.readthedocs.org/en/stable/) ([Apache 2](https://github.com/KeepSafe/aiohttp/blob/master/LICENSE.txt))
+* [Jinja](http://jinja.pocoo.org/) ([BSD](https://github.com/mitsuhiko/jinja2/blob/master/LICENSE))
 * [htmlmin](https://htmlmin.readthedocs.org/en/latest/) ([BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE))
-* [Tornado](http://www.tornadoweb.org/en/stable/) ([Apache License Version 2.0](https://github.com/tornadoweb/tornado/blob/master/LICENSE))
 
 Thanks to all of them and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
