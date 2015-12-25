@@ -41,10 +41,10 @@
       </div>
     </div>
     <p><code>wdl</code> is 2 if the side to move is winning, 1 for a cursed win (that can not be realized under the fifty-move rule), 0 for a draw, -1 for a blessed loss and -2 for a loss.</p>
-    <p><code>dtz</code> is the distance to zero. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move in winning.</p>
+    <p><code>dtz</code> is the distance to zero as found in 6 piece Syzygy tablebases. The absolute value is 0 for a draw and otherwise the number of halfmoves for the winning side to force a pawn move or capture. The DTZ is positive if the side to move is winning. 100 is added to the absolute value indicate 50-move-rule draws in a later phase. In some cases the value can be off by one, but never so that it changes the outcome of practical play.</p>
     <p><code>dtm</code> is the distance to mate as found in 5 piece <a href="https://github.com/michiguel/Gaviota-Tablebases">Gaviota tablebases</a>.</p>
-    <p><code>moves</code> is a dictionary mapping all legal moves in UCI notation to DTZ values of the resulting positions.</p>
-    <p><code>bestmove</code> is a <a href="#ordering">DTZ optimal</a> move.</p>
+    <p><code>moves</code> is a dictionary containing all legal moves as keys (in UCI notation). In turn, each entry has a <code>wdl</code>, <code>dtz</code> and <code>dtm</code> values.</p>
+    <p><code>bestmove</code> is a DTZ optimal move.</p>
     <p><em>Any of the mentioned values might be null if the requested information was not available in the tablebases.</em></p>
   </section>
 
@@ -59,20 +59,8 @@
   </section>
 
   <section id="http">
-    <h2>HTTP</h2>
+    <h2>HTTP without TLS</h2>
     <p>HSTS is enabled for the entire site. However for clients that do not support TLS the API endpoint is also available via HTTP.</p>
-  </section>
-
-  <section id="ordering">
-    <h2>Ordering moves</h2>
-
-    <p><em>Some additional logic is required to order moves by DTZ optimality, other than looking at the DTZ values.</em></p>
-
-    <p>If the move is a <strong>checkmate</strong> play it.</p>
-    <p>If the move is <strong>a capture or pawn move</strong> and maintains a winning position (DTZ of opponent &lt; 0) play it.</p>
-    <p>If the move is <strong>winning</strong> (DTZ of opponent &lt; 0) play it.</p>
-    <p>If the move is a <strong>stalemate or draw by insufficient material or a draw</strong> (DTZ 0) play it.</p>
-    <p>A <strong>losing</strong> move is forced. Avoid zeroing moves. Maximize the DTZ of your opponent.</p>
   </section>
 
   <section id="download">
