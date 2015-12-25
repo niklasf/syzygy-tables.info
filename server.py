@@ -555,7 +555,9 @@ async def init(config, loop):
     bind = config.get("server", "bind")
     port = config.getint("server", "port")
     server = await loop.create_server(app.make_handler(), bind, port)
-    print("Listening on http://%s:%d/ ..." % (bind, port))
+    print("Listening on: http://%s:%d/ ..." % (bind, port))
+    print("* Server name: %s" % (config.get("server", "name"), ))
+    print("* Base url: %s" % (config.get("server", "base_url"), ))
 
     print("---")
     return server
