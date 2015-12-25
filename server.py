@@ -348,7 +348,11 @@ class Frontend(object):
         losing_moves.sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
         losing_moves.sort(key=lambda move: move["zeroing"])
 
-        template = self.jinja.get_template("index.html")
+        if "xhr" in request.GET:
+            template = self.jinja.get_template("probe.html")
+        else:
+            template = self.jinja.get_template("index.html")
+
         return aiohttp.web.Response(
             text=html_minify(template.render(
                 fen_input=board.epd() + " 0 1" if board.epd() + " 0 1" != DEFAULT_FEN else "",
