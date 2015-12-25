@@ -185,7 +185,7 @@ class Api(object):
 
     async def v2(self, request):
         board = self.get_board(request)
-        result = await self.probe_async(board, load_root=True, load_dtz=True, load_dtm=True)
+        result = await self.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
         return jsonp(request, result)
 
     async def pgn(self, request):
@@ -403,7 +403,7 @@ class Frontend(object):
             render["sanitized_fen"] = board.fen()
 
             if board.is_valid():
-                result = await self.api.probe_async(board, load_root=True, load_dtz=True)
+                result = await self.api.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
                 render["request_body"] = json.dumps(result, indent=2, sort_keys=True)
             else:
                 render["status"] = 400
