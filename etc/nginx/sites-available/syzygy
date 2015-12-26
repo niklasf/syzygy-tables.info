@@ -41,7 +41,7 @@ server {
         add_header X-Content-Type-Options "nosniff";
         add_header Cache-Control "public";
 
-        location = /api {
+        location /api/ {
                 expires 7d;
                 proxy_pass http://backend;
         }
