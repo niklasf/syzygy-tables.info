@@ -241,6 +241,13 @@ class Api(object):
     async def syzygy_vs_syzygy_pgn(self, request):
         board = self.get_board(request)
 
+        # Send HTTP headers early, to let the client know wo got the request.
+        # Creating the actual response might take a while.
+        response = aiohttp.web.StreamResponse()
+        response.content_type = "application/x-chess-pgn"
+        await response.prepare(request)
+
+        # Prepare PGN headers.
         game = chess.pgn.Game()
         game.setup(board)
         game.headers["Event"] = ""
@@ -257,6 +264,7 @@ class Api(object):
         else:
             game.comment = "Position not in tablebases"
 
+        # Follow the DTZ mainline.
         node = game
         while not board.is_game_over(claim_draw=True):
             result = await self.probe_async(board, load_dtz=True, load_wdl=True)
@@ -271,6 +279,7 @@ class Api(object):
                 result = await self.probe_async(board, load_root=True)
                 node.comment = "%s with DTZ %d" % (material(board), result["dtz"])
 
+        # Set PGN result.
         if board.is_checkmate():
             node.comment = "Checkmate"
         elif board.is_stalemate():
@@ -283,9 +292,10 @@ class Api(object):
 
         game.headers["Result"] = board.result(claim_draw=True)
 
-        return aiohttp.web.Response(
-            text=str(game),
-            content_type="application/x-chess-pgn")
+        # Send response.
+        response.write(str(game).encode("utf-8"))
+        await response.write_eof()
+        return response
 
 
 class Frontend(object):
