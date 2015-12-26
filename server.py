@@ -12,12 +12,14 @@ import configparser
 import os
 import json
 import logging
-import random
 import warnings
 import datetime
+import functools
 
 try:
-    from htmlmin import minify as html_minify
+    import htmlmin
+
+    html_minify = functools.partial(htmlmin.minify, remove_optional_attribute_quotes=False)
 except ImportError:
     warnings.warn("Not using HTML minification, htmlmin not imported.")
 
