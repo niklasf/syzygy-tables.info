@@ -231,7 +231,7 @@ class Api(object):
         moves.sort(key=lambda move: (result(move, "dtm") is None, result(move, "dtm")), reverse=True)
         moves.sort(key=lambda move: (result(move, "dtz") is None, result(move, "dtz")), reverse=True)
         moves.sort(key=lambda move: zeroing(move) if result(move, "wdl", 0) > 0 else not zeroing(move))
-        moves.sort(key=lambda move: definite_draw(move))
+        moves.sort(key=lambda move: definite_draw(move), reverse=True)
         moves.sort(key=lambda move: (result(move, "wdl") is None, result(move, "wdl")))
         moves.sort(key=lambda move: checkmate(move), reverse=True)
 
