@@ -93,6 +93,12 @@ server {
                 return 200 "google-site-verification: google675e347e646e7c68.html";
         }
 
+        location /syzygy-vs-syzygy/ {
+                proxy_buffering off;
+                proxy_http_version 1.1;
+                proxy_pass http://backend;
+        }
+
         location / {
                 expires 7d;
                 proxy_pass http://backend;

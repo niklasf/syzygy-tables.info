@@ -245,12 +245,18 @@ class Api(object):
         # Creating the actual response might take a while.
         response = aiohttp.web.StreamResponse()
         response.content_type = "application/x-chess-pgn"
+        if request.version >= (1, 1):
+            response.enable_chunked_encoding()
         await response.prepare(request)
+
+        # Force reverse proxies like nginx to send the first chunk.
+        response.write("[Event \"\"]\n".encode("utf-8"))
+        await response.drain()
 
         # Prepare PGN headers.
         game = chess.pgn.Game()
         game.setup(board)
-        game.headers["Event"] = ""
+        del game.headers["Event"]
         game.headers["Site"] = self.config.get("server", "base_url") + "?fen=" + board.fen().replace(" ", "%20")
         game.headers["Date"] = datetime.datetime.now().strftime("%Y.%m.%d")
         del game.headers["Round"]
