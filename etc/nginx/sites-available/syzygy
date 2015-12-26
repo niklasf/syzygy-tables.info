@@ -1,4 +1,4 @@
-upstream api_backend {
+upstream backend {
         server 127.0.0.1:5000;
 }
 
@@ -7,19 +7,19 @@ server {
 
         server_name www.syzygy-tables.info;
 
-        ssl_certificate /etc/ssl/certs/syzygy-tables.info.pem;
-        ssl_certificate_key /etc/ssl/private/syzygy-tables.info.key;
+        ssl_certificate /etc/letsencrypt/live/syzygy-tables.info/cert.pem;
+        ssl_certificate_key /etc/letsencrypt/live/syzygy-tables.info/privkey.pem;
 
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_session_cache shared:SSL:10m;
 
         ssl_prefer_server_ciphers on;
-        ssl_dhparam /etc/ssl/dhparam.pem;
+        ssl_dhparam /etc/ssl/private/dhparams.pem;
         ssl_ciphers AES128+EECDH:AES128+EDH:!aNULL;
 
         ssl_stapling on;
         ssl_stapling_verify on;
-        ssl_trusted_certificate /etc/ssl/stapling.pem;
+        ssl_trusted_certificate /etc/letsencrypt/live/syzygy-tables.info/fullchain.pem;
         resolver 8.8.4.4 8.8.8.8 valid=300s;
         resolver_timeout 10s;
 
@@ -43,7 +43,7 @@ server {
 
         location = /api {
                 expires 7d;
-                proxy_pass http://api_backend;
+                proxy_pass http://backend;
         }
 
         location / {
@@ -56,19 +56,19 @@ server {
 
         server_name syzygy-tables.info;
 
-        ssl_certificate /etc/ssl/certs/syzygy-tables.info.pem;
-        ssl_certificate_key /etc/ssl/private/syzygy-tables.info.key;
+        ssl_certificate /etc/letsencrypt/live/syzygy-tables.info/cert.pem;
+        ssl_certificate_key /etc/letsencrypt/live/syzygy-tables.info/privkey.pem;
 
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_session_cache shared:SSL:10m;
 
         ssl_prefer_server_ciphers on;
-        ssl_dhparam /etc/ssl/dhparam.pem;
+        ssl_dhparam /etc/ssl/private/dhparams.pem;
         ssl_ciphers AES128+EECDH:AES128+EDH:!aNULL;
 
         ssl_stapling on;
         ssl_stapling_verify on;
-        ssl_trusted_certificate /etc/ssl/stapling.pem;
+        ssl_trusted_certificate /etc/letsencrypt/live/syzygy-tables.info/fullchain.pem;
         resolver 8.8.4.4 8.8.8.8 valid=300s;
         resolver_timeout 10s;
 
@@ -78,13 +78,13 @@ server {
         add_header Cache-Control "public";
 
         location /static/ {
-                root /srv/syzygy-tables.info/;
+                root /home/niklas/syzygy-tables.info/;
                 expires 1M;
                 access_log off;
         }
 
         location = /favicon.ico {
-                root /srv/syzygy-tables.info/;
+                root /home/niklas/syzygy-tables.info/;
                 expires 1M;
                 access_log off;
         }
@@ -93,18 +93,8 @@ server {
                 return 200 "google-site-verification: google675e347e646e7c68.html";
         }
 
-        location = /api {
-                expires 7d;
-                proxy_pass http://api_backend;
-        }
-
         location / {
                 expires 7d;
-                proxy_pass http://127.0.0.1:5000;
+                proxy_pass http://backend;
         }
-
-        #location /gaviota/ {
-        #        root /srv/syzygy-tables.info/;
-        #        autoindex on;
-        #}
 }
