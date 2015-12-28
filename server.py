@@ -393,6 +393,8 @@ class Frontend(object):
                 render["status"] = "Black is losing with DTZ %d" % (abs(probe["dtz"]), )
                 render["winning_side"] = "white"
 
+            render["frustrated"] = probe["wdl"] is not None and abs(probe["wdl"]) == 1
+
             # Label and group all legal moves.
             for move in board.legal_moves:
                 san = board.san(move)

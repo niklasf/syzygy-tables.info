@@ -1,5 +1,4 @@
 var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
-var STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 
 function strRepeat(str, num) {

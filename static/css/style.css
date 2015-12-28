@@ -28,11 +28,20 @@ h2 {
   padding: 10px 15px;
   background: #777;
   color: white;
+  font-weight: bold;
 }
 
 h2.white-win {
   background: white;
   color: black;
+}
+
+h2.white-win.frustrated {
+  background: repeating-linear-gradient(45deg, #eee, #eee 8px, white 8px, white 20px);
+}
+
+h2.black-win.frustrated {
+  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
 }
 
 h2.black-win {
@@ -64,6 +73,17 @@ h3 {
   background: white;
   color: black;
   border: 1px solid black;
+}
+
+#cursed.white-turn .badge, #blessed.black-turn .badge {
+  background: repeating-linear-gradient(45deg, #eee, #eee 8px, white 8px, white 20px);
+  color: black;
+  border: 1px solid black;
+}
+
+#cursed.black-turn .badge, #blessed.white-turn .badge {
+  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
+  color: white;
 }
 
 footer > .inner {

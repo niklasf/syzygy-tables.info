@@ -1,4 +1,4 @@
-<h2 id="status"{% if winning_side %} class="{{ winning_side }}-win"{% endif %}>{{ status }}</h2>
+<h2 id="status"{% if winning_side %} class="{{ winning_side }}-win{% if frustrated %} frustrated{% endif %}"{% endif %}>{{ status }}</h2>
 
 <div id="winning" class="list-group {{ turn }}-turn">
 {% for move in winning_moves %}
