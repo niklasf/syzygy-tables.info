@@ -116,6 +116,7 @@ footer > .inner {
   font-weight: bold;
   position: fixed;
   width: 100%;
+  z-index: 1;
 }
 
 /* Device size specifics */
