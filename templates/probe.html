@@ -76,7 +76,7 @@
 </div>
 
 {% if not illegal %}
-<a class="" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|urlencode }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
+<a id="download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|urlencode }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
   <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
   {{ material }}.pgn
 </a>

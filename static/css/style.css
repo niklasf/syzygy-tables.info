@@ -105,6 +105,10 @@ footer > .inner {
   text-align: center;
 }
 
+#download {
+  white-space: nowrap;
+}
+
 #development {
   background: red;
   color: white;
