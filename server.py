@@ -316,10 +316,11 @@ class Frontend(object):
         self.jinja = jinja2.Environment(
             loader=jinja2.FileSystemLoader("templates"))
 
+        self.jinja.globals["DEFAULT_FEN"] = DEFAULT_FEN
+        self.jinja.globals["STARTING_FEN"] = chess.STARTING_FEN
+
     async def index(self, request):
         render = {}
-        render["DEFAULT_FEN"] = DEFAULT_FEN
-        render["STARTING_FEN"] = chess.STARTING_FEN
 
         # Setup a board from the given valid FEN or fall back to the default FEN.
         try:
@@ -492,7 +493,6 @@ class Frontend(object):
 
     async def apidoc(self, request):
         render = {}
-        render["DEFAULT_FEN"] = DEFAULT_FEN
         render["status"] = 200
 
         # Pass the raw unchanged FEN.
