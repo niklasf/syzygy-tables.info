@@ -485,7 +485,7 @@ class Frontend(object):
         render["unknown_moves"] = grouped_moves[None]
 
         if "xhr" in request.GET:
-            template = self.jinja.get_template("probe.html")
+            template = self.jinja.get_template("xhr-probe.html")
         else:
             template = self.jinja.get_template("index.html")
 

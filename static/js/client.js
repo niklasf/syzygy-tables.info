@@ -312,7 +312,7 @@ function TablebaseView(controller) {
   controller.bind('positionChanged', function (position) {
     $('.right-side > .inner')
       .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
-      .load('/?fen=' + encodeURIComponent(position.fen()) + '&xhr=1', function (url, status, xhr) {
+      .load('/?fen=' + encodeURIComponent(position.fen()) + '&xhr=probe', function (url, status, xhr) {
         if (status == 'error') {
           $('.right-side > .inner')
             .empty()
