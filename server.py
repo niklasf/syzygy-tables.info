@@ -319,6 +319,8 @@ class Frontend(object):
         self.jinja.globals["DEFAULT_FEN"] = DEFAULT_FEN
         self.jinja.globals["STARTING_FEN"] = chess.STARTING_FEN
 
+        self.jinja.globals["development"] = self.config.getboolean("server", "development")
+
     async def index(self, request):
         render = {}
 

@@ -105,6 +105,15 @@ footer > .inner {
   text-align: center;
 }
 
+#development {
+  background: red;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  position: fixed;
+  width: 100%;
+}
+
 /* Device size specifics */
 
 @media(min-width: 640px) {
