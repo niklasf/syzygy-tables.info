@@ -37,7 +37,7 @@ h2.white-win {
 }
 
 h2.white-win.frustrated {
-  background: repeating-linear-gradient(45deg, #eee, #eee 8px, white 8px, white 20px);
+  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
 }
 
 h2.black-win.frustrated {
@@ -76,7 +76,7 @@ h3 {
 }
 
 #cursed.white-turn .badge, #blessed.black-turn .badge {
-  background: repeating-linear-gradient(45deg, #eee, #eee 8px, white 8px, white 20px);
+  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
   color: black;
   border: 1px solid black;
 }
