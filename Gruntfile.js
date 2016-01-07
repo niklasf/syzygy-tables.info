@@ -14,7 +14,7 @@ module.exports = function(grunt) {
   var templates = [
     'templates/apidoc.html',
     'templates/index.html',
-    'templates/probe.html',
+    'templates/xhr-probe.html',
     'templates/layout.html',
     'templates/legal.html'
   ];
