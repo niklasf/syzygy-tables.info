@@ -344,7 +344,7 @@ class Frontend(object):
 
         # Mirrored and color swapped FENs for the toolbar.
         render["turn"] = "white" if board.turn == chess.WHITE else "black"
-        render["horizontral_fen"] = mirror_horizontal(fen)
+        render["horizontal_fen"] = mirror_horizontal(fen)
         render["vertical_fen"] = mirror_vertical(fen)
         render["swapped_fen"] = swap_colors(fen)
         render["clear_fen"] = clear_fen(fen)
