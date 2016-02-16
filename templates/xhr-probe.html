@@ -2,7 +2,7 @@
 
 <div id="winning" class="list-group {{ turn }}-turn">
 {% for move in winning_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
     {{ move.san }}
     {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
     <span class="badge">{{ move.badge }}</span>
@@ -12,7 +12,7 @@
 
 <div id="cursed" class="list-group {{ turn }}-turn">
 {% for move in cursed_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
     {{ move.san }}
     {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
     <span class="badge">{{ move.badge }}</span>
@@ -22,19 +22,19 @@
 
 <div id="drawing" class="list-group">
 {% for move in drawing_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
 {% endfor %}
 </div>
 
 <div id="unknown" class="list-group">
 {% for move in unknown_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
 {% endfor %}
 </div>
 
 <div id="blessed" class="list-group {{ turn }}-turn">
 {% for move in blessed_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
     {{ move.san }}
     {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
     <span class="badge">{{ move.badge }}</span>
@@ -44,7 +44,7 @@
 
 <div id="losing" class="list-group {{ turn }}-turn">
 {% for move in losing_moves %}
-  <a class="list-group-item" href="/?fen={{ move.fen|urlencode }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+  <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
     {{ move.san }}
     {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
     <span class="badge">{{ move.badge }}</span>
@@ -76,7 +76,7 @@
 </div>
 
 {% if not illegal %}
-<a id="pgn-download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|urlencode }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
+<a id="pgn-download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|replace(" ", "_") }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
   <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
   {{ material }}.pgn
 </a>
@@ -99,9 +99,9 @@
     <p>Intresting positions:</p>
 
     <ul>
-      <li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201">The longest six piece endgame</a></li>
-      <li><a href="/?fen=8/8/8/8/1p2P3/4P3/1k6/3K4%20w%20-%20-%200%201">The longest five piece endgame</a></li>
-      <li><a href="/?fen=8/6B1/8/8/B7/8/K1pk4/8%20b%20-%20-%200%201">Black escapes to a blessed loss with an underpromotion</a></li>
+      <li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6_w_-_-_0_1">The longest six piece endgame</a></li>
+      <li><a href="/?fen=8/8/8/8/1p2P3/4P3/1k6/3K4_w_-_-_0_1">The longest five piece endgame</a></li>
+      <li><a href="/?fen=8/6B1/8/8/B7/8/K1pk4/8_b_-_-_0_1">Black escapes to a blessed loss with an underpromotion</a></li>
     </ul>
   </section>
 

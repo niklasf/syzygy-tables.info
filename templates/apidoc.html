@@ -10,7 +10,7 @@
   <em>This public API is available for free and provided without any guarantees on a best-effort basis.</em>
 
   <nav>
-    <div class="reload"><a class="btn btn-default" href="/?fen={{ sanitized_fen|urlencode }}">Back to board</a></div>
+    <div class="reload"><a class="btn btn-default" href="/?fen={{ sanitized_fen|replace(" ", "_") }}">Back to board</a></div>
 
     <form id="form-set-fen" action="/apidoc" method="get">
       <div class="input-group">

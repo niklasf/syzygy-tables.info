@@ -32,7 +32,7 @@ function Controller(fen) {
       query.split('&').forEach(function (part) {
         var item = part.split('=');
         if (item[0] == 'fen') {
-          fen = decodeURIComponent(item[1]);
+          fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
         }
       });
     }
@@ -68,7 +68,7 @@ Controller.prototype.push = function (position) {
     if ('pushState' in history) {
       history.pushState({
         fen: fen
-      }, null, '/?fen=' + fen);
+      }, null, '/?fen=' + fen.replace(/\s/g, '_'));
     }
 
     this.setPosition(new Chess(fen));

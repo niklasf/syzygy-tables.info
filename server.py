@@ -165,7 +165,7 @@ class Api(object):
 
     def get_board(self, request):
         try:
-            board = chess.Board(request.GET["fen"])
+            board = chess.Board(request.GET["fen"].replace("_", " "))
         except KeyError:
             raise aiohttp.web.HTTPBadRequest(reason="fen required")
         except ValueError:
@@ -326,10 +326,10 @@ class Frontend(object):
 
         # Setup a board from the given valid FEN or fall back to the default FEN.
         try:
-            board = chess.Board(request.GET.get("fen", DEFAULT_FEN))
+            board = chess.Board(request.GET.get("fen", DEFAULT_FEN).replace("_", " "))
         except ValueError:
             try:
-                board, _ = chess.Board.from_epd(request.GET.get("fen", DEFAULT_FEN))
+                board, _ = chess.Board.from_epd(request.GET.get("fen", DEFAULT_FEN).replace("_", " "))
             except ValueError:
                 board = chess.Board(DEFAULT_FEN)
 
@@ -499,10 +499,10 @@ class Frontend(object):
 
         # Pass the raw unchanged FEN.
         if "fen" in request.GET:
-            render["fen"] = request.GET["fen"]
+            render["fen"] = request.GET["fen"].replace("_", " ")
 
         try:
-            board = chess.Board(request.GET["fen"])
+            board = chess.Board(request.GET["fen"].replace("_", " "))
         except KeyError:
             render["status"] = 400
             render["error"] = "fen required"
