@@ -110,7 +110,7 @@ class Api(object):
         print("Loading syzygy tablebases ...")
         self.syzygy = chess.syzygy.Tablebases()
 
-        for line in config.get("tablebases", "syzygy").splitlines():
+        for line in self.config.get("tablebases", "syzygy").splitlines():
             path = line.strip()
             if not path:
                 continue
@@ -122,7 +122,7 @@ class Api(object):
         print("Loading gaviota tablebases ...")
         self.gaviota = chess.gaviota.open_tablebases()
 
-        for line in config.get("tablebases", "gaviota").splitlines():
+        for line in self.config.get("tablebases", "gaviota").splitlines():
             path = line.strip()
             if not path:
                 continue
@@ -551,15 +551,14 @@ class Frontend(object):
         return aiohttp.web.Response(text=content)
 
 
-async def init(config, loop):
-    print("---")
-
-    api = Api(config, loop)
-    frontend = Frontend(config, api, loop)
-
+def make_app(config, loop):
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")
     assert config.get("server", "base_url").endswith("/")
+
+    # Create request handlers.
+    api = Api(config, loop)
+    frontend = Frontend(config, api, loop)
 
     # Setup routes.
     app = aiohttp.web.Application(loop=loop)
@@ -572,29 +571,45 @@ async def init(config, loop):
     app.router.add_route("GET", "/api/v2", api.v2)
     app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", api.syzygy_vs_syzygy_pgn)
     app.router.add_static("/static/", "static")
+    return app
 
-    # Create server.
-    bind = config.get("server", "bind")
-    port = config.getint("server", "port")
-    server = await loop.create_server(app.make_handler(), bind, port)
-    print("Listening on: http://%s:%d/ ..." % (bind, port))
-    print("* Server name: %s" % (config.get("server", "name"), ))
-    print("* Base url: %s" % (config.get("server", "base_url"), ))
 
+def main():
     print("---")
-    return server
-
-
-if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     loop = asyncio.get_event_loop()
 
     config = configparser.ConfigParser()
-
     config.read([
         os.path.join(os.path.dirname(__file__), "config.default.ini"),
         os.path.join(os.path.dirname(__file__), "config.ini"),
     ])
 
-    loop.run_until_complete(init(config, loop))
-    loop.run_forever()
+    bind = config.get("server", "bind")
+    port = config.getint("server", "port")
+
+    app = make_app(config, loop)
+    handler = app.make_handler(access_log=None)
+    server = loop.run_until_complete(loop.create_server(handler, bind, port))
+
+    print("Listening on: http://%s:%d/ ..." % (bind, port))
+    print("* Server name: ", config.get("server", "name"))
+    print("* Base url: ", config.get("server", "base_url"))
+
+    try:
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.close()
+        loop.run_until_complete(server.wait_closed())
+        loop.run_until_complete(app.shutdown())
+        loop.run_until_complete(handler.finish_connections(5.0))
+        loop.run_until_complete(app.cleanup())
+
+    loop.close()
+    print("---")
+
+
+if __name__ == "__main__":
+    main()
