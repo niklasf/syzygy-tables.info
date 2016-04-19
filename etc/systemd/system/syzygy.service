@@ -4,9 +4,10 @@ After=network.target
 Requires=network.target
 
 [Service]
+LimitNOFILE=4096
 User=www-data
 WorkingDirectory=/home/niklas/syzygy-tables.info/
-ExecStart=/bin/bash -c "ulimit -n 4096; source venv/bin/activate; exec python server.py"
+ExecStart=/home/niklas/syzygy-tables.info/venv/bin/python server.py
 Restart=always
 KillSignal=SIGINT
 
