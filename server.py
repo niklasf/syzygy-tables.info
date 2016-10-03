@@ -259,7 +259,7 @@ class Api(object):
         game = chess.pgn.Game()
         game.setup(board)
         del game.headers["Event"]
-        game.headers["Site"] = self.config.get("server", "base_url") + "?fen=" + board.fen().replace(" ", "%20")
+        game.headers["Site"] = self.config.get("server", "base_url") + "?fen=" + board.fen().replace(" ", "_")
         game.headers["Date"] = datetime.datetime.now().strftime("%Y.%m.%d")
         del game.headers["Round"]
         game.headers["White"] = "Syzygy"
