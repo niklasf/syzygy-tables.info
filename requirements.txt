@@ -1,6 +1,8 @@
-aiohttp==0.21.6
-chardet==2.3.0
-htmlmin==0.1.10
 Jinja2==2.8
 MarkupSafe==0.23
-python-chess==0.14.1
+aiohttp==1.0.2
+async-timeout==1.0.0
+chardet==2.3.0
+htmlmin==0.1.10
+multidict==2.1.2
+python-chess==0.15.3
