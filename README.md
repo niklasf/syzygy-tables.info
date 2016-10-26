@@ -63,7 +63,7 @@ Have a look at `server.py` for server side code. The client side code is in
 License
 -------
 
-This project is licensed under the GPLv3 with the following dependencies:
+This project is licensed under the AGPLv3 with the following dependencies:
 
 * [python-chess](https://github.com/niklasf/python-chess) ([GPL3](https://github.com/niklasf/python-chess/blob/master/LICENSE))
 * [chessboard.js](http://chessboardjs.com/) ([MIT](https://github.com/oakmac/chessboardjs/blob/master/LICENSE))
