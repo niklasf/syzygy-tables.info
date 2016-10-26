@@ -13,7 +13,7 @@ Dependencies (Python 3.5):
     pip install aiohttp
     pip install jinja2
     pip install python-chess
-    pip install htmlmin # Recommended.
+    pip install htmlmin  # recommended
 
 Node.js:
 
@@ -30,7 +30,7 @@ Start the server on port 5000:
 
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables. `etc` contains configuration examples for nginx and
-supervisord.
+a systemd service.
 
 Syzygy tablebase files
 ----------------------
