@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of the syzygy-tables.info tablebase probing website.
-# Copyright (C) 2015-2016 Niklas Fiekas <niklas.fiekas@backscattering.de>
+# Copyright (C) 2015-2017 Niklas Fiekas <niklas.fiekas@backscattering.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -51,17 +51,9 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-def static(url, path):
-    # Workaround to serve a single static file.
-    # TODO: https://github.com/KeepSafe/aiohttp/issues/468
-
+def static(path):
     async def handler(request):
-        prefix = url.rsplit("/", 1)[0] or "/"
-        route = aiohttp.web.StaticRoute(None, prefix, os.path.dirname(__file__))
-
-        request.match_info["filename"] = path
-        return await route.handle(request)
-
+        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path))
     return handler
 
 def jsonp(request, obj):
@@ -100,19 +92,19 @@ def clear_fen(fen):
 
 def material(board):
     name = ""
-    name += "K" * chess.pop_count(board.kings & board.occupied_co[chess.WHITE])
-    name += "Q" * chess.pop_count(board.queens & board.occupied_co[chess.WHITE])
-    name += "R" * chess.pop_count(board.rooks & board.occupied_co[chess.WHITE])
-    name += "B" * chess.pop_count(board.bishops & board.occupied_co[chess.WHITE])
-    name += "N" * chess.pop_count(board.knights & board.occupied_co[chess.WHITE])
-    name += "P" * chess.pop_count(board.pawns & board.occupied_co[chess.WHITE])
+    name += "K" * chess.popcount(board.kings & board.occupied_co[chess.WHITE])
+    name += "Q" * chess.popcount(board.queens & board.occupied_co[chess.WHITE])
+    name += "R" * chess.popcount(board.rooks & board.occupied_co[chess.WHITE])
+    name += "B" * chess.popcount(board.bishops & board.occupied_co[chess.WHITE])
+    name += "N" * chess.popcount(board.knights & board.occupied_co[chess.WHITE])
+    name += "P" * chess.popcount(board.pawns & board.occupied_co[chess.WHITE])
     name += "v"
-    name += "K" * chess.pop_count(board.kings & board.occupied_co[chess.BLACK])
-    name += "Q" * chess.pop_count(board.queens & board.occupied_co[chess.BLACK])
-    name += "R" * chess.pop_count(board.rooks & board.occupied_co[chess.BLACK])
-    name += "B" * chess.pop_count(board.bishops & board.occupied_co[chess.BLACK])
-    name += "N" * chess.pop_count(board.knights & board.occupied_co[chess.BLACK])
-    name += "P" * chess.pop_count(board.pawns & board.occupied_co[chess.BLACK])
+    name += "K" * chess.popcount(board.kings & board.occupied_co[chess.BLACK])
+    name += "Q" * chess.popcount(board.queens & board.occupied_co[chess.BLACK])
+    name += "R" * chess.popcount(board.rooks & board.occupied_co[chess.BLACK])
+    name += "B" * chess.popcount(board.bishops & board.occupied_co[chess.BLACK])
+    name += "N" * chess.popcount(board.knights & board.occupied_co[chess.BLACK])
+    name += "P" * chess.popcount(board.pawns & board.occupied_co[chess.BLACK])
     return name
 
 
@@ -584,7 +576,7 @@ def make_app(config, loop):
     app.router.add_route("GET", "/", frontend.index)
     app.router.add_route("GET", "/apidoc", frontend.apidoc)
     app.router.add_route("GET", "/legal", frontend.legal)
-    app.router.add_route("GET", "/favicon.ico", static("/favicon.ico", "favicon.ico"))
+    app.router.add_route("GET", "/favicon.ico", static("favicon.ico"))
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/api/v1", api.v1)
     app.router.add_route("GET", "/api/v2", api.v2)
