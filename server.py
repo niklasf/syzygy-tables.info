@@ -145,9 +145,9 @@ class Api(object):
         result = {}
 
         if load_root:
-            result["wdl"] = self.syzygy.probe_wdl(board)
-            result["dtz"] = self.syzygy.probe_dtz(board)
-            result["dtm"] = self.gaviota.probe_dtm(board)
+            result["wdl"] = self.syzygy.get_wdl(board)
+            result["dtz"] = self.syzygy.get_dtz(board)
+            result["dtm"] = self.gaviota.get_dtm(board)
 
         result["moves"] = {}
 
@@ -157,13 +157,13 @@ class Api(object):
             result["moves"][move.uci()] = move_info = {}
 
             if load_wdl:
-                move_info["wdl"] = self.syzygy.probe_wdl(board)
+                move_info["wdl"] = self.syzygy.get_wdl(board)
 
             if load_dtz:
-                move_info["dtz"] = self.syzygy.probe_dtz(board)
+                move_info["dtz"] = self.syzygy.get_dtz(board)
 
             if load_dtm:
-                move_info["dtm"] = self.gaviota.probe_dtm(board)
+                move_info["dtm"] = self.gaviota.get_dtm(board)
 
             board.pop()
 
