@@ -1,4 +1,4 @@
 aiohttp==2.0.2
-python-chess==0.18.2
+git+https://github.com/niklasf/python-chess.git@0.18.x#egg=python-chess
 Jinja2==2.9.6
 htmlmin==0.1.10
