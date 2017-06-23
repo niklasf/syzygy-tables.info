@@ -5,7 +5,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-purifycss');
 
   var js = [
-    'static/js/jquery-2.1.4.js',
+    'static/js/jquery-3.2.1.js',
     'static/js/chess.js',
     'static/js/chessboard-0.3.0.js',
     'static/js/client.js'
