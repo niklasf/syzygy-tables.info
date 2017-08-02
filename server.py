@@ -131,7 +131,7 @@ class Api(object):
 
     def init_gaviota(self):
         print("Loading gaviota tablebases ...")
-        self.gaviota = chess.gaviota.open_tablebases()
+        self.gaviota = chess.gaviota.open_tablebases("gaviota")
 
         for line in self.config.get("tablebases", "gaviota").splitlines():
             path = line.strip()

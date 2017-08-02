@@ -1,4 +1,4 @@
-aiohttp==2.0.2
-python-chess==0.18.3
+aiohttp==2.2.0
+python-chess==0.19.0
 Jinja2==2.9.6
 htmlmin==0.1.10
