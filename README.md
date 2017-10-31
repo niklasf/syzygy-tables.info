@@ -44,7 +44,7 @@ Gaviota tablebases
 ------------------
 
 Optionally build and install [libgtb](https://github.com/michiguel/Gaviota-Tablebases)
-and [download](http://www.olympuschess.com/egtb/gaviota/filelist.txt)
+and [download](https://syzygy-tables.info/gaviota/)
 Gaviota tablebase files. Put them into the `gaviota` directory or
 a configured path.
 
