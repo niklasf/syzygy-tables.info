@@ -586,7 +586,6 @@ def make_app(config, loop):
 
 
 def main():
-    print("---")
     logging.basicConfig(level=logging.DEBUG)
     loop = asyncio.get_event_loop()
 
@@ -600,26 +599,10 @@ def main():
     port = config.getint("server", "port")
 
     app = make_app(config, loop)
-    handler = app.make_handler(access_log=None)
-    server = loop.run_until_complete(loop.create_server(handler, bind, port))
 
-    print("Listening on: http://%s:%d/ ..." % (bind, port))
     print("* Server name: ", config.get("server", "name"))
     print("* Base url: ", config.get("server", "base_url"))
-
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.close()
-        loop.run_until_complete(server.wait_closed())
-        loop.run_until_complete(app.shutdown())
-        loop.run_until_complete(handler.finish_connections(5.0))
-        loop.run_until_complete(app.cleanup())
-
-    loop.close()
-    print("---")
+    aiohttp.web.run_app(app, host=bind, port=port, loop=loop, access_log=None)
 
 
 if __name__ == "__main__":
