@@ -577,6 +577,7 @@ def make_app(config, loop):
     app.router.add_route("GET", "/apidoc", frontend.apidoc)
     app.router.add_route("GET", "/legal", frontend.legal)
     app.router.add_route("GET", "/favicon.ico", static("favicon.ico"))
+    app.router.add_route("GET", "/favicon.png", static("favicon.png"))
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/api/v1", api.v1)
     app.router.add_route("GET", "/api/v2", api.v2)
