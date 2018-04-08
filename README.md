@@ -8,12 +8,9 @@ User interface and public API for probing Syzygy endgame tablebases.
 Running
 -------
 
-Dependencies (Python 3.5):
+Install dependencies (with Python >= 3.5):
 
-    pip install aiohttp
-    pip install jinja2
-    pip install python-chess
-    pip install htmlmin  # recommended
+    pip install -r requirements.txt
 
 Node.js:
 
