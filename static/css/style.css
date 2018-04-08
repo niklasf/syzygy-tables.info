@@ -125,6 +125,7 @@ footer > .inner {
   border: 1px solid #faebcc;
   border-radius: 4px;
   padding: 15px;
+  margin-bottom: 15px;
 }
 
 /* Device size specifics */
