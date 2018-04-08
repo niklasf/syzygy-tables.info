@@ -8,7 +8,7 @@ User interface and public API for probing Syzygy endgame tablebases.
 Running
 -------
 
-Install dependencies (with Python >= 3.5):
+Install dependencies (with Python >= 3.5.3):
 
     pip install -r requirements.txt
 

@@ -59,7 +59,7 @@ def static(path):
 def jsonp(request, obj):
     json_str = json.dumps(obj, indent=2, sort_keys=True)
 
-    callback = request.GET.get("callback")
+    callback = request.query.get("callback")
     if callback:
         content = "%s(%s);" % (callback, json_str)
         return aiohttp.web.Response(
@@ -110,9 +110,8 @@ def material(board):
 
 class Api(object):
 
-    def __init__(self, config, loop):
+    def __init__(self, config):
         self.config = config
-        self.loop = loop
 
         self.init_syzygy()
         self.init_gaviota()
@@ -170,13 +169,13 @@ class Api(object):
         return result
 
     async def probe_async(self, board, *, load_root=False, load_wdl=False, load_dtz=False, load_dtm=False):
-        return await self.loop.run_in_executor(
+        return await asyncio.get_event_loop().run_in_executor(
             None,
             self.probe, board.copy(), load_root, load_wdl, load_dtz, load_dtm)
 
     def get_board(self, request):
         try:
-            board = chess.Board(request.GET["fen"].replace("_", " "))
+            board = chess.Board(request.query["fen"].replace("_", " "))
         except KeyError:
             raise aiohttp.web.HTTPBadRequest(reason="fen required")
         except ValueError:
@@ -263,7 +262,7 @@ class Api(object):
         await response.prepare(request)
 
         # Force reverse proxies like nginx to send the first chunk.
-        response.write("[Event \"\"]\n".encode("utf-8"))
+        await response.write("[Event \"\"]\n".encode("utf-8"))
         await response.drain()
 
         # Prepare PGN headers.
@@ -312,17 +311,16 @@ class Api(object):
         game.headers["Result"] = board.result(claim_draw=True)
 
         # Send response.
-        response.write(str(game).encode("utf-8"))
+        await response.write(str(game).encode("utf-8"))
         await response.write_eof()
         return response
 
 
 class Frontend(object):
 
-    def __init__(self, config, api, loop):
+    def __init__(self, config, api):
         self.config = config
         self.api = api
-        self.loop = loop
 
         self.jinja = jinja2.Environment(
             loader=jinja2.FileSystemLoader("templates"))
@@ -337,10 +335,10 @@ class Frontend(object):
 
         # Setup a board from the given valid FEN or fall back to the default FEN.
         try:
-            board = chess.Board(request.GET.get("fen", DEFAULT_FEN).replace("_", " "))
+            board = chess.Board(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
         except ValueError:
             try:
-                board, _ = chess.Board.from_epd(request.GET.get("fen", DEFAULT_FEN).replace("_", " "))
+                board, _ = chess.Board.from_epd(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
             except ValueError:
                 board = chess.Board(DEFAULT_FEN)
 
@@ -495,7 +493,7 @@ class Frontend(object):
         grouped_moves[None].sort(key=lambda move: move["uci"])
         render["unknown_moves"] = grouped_moves[None]
 
-        if "xhr" in request.GET:
+        if "xhr" in request.query:
             template = self.jinja.get_template("xhr-probe.html")
         else:
             template = self.jinja.get_template("index.html")
@@ -509,11 +507,11 @@ class Frontend(object):
         render["status"] = 200
 
         # Pass the raw unchanged FEN.
-        if "fen" in request.GET:
-            render["fen"] = request.GET["fen"].replace("_", " ")
+        if "fen" in request.query:
+            render["fen"] = request.query["fen"].replace("_", " ")
 
         try:
-            board = chess.Board(request.GET["fen"].replace("_", " "))
+            board = chess.Board(request.query["fen"].replace("_", " "))
         except KeyError:
             render["status"] = 400
             render["error"] = "fen required"
@@ -562,17 +560,17 @@ class Frontend(object):
         return aiohttp.web.Response(text=content)
 
 
-def make_app(config, loop):
+def make_app(config):
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")
     assert config.get("server", "base_url").endswith("/")
 
     # Create request handlers.
-    api = Api(config, loop)
-    frontend = Frontend(config, api, loop)
+    api = Api(config)
+    frontend = Frontend(config, api)
 
     # Setup routes.
-    app = aiohttp.web.Application(loop=loop)
+    app = aiohttp.web.Application()
     app.router.add_route("GET", "/", frontend.index)
     app.router.add_route("GET", "/apidoc", frontend.apidoc)
     app.router.add_route("GET", "/legal", frontend.legal)
@@ -588,7 +586,6 @@ def make_app(config, loop):
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
-    loop = asyncio.get_event_loop()
 
     config = configparser.ConfigParser()
     config.read([
@@ -599,11 +596,11 @@ def main():
     bind = config.get("server", "bind")
     port = config.getint("server", "port")
 
-    app = make_app(config, loop)
+    app = make_app(config)
 
     print("* Server name: ", config.get("server", "name"))
     print("* Base url: ", config.get("server", "base_url"))
-    aiohttp.web.run_app(app, host=bind, port=port, loop=loop, access_log=None)
+    aiohttp.web.run_app(app, host=bind, port=port, access_log=None)
 
 
 if __name__ == "__main__":
