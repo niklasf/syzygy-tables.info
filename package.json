@@ -24,9 +24,9 @@
     "url": "https://github.com/niklasf/syzygy-tables.info.git"
   },
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-cssmin": "^2.2.0",
-    "grunt-contrib-uglify": "^3.0.1",
+    "grunt": "^1.0.2",
+    "grunt-contrib-cssmin": "^2.2.1",
+    "grunt-contrib-uglify": "^3.3.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-purifycss": "^0.1.2"
   }
