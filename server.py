@@ -390,7 +390,6 @@ class Frontend(object):
                 render["insufficient_material"] = True
             elif probe["wdl"] is None or probe["dtz"] is None:
                 render["status"] = "Position not found in tablebases"
-                render["unknown"] = True
             elif probe["wdl"] == 0:
                 render["status"] = "Tablebase draw"
             elif probe["dtz"] > 0 and board.turn == chess.WHITE:

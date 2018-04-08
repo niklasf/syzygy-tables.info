@@ -1,6 +1,6 @@
 <h2 id="status"{% if winning_side %} class="{{ winning_side }}-win{% if frustrated %} frustrated{% endif %}"{% endif %}>{{ status }}</h2>
 
-{% if piece_count == 7 and not unknown %}
+{% if piece_count >= 7 and not unknown_moves %}
   <div class="warning" role="alert">
     Careful, this is based on <strong>experimental</strong> 7 piece tables thankfully <a href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat">generated and shared by Bojun Guo</a>.
   </div>
@@ -65,7 +65,7 @@
 {% elif insufficient_material %}
   <p><strong>The game is drawn</strong> because with the remaining
     material no sequence of legal moves can lead to a checkmate.</p>
-{% elif unknown %}
+{% elif unknown_moves %}
   {% if fen == STARTING_FEN %}
     <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
       yet solved.</a></p>
