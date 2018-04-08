@@ -1,5 +1,11 @@
 <h2 id="status"{% if winning_side %} class="{{ winning_side }}-win{% if frustrated %} frustrated{% endif %}"{% endif %}>{{ status }}</h2>
 
+{% if piece_count == 7 and not unknown %}
+  <div class="warning" role="alert">
+    Careful, this is based on <strong>experimental</strong> 7 piece tables thankfully <a href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat">generated and shared by Bojun Guo</a>.
+  </div>
+{% endif %}
+
 <div id="winning" class="list-group {{ turn }}-turn">
 {% for move in winning_moves %}
   <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">

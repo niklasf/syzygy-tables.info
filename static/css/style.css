@@ -119,6 +119,14 @@ footer > .inner {
   z-index: 1;
 }
 
+.warning {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border: 1px solid #faebcc;
+  border-radius: 4px;
+  padding: 15px;
+}
+
 /* Device size specifics */
 
 @media(min-width: 640px) {
