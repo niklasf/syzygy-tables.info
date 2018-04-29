@@ -218,11 +218,7 @@ class Api(object):
                 return res
 
         def zeroing(move):
-            try:
-                board.push(move)
-                return board.halfmove_clock == 0
-            finally:
-                board.pop()
+            return board.is_zeroing(move)
 
         def checkmate(move):
             try:
