@@ -29,27 +29,10 @@ You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables. `etc` contains configuration examples for nginx and
 a systemd service.
 
-Syzygy tablebase files
-----------------------
+API / Backend
+-------------
 
-Only the small four-men tablebases are in this Git repository.
-Optionally [generate](https://github.com/syzygy1/tb) or
-[download](http://oics.olympuschess.com/tracker/index.php)
-five-men and six-men tablebases and configure the directories.
-
-Gaviota tablebases
-------------------
-
-Optionally build and install [libgtb](https://github.com/michiguel/Gaviota-Tablebases)
-and [download](https://syzygy-tables.info/gaviota/)
-Gaviota tablebase files. Put them into the `gaviota` directory or
-a configured path.
-
-API
----
-
-See [https://syzygy-tables.info/apidoc](https://syzygy-tables.info/apidoc?fen=4k3/8/8/8/8/8/8/4K3%20w%20-%20-%200%201)
-for information about the JSON API.
+This website is based on a [public API](https://github.com/niklasf/lila-tablebase) hosted by [lichess.org](https://tablebase.lichess.ovh).
 
 Hacking
 -------
