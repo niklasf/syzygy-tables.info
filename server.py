@@ -109,6 +109,7 @@ class Frontend(object):
         return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
 
     async def syzygy_vs_syzygy_pgn(self, request):
+        # Parse FEN.
         try:
             board = chess.Board(request.query["fen"].replace("_", " "))
             board.halfmove_clock = 0
@@ -121,7 +122,7 @@ class Frontend(object):
         if not board.is_valid():
             raise aiohttp.web.HTTPBadRequest(reason="illegal fen")
 
-        # Send HTTP headers early, to let the client know wo got the request.
+        # Send HTTP headers early, to let the client know we got the request.
         # Creating the actual response might take a while.
         response = aiohttp.web.StreamResponse()
         response.content_type = "application/x-chess-pgn"
@@ -144,39 +145,54 @@ class Frontend(object):
         game.headers["Black"] = "Syzygy"
         game.headers["Annotator"] = self.config.get("server", "name")
 
-        result = await self.probe_async(board, load_root=True)
+        # Query backend.
+        async with self.backend_session(request) as session:
+            async with session.get(self.config.get("server", "backend") + "/mainline", params={"fen": board.fen()}) as res:
+                if res.status == 404:
+                    result = {
+                        dtz: None,
+                        mainline: [],
+                    }
+                else:
+                    result = await res.json()
+
+        # Starting comment.
         if result["dtz"] is not None:
             game.comment = "DTZ %d" % (result["dtz"], )
+        elif result["dtz"] == 0:
+            game.comment = "Tablebase draw"
         else:
             game.comment = "Position not in tablebases"
 
         # Follow the DTZ mainline.
+        dtz = result["dtz"]
         node = game
-        while not board.is_game_over(claim_draw=True):
-            result = await self.probe_async(board, load_dtz=True, load_wdl=True)
-            move = self.dtz_bestmove(board, result)
-            if not move:
-                break
-
-            board.push(move)
+        for move_info in result["mainline"]:
+            move = board.push_uci(move_info["uci"])
             node = node.add_variation(move)
+            dtz = move_info["dtz"]
 
             if board.halfmove_clock == 0:
-                result = await self.probe_async(board, load_root=True)
-                node.comment = "%s with DTZ %d" % (material(board), result["dtz"])
+                node.comment = "%s with DTZ %d" % (material(board), dtz)
 
-        # Set PGN result.
+        # Final comment.
         if board.is_checkmate():
             node.comment = "Checkmate"
         elif board.is_stalemate():
             node.comment = "Stalemate"
         elif board.is_insufficient_material():
             node.comment = "Insufficient material"
-        elif board.can_claim_draw():
-            result = await self.probe_async(board, load_root=True)
-            node.comment = "Draw claimed at DTZ %d" % (result["dtz"], )
+        elif dtz is not None and dtz != 0 and result["winner"] is None:
+            node.comment = "Draw claimed at DTZ %d" % (dtz, )
 
-        game.headers["Result"] = board.result(claim_draw=True)
+        # Set result.
+        if dtz is not None:
+            if result["winner"] is None:
+                game.headers["Result"] = "1/2-1/2"
+            elif result["winner"].startswith("w"):
+                game.headers["Result"] = "1-0"
+            elif result["winner"].startswith("b"):
+                game.headers["Result"] = "0-1"
 
         # Send response.
         await response.write(str(game).encode("utf-8"))
