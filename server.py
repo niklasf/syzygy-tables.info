@@ -157,10 +157,10 @@ class Frontend(object):
                     result = await res.json()
 
         # Starting comment.
-        if result["dtz"] is not None:
-            game.comment = "DTZ %d" % (result["dtz"], )
-        elif result["dtz"] == 0:
+        if result["dtz"] == 0:
             game.comment = "Tablebase draw"
+        elif result["dtz"] is not None:
+            game.comment = "DTZ %d" % (result["dtz"], )
         else:
             game.comment = "Position not in tablebases"
 
