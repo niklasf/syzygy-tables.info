@@ -498,43 +498,6 @@ class Frontend(object):
             text=html_minify(template.render(render)),
             content_type="text/html")
 
-    async def apidoc(self, request):
-        render = {}
-        render["status"] = 200
-
-        # Pass the raw unchanged FEN.
-        if "fen" in request.query:
-            render["fen"] = request.query["fen"].replace("_", " ")
-
-        try:
-            board = chess.Board(request.query["fen"].replace("_", " "))
-        except KeyError:
-            render["status"] = 400
-            render["error"] = "fen required"
-            render["sanitized_fen"] = EMPTY_FEN
-        except ValueError:
-            render["status"] = 400
-            render["error"] = "invalid fen"
-            render["sanitized_fen"] = EMPTY_FEN
-        else:
-            render["sanitized_fen"] = board.fen()
-
-            if board.is_valid():
-                result = await self.api.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
-
-                bm = self.api.dtz_bestmove(board, result)
-                result["bestmove"] = bm.uci() if bm else None
-
-                render["request_body"] = json.dumps(result, indent=2, sort_keys=True)
-            else:
-                render["status"] = 400
-                render["error"] = "illegal fen"
-
-        template = self.jinja.get_template("apidoc.html")
-        return aiohttp.web.Response(
-            text=html_minify(template.render(render)),
-            content_type="text/html")
-
     def legal(self, request):
         template = self.jinja.get_template("legal.html")
         return aiohttp.web.Response(
@@ -546,7 +509,6 @@ class Frontend(object):
             "",
             "?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
             "?fen=4r3/1K6/8/8/5p2/3k4/8/7Q%20b%20-%20-%200%201",
-            "apidoc?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201",
             "legal",
         ]
 
@@ -568,7 +530,6 @@ def make_app(config):
     # Setup routes.
     app = aiohttp.web.Application()
     app.router.add_route("GET", "/", frontend.index)
-    app.router.add_route("GET", "/apidoc", frontend.apidoc)
     app.router.add_route("GET", "/legal", frontend.legal)
     app.router.add_route("GET", "/favicon.ico", static("favicon.ico"))
     app.router.add_route("GET", "/favicon.png", static("favicon.png"))
