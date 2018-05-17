@@ -4,10 +4,9 @@ After=network.target
 Requires=network.target
 
 [Service]
-LimitNOFILE=4096
 User=www-data
-WorkingDirectory=/home/niklas/syzygy-tables.info/
-ExecStart=/home/niklas/syzygy-tables.info/venv/bin/python server.py
+WorkingDirectory=/opt/syzygy-tables.info/
+ExecStart=/opt/syzygy-tables.info/venv/bin/python server.py
 Restart=always
 KillSignal=SIGINT
 
