@@ -150,8 +150,8 @@ class Frontend(object):
             async with session.get(self.config.get("server", "backend") + "/mainline", params={"fen": board.fen()}) as res:
                 if res.status == 404:
                     result = {
-                        dtz: None,
-                        mainline: [],
+                        "dtz": None,
+                        "mainline": [],
                     }
                 else:
                     result = await res.json()
