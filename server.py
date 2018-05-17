@@ -22,8 +22,6 @@ import aiohttp.web
 import jinja2
 
 import chess
-import chess.syzygy
-import chess.gaviota
 import chess.pgn
 
 import asyncio
@@ -55,20 +53,6 @@ def static(path):
     async def handler(request):
         return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path))
     return handler
-
-def jsonp(request, obj):
-    json_str = json.dumps(obj, indent=2, sort_keys=True)
-
-    callback = request.query.get("callback")
-    if callback:
-        content = "%s(%s);" % (callback, json_str)
-        return aiohttp.web.Response(
-            text=content,
-            content_type="application/javascript")
-    else:
-        return aiohttp.web.Response(
-            text=json_str,
-            content_type="application/json")
 
 
 def swap_colors(fen):
@@ -108,74 +92,24 @@ def material(board):
     return name
 
 
-class Api(object):
+class Frontend(object):
 
     def __init__(self, config):
         self.config = config
 
-        self.init_syzygy()
-        self.init_gaviota()
+        self.jinja = jinja2.Environment(
+            loader=jinja2.FileSystemLoader("templates"))
 
-    def init_syzygy(self):
-        print("Loading syzygy tablebases ...")
-        self.syzygy = chess.syzygy.Tablebases()
+        self.jinja.globals["DEFAULT_FEN"] = DEFAULT_FEN
+        self.jinja.globals["STARTING_FEN"] = chess.STARTING_FEN
 
-        for line in self.config.get("tablebases", "syzygy").splitlines():
-            path = line.strip()
-            if not path:
-                continue
+        self.jinja.globals["development"] = self.config.getboolean("server", "development")
 
-            num = self.syzygy.open_directory(path)
-            print("* Loaded %d syzygy tablebases from %r" % (num, path))
-
-    def init_gaviota(self):
-        print("Loading gaviota tablebases ...")
-        self.gaviota = chess.gaviota.open_tablebases("gaviota")
-
-        for line in self.config.get("tablebases", "gaviota").splitlines():
-            path = line.strip()
-            if not path:
-                continue
-
-            self.gaviota.open_directory(path)
-            print("* Loaded gaviota tablebases from %r" % path)
-
-    def probe(self, board, load_root=False, load_wdl=False, load_dtz=False, load_dtm=False):
-        result = {}
-
-        if load_root:
-            result["wdl"] = self.syzygy.get_wdl(board)
-            result["dtz"] = self.syzygy.get_dtz(board)
-            result["dtm"] = self.gaviota.get_dtm(board)
-
-        result["moves"] = {}
-
-        for move in board.legal_moves:
-            board.push(move)
-
-            result["moves"][move.uci()] = move_info = {}
-
-            if load_wdl:
-                move_info["wdl"] = self.syzygy.get_wdl(board)
-
-            if load_dtz:
-                move_info["dtz"] = self.syzygy.get_dtz(board)
-
-            if load_dtm:
-                move_info["dtm"] = self.gaviota.get_dtm(board)
-
-            board.pop()
-
-        return result
-
-    async def probe_async(self, board, *, load_root=False, load_wdl=False, load_dtz=False, load_dtm=False):
-        return await asyncio.get_event_loop().run_in_executor(
-            None,
-            self.probe, board.copy(), load_root, load_wdl, load_dtz, load_dtm)
-
-    def get_board(self, request):
+    async def syzygy_vs_syzygy_pgn(self, request):
         try:
             board = chess.Board(request.query["fen"].replace("_", " "))
+            board.halfmove_clock = 0
+            board.fullmoves = 1
         except KeyError:
             raise aiohttp.web.HTTPBadRequest(reason="fen required")
         except ValueError:
@@ -183,71 +117,6 @@ class Api(object):
 
         if not board.is_valid():
             raise aiohttp.web.HTTPBadRequest(reason="illegal fen")
-
-        return board
-
-    async def v1(self, request):
-        board = self.get_board(request)
-        result = await self.probe_async(board, load_root=True, load_dtz=True)
-
-        bm = self.dtz_bestmove(board, result)
-        result["bestmove"] = bm.uci() if bm else None
-
-        # Collapse move information to produce legacy API output.
-        for move in result["moves"]:
-            result["moves"][move] = result["moves"][move]["dtz"]
-
-        return jsonp(request, result)
-
-    async def v2(self, request):
-        board = self.get_board(request)
-
-        result = await self.probe_async(board, load_root=True, load_dtz=True, load_dtm=True, load_wdl=True)
-
-        bm = self.dtz_bestmove(board, result)
-        result["bestmove"] = bm.uci() if bm else None
-
-        return jsonp(request, result)
-
-    def dtz_bestmove(self, board, probe_result):
-        def result(move, key, default=None):
-            res = probe_result["moves"][move.uci()].get(key)
-            if res is None:
-                return default
-            else:
-                return res
-
-        def zeroing(move):
-            return board.is_zeroing(move)
-
-        def checkmate(move):
-            try:
-                board.push(move)
-                return board.is_checkmate()
-            finally:
-                board.pop()
-
-        def definite_draw(move):
-            try:
-                board.push(move)
-                return board.is_insufficient_material() or board.is_stalemate()
-            finally:
-                board.pop()
-
-        moves = list(board.legal_moves)
-        moves.sort(key=lambda move: move.uci())
-        moves.sort(key=lambda move: (result(move, "dtm") is None, result(move, "dtm")), reverse=True)
-        moves.sort(key=lambda move: (result(move, "dtz") is None, result(move, "dtz")), reverse=True)
-        moves.sort(key=lambda move: zeroing(move) if result(move, "wdl", 0) > 0 else not zeroing(move))
-        moves.sort(key=lambda move: definite_draw(move), reverse=True)
-        moves.sort(key=lambda move: (result(move, "wdl") is None, result(move, "wdl")))
-        moves.sort(key=lambda move: checkmate(move), reverse=True)
-
-        if moves and result(moves[0], "dtz") is not None:
-            return moves[0]
-
-    async def syzygy_vs_syzygy_pgn(self, request):
-        board = self.get_board(request)
 
         # Send HTTP headers early, to let the client know wo got the request.
         # Creating the actual response might take a while.
@@ -311,21 +180,6 @@ class Api(object):
         await response.write_eof()
         return response
 
-
-class Frontend(object):
-
-    def __init__(self, config, api):
-        self.config = config
-        self.api = api
-
-        self.jinja = jinja2.Environment(
-            loader=jinja2.FileSystemLoader("templates"))
-
-        self.jinja.globals["DEFAULT_FEN"] = DEFAULT_FEN
-        self.jinja.globals["STARTING_FEN"] = chess.STARTING_FEN
-
-        self.jinja.globals["development"] = self.config.getboolean("server", "development")
-
     async def index(self, request):
         render = {}
 
@@ -337,6 +191,8 @@ class Frontend(object):
                 board, _ = chess.Board.from_epd(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
             except ValueError:
                 board = chess.Board(DEFAULT_FEN)
+        board.halfmove_clock = 0
+        board.fullmoves = 0
 
         # Get FENs with the current side to move, black and white to move.
         original_turn = board.turn
@@ -353,7 +209,7 @@ class Frontend(object):
         render["vertical_fen"] = mirror_vertical(fen)
         render["swapped_fen"] = swap_colors(fen)
         render["clear_fen"] = clear_fen(fen)
-        render["fen_input"] = "" if board.epd() + " 0 1" == DEFAULT_FEN else board.epd() + " 0 1"
+        render["fen_input"] = "" if board.fen() == DEFAULT_FEN else board.fen()
 
         # Material key for the page title.
         render["material"] = material(board)
@@ -375,8 +231,11 @@ class Frontend(object):
                 render["status"] = "White won by checkmate"
                 render["winning_side"] = "white"
         else:
-            # Probe.
-            probe = await self.api.probe_async(board, load_root=True, load_dtz=True, load_wdl=True, load_dtm=True)
+            # Query backend.
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.config.get("server", "backend"), params={"fen": board.fen()}) as res:
+                    probe = await res.json()
+
             render["blessed_loss"] = probe["wdl"] == -1
             render["cursed_win"] = probe["wdl"] == 1
 
@@ -404,23 +263,10 @@ class Frontend(object):
             render["frustrated"] = probe["wdl"] is not None and abs(probe["wdl"]) == 1
 
             # Label and group all legal moves.
-            for move in board.legal_moves:
-                san = board.san(move)
-                uci = board.uci(move)
-                board.push(move)
-
-                move_info = {
-                    "uci": uci,
-                    "san": san,
-                    "fen": board.epd() + " 0 1",
-                    "wdl": probe["moves"][uci]["wdl"],
-                    "dtz": probe["moves"][uci]["dtz"],
-                    "dtm": probe["moves"][uci]["dtm"],
-                    "zeroing": board.halfmove_clock == 0,
-                    "checkmate": board.is_checkmate(),
-                    "stalemate": board.is_stalemate(),
-                    "insufficient_material": board.is_insufficient_material(),
-                }
+            for move_info in probe["moves"]:
+                board.push_uci(move_info["uci"])
+                move_info["fen"] = board.fen()
+                board.pop()
 
                 move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
 
@@ -447,8 +293,6 @@ class Frontend(object):
                     move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
 
                 grouped_moves[move_info["wdl"]].append(move_info)
-
-                board.pop()
 
         # Sort winning moves.
         grouped_moves[-2].sort(key=lambda move: move["uci"])
@@ -524,8 +368,7 @@ def make_app(config):
     assert config.get("server", "base_url").endswith("/")
 
     # Create request handlers.
-    api = Api(config)
-    frontend = Frontend(config, api)
+    frontend = Frontend(config)
 
     # Setup routes.
     app = aiohttp.web.Application()
@@ -534,9 +377,7 @@ def make_app(config):
     app.router.add_route("GET", "/favicon.ico", static("favicon.ico"))
     app.router.add_route("GET", "/favicon.png", static("favicon.png"))
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
-    app.router.add_route("GET", "/api/v1", api.v1)
-    app.router.add_route("GET", "/api/v2", api.v2)
-    app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", api.syzygy_vs_syzygy_pgn)
+    app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", frontend.syzygy_vs_syzygy_pgn)
     app.router.add_static("/static/", "static")
     return app
 
