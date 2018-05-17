@@ -105,6 +105,9 @@ class Frontend(object):
 
         self.jinja.globals["development"] = self.config.getboolean("server", "development")
 
+    def backend_session(self, request):
+        return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
+
     async def syzygy_vs_syzygy_pgn(self, request):
         try:
             board = chess.Board(request.query["fen"].replace("_", " "))
@@ -232,7 +235,7 @@ class Frontend(object):
                 render["winning_side"] = "white"
         else:
             # Query backend.
-            async with aiohttp.ClientSession() as session:
+            async with self.backend_session(request) as session:
                 async with session.get(self.config.get("server", "backend"), params={"fen": board.fen()}) as res:
                     probe = await res.json()
 
