@@ -140,7 +140,7 @@ class Frontend(object):
         del game.headers["Event"]
         game.headers["Site"] = self.config.get("server", "base_url") + "?fen=" + board.fen().replace(" ", "_")
         game.headers["Date"] = datetime.datetime.now().strftime("%Y.%m.%d")
-        del game.headers["Round"]
+        game.headers["Round"] = "-"
         game.headers["White"] = "Syzygy"
         game.headers["Black"] = "Syzygy"
         game.headers["Annotator"] = self.config.get("server", "name")
