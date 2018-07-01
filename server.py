@@ -253,6 +253,13 @@ class Frontend(object):
             # Query backend.
             async with self.backend_session(request) as session:
                 async with session.get(self.config.get("server", "backend"), params={"fen": board.fen()}) as res:
+                    if res.status != 200:
+                        return aiohttp.web.Response(
+                            status=res.status,
+                            content_type=res.content_type,
+                            body=await res.read(),
+                            charset=res.charset)
+
                     probe = await res.json()
 
             render["blessed_loss"] = probe["wdl"] == -1
