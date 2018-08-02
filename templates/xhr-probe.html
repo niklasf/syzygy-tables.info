@@ -98,17 +98,20 @@
 <div id="start-info">
   <section id="syzygy">
     <h2>Syzygy tablebases</h2>
-
-    <p>Syzygy tablebases provide <abbr title="win-draw-loss">WDL</abbr> and
+    <p><strong>Syzygy tablebases allow perfect play with up to 6
+      (and experimentally 7) pieces,
+      both with and without the fifty-move drawing rule</strong>,
+      i.e. they allow winning all won
+      positions and bringing all drawn positions over the fifty-move line.<p>
+    <p>The tables provide <abbr title="win-draw-loss">WDL</abbr> and
       <abbr title="distance-to-zeroing (a capture or pawn move)">DTZ</abbr>
-      information for all endgame positions with <strong>up to 6 (and experimentally 7)
-      pieces</strong>. They allow <strong>perfect play with and without the fifty-move rule</strong>,
-      i.e. winning all won positions and bringing all drawn positions over the
-      fifty-move line.</p>
+      information. Forcing captures or pawn moves while keeping a win in hand
+      ensures that progress is beeing made.</p>
     <p>DTZ optimal play is unlike the shortest way to mate, because
       <abbr title="depth-to-mate">DTM</abbr> does not account for the
-      fifty-move drawing rule.</p>
-    <p>The 7 piece tablebases will contain 423,836,835,667,331 <a href="https://kirill-kryukov.com/chess/nulp/results.html">unique legal positions</a> in about 20TB.</p>
+      fifty-move drawing rule: Sometimes it is better to reset the fifty-move
+      counter than to go for the shortest mate.</p>
+    <p>The 7 piece tablebases will contain 423,836,835,667,331 <a href="https://kirill-kryukov.com/chess/nulp/results.html">unique legal positions</a> in about 20 Terabytes.</p>
     <p>Selected positions:</p>
     <ul>
       <li>Longest endgames:
