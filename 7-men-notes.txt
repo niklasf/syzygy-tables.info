@@ -1,0 +1,51 @@
+7-men Syzygy attempt
+====================
+
+http://talkchess.com/forum3/viewtopic.php?f=7&t=66797
+
+Initiative by Bojun Guo aka noobpwnftw
+FTP server: ftp://112.73.74.24/pub/syzygy/
+
+[D] QN4n1/6r1/3k4/8/b2K4/8/8/8 b - - 0 1
+longest win: 1098 plies
+
+4-way Xeon, more than 1TB RAM
+two machines with 384 threads
+FTP server with 96 TB in RAID-10
+
+white can escape stalemate trick:
+[D] k7/2QR4/8/8/8/4N3/2r4Q/1K6 b - - 0 1
+
+awesome study:
+https://lichess.org/study/58OZVKJb
+
+@Nordlandia
+Spassky vs. Fischer 1st match game
+29... Bxh2
+2k5/1p6/pP2K3/P7/8/4B3/8/8 w - - 0 0
+
+Numer of unique legal positions in chess:
+http://kirill-kryukov.com/chess/nulp/results.html
+
+Carlsen - Caruana around May 28
+https://syzygy-tables.info/?fen=7k/8/3Q4/P6P/8/6P1/7K/5q2_w_-_-_0_1
+
+Nordlandia
+Bething study
+8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -
+
+KRBBPvKQ needs 16-bit table
+Longest win for white: 100 ply; 5q2/P5R1/8/k7/B7/6B1/8/K7 w - -
+Longest cursed win for white: 656 ply; 6B1/3B4/5R2/6q1/P7/1k6/8/3K4 b - -
+Longest cursed win for black: 138 ply; 7B/8/1K6/7B/P7/4q1k1/8/7R w - -
+Longest win for black: 60 ply; 2qk4/8/8/P4K2/8/8/RB6/4B3 w - -
+
+Syzygy endgame explorer:
+http://ruszchessstudies.blogspot.com/2018/06/syzygy-endgame-explorer-see.html
+
+Nordlandia
+Losomonov does not handle this endgame:
+8/8/5Q2/2K4p/6bP/4k1n1/8/8 w - - 0 0
+
+MVL vs Carlsen:
+https://lichess.org/study/UZZvV9fO/eRd2E7uE#141
