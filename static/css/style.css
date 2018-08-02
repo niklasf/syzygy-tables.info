@@ -58,6 +58,20 @@ li {
   margin-left: -1em;
 }
 
+table {
+  width: 100%;
+  border-bottom: 2px solid #eee;
+  border-top: 2px solid #eee;
+  margin: 1em 0;
+}
+thead {
+  border-bottom: 4px solid #eee;
+}
+td, th {
+  padding: 0.2em;
+  text-align: center;
+}
+
 .left-side > .inner {
   width: 300px;
   text-align: center;

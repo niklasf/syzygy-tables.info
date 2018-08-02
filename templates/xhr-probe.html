@@ -127,15 +127,29 @@
 
   <section id="download">
     <h2>Download</h2>
+
     <p>If you want to use tablebases in a chess engine you certainly need a local copy.</p>
     <p>Most of the time (during search) only WDL tables are used. Keep these on SSD storage if you can. DTZ tables are generally only used to finish the final phase of the game ("at the root").</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Pieces</th><th>WDL</th><th>DTZ</th><th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>3-5</td><td>379&nbsp;M</td><td>561&nbsp;M</td><td>939&nbsp;M</td></tr>
+        <tr><td>6</td><td>68&nbsp;G</td><td>82&nbsp;G</td><td>150&nbsp;G</td></tr>
+        <tr><td>7</td><td colspan="3">about 20&nbsp;T</td></tr>
+      </tbody>
+    </table>
+
     <p><a href="https://github.com/syzygy1/tb">Generating</a> the tablebases requires time and resources. It is more efficient to download them <a href="http://oics.olympuschess.com/tracker/index.php">via BitTorrent</a> or from a mirror:</p>
     <ul>
       <li><a href="http://tablebase.sesse.net/syzygy/">tablebase.sesse.net</a> (fastest mirror, EU, not all 7 piece tables)</li>
       <li><a href="https://tablebase.lichess.ovh/tables/">tablebase.lichess.ovh</a> (complete mirror, EU)</li>
       <li><a href="ftp://112.73.74.24/pub/syzygy">Bojun Guo</a> (ftp, China, original source of 7 piece tables)</li>
     </ul>
-    Combined size if about <strong>150GB for 6 pieces</strong>, 20TB for 7 pieces.
   </section>
 
   <section id="contact">
