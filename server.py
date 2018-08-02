@@ -23,6 +23,7 @@ import jinja2
 
 import chess
 import chess.pgn
+import chess.syzygy
 
 import asyncio
 import configparser
@@ -94,8 +95,9 @@ def material(board):
 
 class Frontend(object):
 
-    def __init__(self, config):
+    def __init__(self, config, stats):
         self.config = config
+        self.stats = stats
 
         self.jinja = jinja2.Environment(
             loader=jinja2.FileSystemLoader("templates"))
@@ -387,14 +389,34 @@ class Frontend(object):
         content = "\n".join(base_url + entry for entry in entries)
         return aiohttp.web.Response(text=content)
 
+    async def stats_json(self, request):
+        table = request.match_info["material"]
+        if len(table) > 7 + 1 or not chess.syzygy.TABLENAME_REGEX.match(table):
+            raise aiohttp.web.HTTPNotFound()
+
+        normalized = chess.syzygy.normalize_tablename(table)
+        if table != normalized:
+            raise aiohttp.web.HTTPMovedPermanently(location="/stats/{}.json".format(normalized))
+
+        try:
+            stats = self.stats[table]
+        except KeyError:
+            raise aiohttp.web.HTTPNotFound()
+        else:
+            return aiohttp.web.json_response(stats)
+
 
 def make_app(config):
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")
     assert config.get("server", "base_url").endswith("/")
 
+    # Load stats.
+    with open("stats.json") as f:
+        stats = json.load(f)
+
     # Create request handlers.
-    frontend = Frontend(config)
+    frontend = Frontend(config, stats)
 
     # Setup routes.
     app = aiohttp.web.Application()
@@ -404,6 +426,8 @@ def make_app(config):
     app.router.add_route("GET", "/favicon.png", static("favicon.png"))
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", frontend.syzygy_vs_syzygy_pgn)
+    app.router.add_route("GET", "/stats.json", static("stats.json"))
+    app.router.add_route("GET", "/stats/{material}.json", frontend.stats_json)
     app.router.add_static("/static/", "static")
     return app
 
