@@ -83,9 +83,15 @@
 
 {% if not illegal %}
   <a id="pgn-download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|replace(" ", "_") }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
-  <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-  {{ material }}.pgn
+    <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+    {{ material }}.pgn
 </a>
+{% endif %}
+{% if not unknown_moves %}
+  <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
+    <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+    {{ material }}.json
+  </a>
 {% endif %}
 
 {% if fen == DEFAULT_FEN %}
