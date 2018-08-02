@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block title %}Endgame statistics – Syzygy endgame tablebases{% endblock %}
+
+{% block apidoc_query %}?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201{% endblock %}
+
+{% block leftside %}
+  <h1>Endgame statistics</h1>
+
+  <nav>
+    <div class="reload"><a class="btn btn-default" href="/">Back to board</a></div>
+  </nav>
+{% endblock %}
+
+{% block rightside %}
+  <section id="api">
+    <h2>API</h2>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        GET <a href="/stats.json">/stats.json</a>
+      </div>
+      <div class="panel-body">
+        All endgame stats with keys such as <code>KRNvKNN</code>.
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        GET <a href="/stats/KRNvKNN.json">/stats/KRNvKNN.json</a>
+      </div>
+      <div class="panel-body">
+        Endgame stats for a specific endgame, e.g. <code>KRNvKNN</code>.
+        Redirects to normalized endgame names.
+      </div>
+    </div>
+  </section>
+
+  <section id="example">
+    <h2>Example (KRNvKNN)</h2>
+
+    <pre><code class="language-javascript">{
+  "w": { // white to move
+    "win_hist": [
+      0,
+      1924310948,
+      35087,
+      363845772,
+      37120,
+      138550471,
+      // ...
+    ]
+    "loss_hist": [
+      98698,
+      144,
+      3810,
+      0,
+      596,
+      0,
+      58
+    ],
+    "wdl": {
+      "-2": 0,
+      "-1": 103306,
+      "0": 1333429189,
+      "1": 162344388,
+      "2": 2959977091
+    }
+  },
+  "b": { // black to move
+    // ...
+  },
+  "longest": [
+    {
+      "epd": "3n1n2/8/8/8/4R3/8/8/NK1k4 b - -",
+      "ply": 100,
+      "wdl": -2
+    },
+    {
+      "epd": "6k1/5n2/8/8/8/5n2/1RK5/1N6 w - -",
+      "ply": 485,
+      "wdl": 1
+    },
+    {
+      "epd": "8/8/8/8/8/8/N1nk4/RKn5 b - -",
+      "ply": 7,
+      "wdl": 2
+    }
+  ]}</code></pre>
+  <p>
+    Information for <code>w</code> and <code>b</code> to move respectively.
+  </p>
+  <p>
+    Histograms <code>win_hist</code> and <code>loss_hist</code>: Number of
+    positions winning/losing in 0, 1, 2 plies.
+  </p>
+  <p>
+    Number of positions with <code>wdl</code>.
+  </p>
+  <p>
+    <code>longest</code> endgames with white and black winning
+    and winning except for the fifty-move rule, if such endgames exist.
+  </p>
+  </section>
+{% endblock %}

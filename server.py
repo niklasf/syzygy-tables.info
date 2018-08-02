@@ -389,7 +389,13 @@ class Frontend(object):
         content = "\n".join(base_url + entry for entry in entries)
         return aiohttp.web.Response(text=content)
 
-    async def stats_json(self, request):
+    def stats_doc(self, request):
+        template = self.jinja.get_template("stats.html")
+        return aiohttp.web.Response(
+            text=html_minify(template.render()),
+            content_type="text/html")
+
+    def stats_json(self, request):
         table = request.match_info["material"]
         if len(table) > 7 + 1 or not chess.syzygy.TABLENAME_REGEX.match(table):
             raise aiohttp.web.HTTPNotFound()
@@ -426,6 +432,7 @@ def make_app(config):
     app.router.add_route("GET", "/favicon.png", static("favicon.png"))
     app.router.add_route("GET", "/sitemap.txt", frontend.sitemap)
     app.router.add_route("GET", "/syzygy-vs-syzygy/{material}.pgn", frontend.syzygy_vs_syzygy_pgn)
+    app.router.add_route("GET", "/stats", frontend.stats_doc)
     app.router.add_route("GET", "/stats.json", static("stats.json"))
     app.router.add_route("GET", "/stats/{material}.json", frontend.stats_json)
     app.router.add_static("/static/", "static")

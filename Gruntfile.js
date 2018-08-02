@@ -16,7 +16,8 @@ module.exports = function(grunt) {
     'templates/index.html',
     'templates/xhr-probe.html',
     'templates/layout.html',
-    'templates/legal.html'
+    'templates/legal.html',
+    'templates/stats.html'
   ];
 
   var unpureCss = [
