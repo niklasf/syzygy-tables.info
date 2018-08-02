@@ -93,35 +93,40 @@
   <section id="syzygy">
     <h2>Syzygy tablebases</h2>
 
-    <p>Put a position on the board to probe the tablebases.</p>
     <p>Syzygy tablebases provide <abbr title="win-draw-loss">WDL</abbr> and
       <abbr title="distance-to-zeroing (a capture or pawn move)">DTZ</abbr>
-      information for all endgame positions with up to 6 pieces, allowing
-      you to make progress, keeping a win in hand, winning all won positions,
-      bringing all drawn positions over the fifty-move line.</p>
-    <p>This is unlike the shortest way to mate
-      (<abbr title="depth-to-mate">DTM</abbr>), that does not account for the
+      information for all endgame positions with <strong>up to 6 (and experimentally 7)
+      pieces</strong>. They allow <strong>perfect play with and without the fifty-move rule</strong>,
+      i.e. winning all won positions and bringing all drawn positions over the
+      fifty-move line.</p>
+    <p>DTZ optimal play is unlike the shortest way to mate, because
+      <abbr title="depth-to-mate">DTM</abbr> does not account for the
       fifty-move drawing rule.</p>
-    <p>Intresting positions:</p>
-
+    <p>The 7 piece tablebases will contain 423,836,835,667,331 <a href="https://kirill-kryukov.com/chess/nulp/results.html">unique legal positions</a> in about 20TB.</p>
+    <p>Selected positions:</p>
     <ul>
-      <li><a href="/?fen=QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-_0_1">The longest seven piece endgame</a></li>
-      <li><a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6_w_-_-_0_1">The longest six piece endgame</a></li>
-      <li><a href="/?fen=8/8/8/8/1p2P3/4P3/1k6/3K4_w_-_-_0_1">The longest five piece endgame</a></li>
+      <li>Longest endgames:
+        <a href="/?fen=8/8/8/8/1p2P3/4P3/1k6/3K4_w_-_-_0_1">5</a>,
+        <a href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6_w_-_-_0_1">6</a>,
+        <a href="/?fen=QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-_0_1">7 pieces</a>
+      </li>
       <li><a href="/?fen=8/6B1/8/8/B7/8/K1pk4/8_b_-_-_0_1">Black escapes to a blessed loss with an underpromotion</a></li>
+      <li><a href="/?fen=k7/2QR4/8/8/8/4N3/2r4Q/1K6_b_-_-_0_1">Black rook chasing king to force stalemate, without avail</a></li>
+      <li>Collection of <a href="http://ruszchessstudies.blogspot.com/2018/06/syzygy-endgame-explorer-see.html">mutual zugzwangs by Árpád Rusz</a></li>
     </ul>
   </section>
 
   <section id="download">
     <h2>Download</h2>
     <p>If you want to use tablebases in a chess engine you certainly need a local copy.</p>
+    <p>Most of the time (during search) only WDL tables are used. Keep these on SSD storage if you can. DTZ tables are generally only used to finish the final phase of the game ("at the root").</p>
     <p><a href="https://github.com/syzygy1/tb">Generating</a> the tablebases requires time and resources. It is more efficient to download them <a href="http://oics.olympuschess.com/tracker/index.php">via BitTorrent</a> or from a mirror:</p>
     <ul>
-      <li><a href="http://tablebase.sesse.net/syzygy/">tablebase.sesse.net</a></li>
-      <li><a href="https://tablebase.lichess.ovh/tables/">tablebase.lichess.ovh</a></li>
-      <li><a href="ftp://112.73.74.24/pub/syzygy">Bojun Guo (ftp)</a></li>
+      <li><a href="http://tablebase.sesse.net/syzygy/">tablebase.sesse.net</a> (fastest mirror, EU, not all 7 piece tables)</li>
+      <li><a href="https://tablebase.lichess.ovh/tables/">tablebase.lichess.ovh</a> (complete mirror, EU)</li>
+      <li><a href="ftp://112.73.74.24/pub/syzygy">Bojun Guo</a> (ftp, China, original source of 7 piece tables)</li>
     </ul>
-    Combined size if about 150GB for 6 pieces, 20TB for 7 pieces.
+    Combined size if about <strong>150GB for 6 pieces</strong>, 20TB for 7 pieces.
   </section>
 
   <section id="contact">
