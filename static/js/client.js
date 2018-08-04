@@ -344,15 +344,6 @@ function TablebaseView(controller) {
 }
 
 
-function ApidocLink(controller) {
-  controller.bind('positionChanged', function (position) {
-    $('#apidoc').attr({
-      href: '/apidoc?fen=' + encodeURIComponent(position.fen())
-    });
-  });
-}
-
-
 function DocumentTitle(controller) {
   controller.bind('positionChanged', function (position) {
     var fen = position.fen().split(/\s/)[0];
@@ -382,7 +373,6 @@ $(function () {
   new SideToMoveView(controller);
   new FenInputView(controller);
   new ToolBarView(controller, boardView);
-  new ApidocLink(controller);
 
   new DocumentTitle(controller);
   new TablebaseView(controller);
