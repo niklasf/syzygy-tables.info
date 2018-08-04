@@ -112,8 +112,10 @@ Controller.prototype.pushMove = function (from, to) {
 Controller.prototype.setPosition = function (position) {
   var self = this;
 
-  this.position = position;
-  this.trigger('positionChanged', position);
+  if (this.position.fen() != position.fen()) {
+    this.position = position;
+    this.trigger('positionChanged', position);
+  }
 };
 
 
