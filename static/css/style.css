@@ -10,14 +10,8 @@ h1 {
   margin: 0;
   padding: 1em 0;
 }
-
 h1 a, h1 a:hover {
   color: black;
-  text-decoration: none;
-}
-
-h2 a, h2 a:hover {
-  color: white;
   text-decoration: none;
 }
 
@@ -30,20 +24,16 @@ h2 {
   color: white;
   font-weight: bold;
 }
-
 h2.white-win {
   background: white;
   color: black;
 }
-
 h2.white-win.frustrated {
   background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
 }
-
 h2.black-win.frustrated {
   background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
 }
-
 h2.black-win {
   background: black;
   color: white;
@@ -72,50 +62,48 @@ td, th {
   text-align: center;
 }
 
-.left-side > .inner {
+#losing.white-turn .badge, #winning.black-turn .badge {
+  background: black;
+  color: white;
+}
+#losing.black-turn .badge, #winning.white-turn .badge {
+  background: white;
+  color: black;
+  border: 1px solid black;
+}
+#cursed.white-turn .badge, #blessed.black-turn .badge {
+  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
+  color: black;
+  border: 1px solid black;
+}
+#cursed.black-turn .badge, #blessed.white-turn .badge {
+  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
+  color: white;
+}
+
+.left-side > .inner, .right-side > .inner, footer > .inner {
   width: 300px;
+  margin: auto;
+}
+
+.left-side > .inner {
   text-align: center;
   padding-bottom: 40px;
+}
+#board {
+  margin: 15px 0;
+}
+#board-toolbar {
+  margin: 10px 0;
 }
 
 .right-side > .inner {
   padding: 40px 0;
 }
 
-#losing.white-turn .badge, #winning.black-turn .badge {
-  background: black;
-  color: white;
-}
-
-#losing.black-turn .badge, #winning.white-turn .badge {
-  background: white;
-  color: black;
-  border: 1px solid black;
-}
-
-#cursed.white-turn .badge, #blessed.black-turn .badge {
-  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
-  color: black;
-  border: 1px solid black;
-}
-
-#cursed.black-turn .badge, #blessed.white-turn .badge {
-  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
-  color: white;
-}
-
 footer > .inner {
-  width: 300px;
   text-align: center;
   padding-top: 40px;
-}
-
-#board {
-  margin: 15px 0;
-}
-
-#board-toolbar {
-  margin: 10px 0;
 }
 
 .reload {
@@ -152,16 +140,12 @@ footer > .inner {
   .left-side, .right-side {
     width: 50%;
   }
-  .left-side > .inner, .right-side > .inner {
-    width: 300px;
-  }
 
   .left-side {
     position: fixed;
   }
   .left-side > .inner {
     margin-right: 10%;
-    margin-left: auto;
   }
 
   .right-side {
@@ -169,7 +153,6 @@ footer > .inner {
   }
   .right-side > .inner {
     margin-left: 10%;
-    margin-right: auto;
   }
 
   footer > .inner {
@@ -192,19 +175,9 @@ footer > .inner {
 }
 
 @media(max-width: 640px) {
-  .left-side > .inner, .right-side > .inner {
-    margin: auto;
-    width: 300px;
-  }
-
   .left-side {
     background: #fff url('/static/triangle-bg.svg');
     background-position: center bottom;
-    margin: auto;
-  }
-
-  footer > .inner {
-    margin: auto;
   }
 
   .fork-me {
@@ -226,8 +199,8 @@ footer > .inner {
 @media(min-width: 640px) and (max-height: 730px) {
   footer > .inner {
     position: relative;
-    width: 300px;
-    margin-left: 340px;
+    right: auto;
+    margin-left: 55%;
   }
 }
 
