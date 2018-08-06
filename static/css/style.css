@@ -4,12 +4,17 @@ body {
   margin: 0;
   padding: 0;
   overflow-y: scroll;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
 }
 
 h1 {
   margin: 0;
   padding: 1em 0;
-  font-size: 2.4em;
+  font-size: 2.2em;
+  line-height: 1.1;
+  font-weight: bold;
 }
 h1 a, h1 a:hover {
   color: black;
@@ -54,6 +59,7 @@ table {
   border-bottom: 2px solid #eee;
   border-top: 2px solid #eee;
   margin: 1em 0;
+  border-collapse: collapse;
 }
 thead {
   border-bottom: 4px solid #eee;
