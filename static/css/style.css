@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-y: scroll;
+  overflow-x: hidden;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
   line-height: 1.42857143;
@@ -22,7 +23,7 @@ h1 a, h1 a:hover {
 }
 
 h2 {
-  margin: 1em 0;
+  margin: 60px 0 1em 0;
   border: 1px solid black;
   font-size: 1.2em;
   padding: 10px 15px;
@@ -76,7 +77,6 @@ td, th {
 
 .left-side > .inner {
   text-align: center;
-  padding-bottom: 40px;
 }
 #board {
   margin: 15px 0;
@@ -89,6 +89,9 @@ td, th {
   text-align: center;
 }
 
+.right-side > .inner {
+  padding-bottom: 40px;
+}
 .warning {
   color: #8a6d3b;
   background: #fcf8e3;
@@ -137,12 +140,13 @@ footer > .inner {
 
 /* Two columns */
 
-@media(min-width: 640px) {
+@media(min-width: 680px) {
   .left-side, .right-side {
     width: 50%;
   }
 
   .left-side {
+    top: 0;
     position: fixed;
     background: none;
   }
@@ -182,7 +186,7 @@ footer > .inner {
 
 /* Two columns, but limited height */
 
-@media(min-width: 640px) and (max-height: 840px) {
+@media(min-width: 680px) and (max-height: 840px) {
   h1 {
     padding: 10px 0;
   }
@@ -190,14 +194,14 @@ footer > .inner {
     bottom: 10px;
   }
 }
-@media(min-width: 640px) and (max-height: 750px) {
+@media(min-width: 680px) and (max-height: 750px) {
   footer > .inner {
     position: relative;
     right: auto;
     margin-left: 55%;
   }
 }
-@media(min-width: 640px) and (max-height: 650px) {
+@media(min-width: 680px) and (max-height: 650px) {
   h1, .fork-me {
     display: none;
   }
@@ -205,12 +209,12 @@ footer > .inner {
     margin-top: 10px;
   }
 }
-@media(min-width: 640px) and (max-height: 560px) {
+@media(min-width: 680px) and (max-height: 560px) {
   h1, .fork-me, #board-toolbar {
     display: none;
   }
 }
-@media(min-width: 640px) and (max-height: 380px) {
+@media(min-width: 680px) and (max-height: 380px) {
   #side-to-move, #form-set-fen, .spare-pieces-7492f {
     display: none;
   }
