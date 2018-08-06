@@ -89,9 +89,6 @@ td, th {
   text-align: center;
 }
 
-.right-side > .inner {
-  padding: 40px 0;
-}
 .warning {
   color: #8a6d3b;
   background: #fcf8e3;
@@ -166,7 +163,7 @@ footer > .inner {
     right: 55%;
   }
 
-  .content::after {
+  .left-side::after {
     content: '';
     display: block;
     position: fixed;
