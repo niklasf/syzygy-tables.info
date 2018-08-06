@@ -69,13 +69,13 @@ li {
 
 table {
   width: 100%;
-  border-bottom: 2px solid #ccc;
-  border-top: 2px solid #ccc;
+  border-bottom: 2px solid #ddd;
+  border-top: 2px solid #ddd;
   margin: 1em 0;
   border-collapse: collapse;
 }
 thead {
-  border-bottom: 4px solid #ccc;
+  border-bottom: 4px solid #ddd;
 }
 td, th {
   padding: 0.2em;
@@ -89,6 +89,7 @@ td, th {
 
 .left-side > .inner {
   text-align: center;
+  padding-bottom: 40px;
 }
 #board {
   margin: 15px 0;
@@ -102,8 +103,8 @@ td, th {
 }
 
 .right-side > .inner {
-  padding-bottom: 40px;
   text-align: justify;
+  padding-bottom: 40px;
 }
 .warning {
   color: #8a6d3b;
