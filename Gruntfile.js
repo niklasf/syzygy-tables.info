@@ -27,7 +27,7 @@ module.exports = function(grunt) {
   var purifiedCss = 'static/css/purified.css';
 
   var pureCss = [
-    purifiedCss,
+    //purifiedCss,
     'static/css/chessboard-0.3.0.css',
     'static/css/style.css'
   ];
