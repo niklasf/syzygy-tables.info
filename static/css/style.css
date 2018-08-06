@@ -9,6 +9,7 @@ body {
 h1 {
   margin: 0;
   padding: 1em 0;
+  font-size: 2.4em;
 }
 h1 a, h1 a:hover {
   color: black;
@@ -62,6 +63,40 @@ td, th {
   text-align: center;
 }
 
+.left-side > .inner, .right-side > .inner, footer > .inner {
+  width: 300px;
+  margin: auto;
+}
+
+.left-side > .inner {
+  text-align: center;
+  padding-bottom: 40px;
+}
+#board {
+  margin: 15px 0;
+}
+#board-toolbar {
+  margin: 10px 0;
+}
+.reload {
+  padding: 20px 0;
+  text-align: center;
+}
+
+.right-side > .inner {
+  padding: 40px 0;
+}
+.warning {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border: 1px solid #faebcc;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+#pgn-download {
+  white-space: nowrap;
+}
 #losing.white-turn .badge, #winning.black-turn .badge {
   background: black;
   color: white;
@@ -81,60 +116,23 @@ td, th {
   color: white;
 }
 
-.left-side > .inner, .right-side > .inner, footer > .inner {
-  width: 300px;
-  margin: auto;
-}
-
-.left-side > .inner {
-  text-align: center;
-  padding-bottom: 40px;
-}
-#board {
-  margin: 15px 0;
-}
-#board-toolbar {
-  margin: 10px 0;
-}
-
-.right-side > .inner {
-  padding: 40px 0;
-}
-
 footer > .inner {
   text-align: center;
   padding-top: 40px;
 }
 
-.reload {
-  padding: 20px 0;
-  text-align: center;
+/* Single column */
+
+.left-side {
+  background: #fff url('/static/triangle-bg.svg');
+  background-position: center bottom;
 }
 
-#pgn-download {
-  white-space: nowrap;
+.fork-me {
+  display: none;
 }
 
-#development {
-  background: red;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  position: fixed;
-  width: 100%;
-  z-index: 1;
-}
-
-.warning {
-  color: #8a6d3b;
-  background: #fcf8e3;
-  border: 1px solid #faebcc;
-  border-radius: 4px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-/* Device size specifics */
+/* Two columns */
 
 @media(min-width: 640px) {
   .left-side, .right-side {
@@ -143,6 +141,7 @@ footer > .inner {
 
   .left-side {
     position: fixed;
+    background: none;
   }
   .left-side > .inner {
     margin-right: 10%;
@@ -172,30 +171,22 @@ footer > .inner {
     background: #eee;
     z-index: -1;
   }
-}
-
-@media(max-width: 640px) {
-  .left-side {
-    background: #fff url('/static/triangle-bg.svg');
-    background-position: center bottom;
-  }
 
   .fork-me {
-    display: none;
-    visibility: hidden;
+    display: initial;
   }
 }
+
+/* Two columns, but limited height */
 
 @media(min-width: 640px) and (max-height: 820px) {
   h1 {
     padding: 10px 0;
   }
-
   footer > .inner {
     bottom: 10px;
   }
 }
-
 @media(min-width: 640px) and (max-height: 730px) {
   footer > .inner {
     position: relative;
@@ -203,31 +194,23 @@ footer > .inner {
     margin-left: 55%;
   }
 }
-
 @media(min-width: 640px) and (max-height: 630px) {
   h1, .fork-me {
     display: none;
-    visibility: hidden;
   }
-
   #side-to-move {
     margin-top: 10px;
   }
 }
-
 @media(min-width: 640px) and (max-height: 540px) {
   h1, .fork-me, #board-toolbar {
     display: none;
-    visibility: hidden;
   }
 }
-
 @media(min-width: 640px) and (max-height: 360px) {
   #side-to-move, #form-set-fen, .spare-pieces-7492f {
     display: none;
-    visibility: hidden;
   }
-
   #board {
     margin: 0;
   }
