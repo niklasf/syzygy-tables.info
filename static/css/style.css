@@ -149,18 +149,33 @@ footer > .inner {
 /* Device size specifics */
 
 @media(min-width: 640px) {
-  .content {
-    width: 640px;
-    margin: auto;
+  .left-side, .right-side {
+    width: 50%;
+  }
+  .left-side > .inner, .right-side > .inner {
+    width: 300px;
   }
 
-  .left-side > .inner {
+  .left-side {
     position: fixed;
+  }
+  .left-side > .inner {
+    margin-right: 10%;
+    margin-left: auto;
+  }
+
+  .right-side {
+    margin-left: 50%;
+  }
+  .right-side > .inner {
+    margin-left: 10%;
+    margin-right: auto;
   }
 
   footer > .inner {
     position: fixed;
     bottom: 40px;
+    right: 55%;
   }
 
   .content::after {
@@ -173,11 +188,6 @@ footer > .inner {
     width: 50%;
     background: #eee;
     z-index: -1;
-  }
-
-  .right-side {
-    width: 300px;
-    margin-left: 340px;
   }
 }
 
