@@ -355,8 +355,10 @@ function TablebaseView(controller) {
         if (status == 'error') {
           $('.right-side > .inner')
             .empty()
-            .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
-            .append($('<div id="info"></div>').text(xhr.statusText));
+            .append(
+              $('<section>')
+                .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
+                .append($('<div id="info"></div>').text(xhr.statusText)));
         } else {
           bindMoveLink($('.list-group-item'));
         }
