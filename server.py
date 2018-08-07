@@ -94,7 +94,7 @@ def material(board):
 
 
 def asset_url(path):
-    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join("static", path)))
+    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
 
 
 def backend_session(request):
@@ -368,9 +368,7 @@ async def index(request):
 @routes.get("/legal")
 def legal(request):
     template = request.app["jinja"].get_template("legal.html")
-    return aiohttp.web.Response(
-        text=html_minify(template.render()),
-        content_type="text/html")
+    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
 
 @routes.get("/sitemap.txt")
 def sitemap(request):
@@ -388,9 +386,7 @@ def sitemap(request):
 @routes.get("/stats")
 def stats_doc(request):
     template = request.app["jinja"].get_template("stats.html")
-    return aiohttp.web.Response(
-        text=html_minify(template.render()),
-        content_type="text/html")
+    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
 
 @routes.get("/stats/{material}.json")
 def stats_json(request):
