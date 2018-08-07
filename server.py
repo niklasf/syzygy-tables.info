@@ -84,6 +84,8 @@ def backend_session(request):
 
 
 def prepare_stats(request, material):
+    render = {}
+
     # Get stats and side.
     stats = request.app["stats"].get(material)
     side = "w"
@@ -95,6 +97,7 @@ def prepare_stats(request, material):
     if stats is None:
         return None
 
+    # Basic statistics.
     outcomes = {
         "white": stats[side]["wdl"]["2"] + stats[other]["wdl"]["-2"],
         "cursed": stats[side]["wdl"]["1"] + stats[other]["wdl"]["-1"],
@@ -107,11 +110,22 @@ def prepare_stats(request, material):
     if not total:
         return None
 
-    render = {}
-
     for key in outcomes:
         render[key] = outcomes[key]
         render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)
+
+    # Longest endgames.
+    for longest in stats["longest"]:
+        material_side = material.split("v", 1)[0]
+        label = "{} {} in {}{}".format(
+            material_side,
+            "winning" if (longest["wdl"] > 0) == ((" " + side) in longest["epd"]) else "losing",
+            longest["ply"],
+            " (frustrated)" if abs(longest["wdl"]) == 1 else "")
+        longest["label"] = label
+        longest["fen"] = longest["epd"] + " 0 1"
+
+    render["longest"] = stats["longest"]
 
     return render
 
