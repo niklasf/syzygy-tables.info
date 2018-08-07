@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Creates JSON files from tablebase generator output."""
+
 import sys
 import json
 
