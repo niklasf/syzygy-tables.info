@@ -26,8 +26,7 @@ Start the server on port 5000:
     python server.py
 
 You can optionally copy `config.default.ini` to `config.ini` and adjust
-configuration variables. `etc` contains configuration examples for nginx and
-a systemd service.
+configuration variables.
 
 API / Backend
 -------------
