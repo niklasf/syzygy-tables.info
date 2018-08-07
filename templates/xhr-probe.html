@@ -88,11 +88,21 @@
   </a>
   {% endif %}
 
-  {% if not unknown_moves %}
-    <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
-      <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-      {{ material }}.json
-    </a>
+  {% if stats %}
+    <section id="stats">
+      <h3>{{ material }} statistics</h3>
+      <div class="list-group stats">
+        {% if stats.white %}<div class="list-group-item white-win" title="Unique positions with white wins">{{ "{:,}".format(stats.white) }} ({{ stats.white_pct }}%)</div>{% endif %}
+        {% if stats.cursed %}<div class="list-group-item white-win frustrated" title="Unique positions with frustrated white wins">{{ "{:,}".format(stats.cursed) }} ({{ stats.cursed_pct }}%)</div>{% endif %}
+        {% if stats.draws %}<div class="list-group-item draws" title="Unique drawn positions">{{ "{:,}".format(stats.draws) }} ({{ stats.draws_pct }}%)</div>{% endif %}
+        {% if stats.blessed %}<div class="list-group-item black-win frustrated" title="Unique positions with frustrated black wins">{{ "{:,}".format(stats.blessed) }} ({{ stats.blessed_pct }}%)</div>{% endif %}
+        {% if stats.black %}<div class="list-group-item black-win" title="Unique positions with black wins">{{ "{:,}".format(stats.black) }} ({{ stats.black_pct }}%)</div>{% endif %}
+      </div>
+      <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
+        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+        {{ material }}.json
+      </a>
+    </section>
   {% endif %}
 </section>
 

@@ -75,30 +75,45 @@ def clear_fen(fen):
     return DEFAULT_FEN.replace("w", parts[1])
 
 
-def material(board):
-    name = ""
-    name += "K" * chess.popcount(board.kings & board.occupied_co[chess.WHITE])
-    name += "Q" * chess.popcount(board.queens & board.occupied_co[chess.WHITE])
-    name += "R" * chess.popcount(board.rooks & board.occupied_co[chess.WHITE])
-    name += "B" * chess.popcount(board.bishops & board.occupied_co[chess.WHITE])
-    name += "N" * chess.popcount(board.knights & board.occupied_co[chess.WHITE])
-    name += "P" * chess.popcount(board.pawns & board.occupied_co[chess.WHITE])
-    name += "v"
-    name += "K" * chess.popcount(board.kings & board.occupied_co[chess.BLACK])
-    name += "Q" * chess.popcount(board.queens & board.occupied_co[chess.BLACK])
-    name += "R" * chess.popcount(board.rooks & board.occupied_co[chess.BLACK])
-    name += "B" * chess.popcount(board.bishops & board.occupied_co[chess.BLACK])
-    name += "N" * chess.popcount(board.knights & board.occupied_co[chess.BLACK])
-    name += "P" * chess.popcount(board.pawns & board.occupied_co[chess.BLACK])
-    return name
-
-
 def asset_url(path):
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
 
 
 def backend_session(request):
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
+
+
+def prepare_stats(request, material):
+    # Get stats and side.
+    stats = request.app["stats"].get(material)
+    side = "w"
+    other = "b"
+    if stats is None:
+        stats = request.app["stats"].get(chess.syzygy.normalize_tablename(material))
+        side = "b"
+        other = "w"
+    if stats is None:
+        return None
+
+    outcomes = {
+        "white": stats[side]["wdl"]["2"] + stats[other]["wdl"]["-2"],
+        "cursed": stats[side]["wdl"]["1"] + stats[other]["wdl"]["-1"],
+        "draws": stats[side]["wdl"]["0"] + stats[other]["wdl"]["0"],
+        "blessed": stats[side]["wdl"]["-1"] + stats[other]["wdl"]["1"],
+        "black": stats[side]["wdl"]["-2"] + stats[other]["wdl"]["2"],
+    }
+
+    total = sum(outcomes.values())
+    if not total:
+        return None
+
+    render = {}
+
+    for key in outcomes:
+        render[key] = outcomes[key]
+        render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)
+
+    return render
 
 
 routes = aiohttp.web.RouteTableDef()
@@ -169,7 +184,7 @@ async def syzygy_vs_syzygy_pgn(request):
         dtz = move_info["dtz"]
 
         if board.halfmove_clock == 0:
-            node.comment = "%s with DTZ %d" % (material(board), dtz)
+            node.comment = "%s with DTZ %d" % (chess.syzygy.calc_key(board), dtz)
 
     # Final comment.
     if board.is_checkmate():
@@ -228,7 +243,7 @@ async def index(request):
     render["fen_input"] = "" if board.fen() == DEFAULT_FEN else board.fen()
 
     # Material key for the page title.
-    render["material"] = material(board)
+    render["material"] = material = chess.syzygy.calc_key(board)
     render["piece_count"] = chess.popcount(board.occupied)
 
     # Moves are going to be grouped by WDL.
@@ -355,6 +370,9 @@ async def index(request):
     # Sort unknown moves.
     grouped_moves[None].sort(key=lambda move: move["uci"])
     render["unknown_moves"] = grouped_moves[None]
+
+    # Stats.
+    render["stats"] = prepare_stats(request, material)
 
     if "xhr" in request.query:
         template = request.app["jinja"].get_template("xhr-probe.html")

@@ -34,17 +34,17 @@ h2 {
   border-radius: 4px;
   text-align: left;
 }
-h2.white-win {
+.white-win {
   background: white;
   color: black;
 }
-h2.white-win.frustrated {
+.white-win.frustrated {
   background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
 }
-h2.black-win.frustrated {
+.black-win.frustrated {
   background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
 }
-h2.black-win {
+.black-win {
   background: black;
   color: white;
 }
@@ -367,6 +367,16 @@ input[type=text] {
   white-space: nowrap;
   width: 1%;
   vertical-align: middle;
+}
+
+/* Stats */
+
+.stats .list-group-item {
+  text-align: center;
+}
+.draws {
+  background: #777;
+  color: white;
 }
 
 /* Code */
