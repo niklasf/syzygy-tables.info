@@ -45,7 +45,7 @@ License
 This project is licensed under the AGPLv3 with the following dependencies:
 
 * [python-chess](https://github.com/niklasf/python-chess) ([GPL3](https://github.com/niklasf/python-chess/blob/master/LICENSE))
-* [chessboard.js](http://chessboardjs.com/) ([MIT](https://github.com/oakmac/chessboardjs/blob/master/LICENSE))
+* [chessground](https://github.com/ornicar/chessground) ([GPL3](https://github.com/ornicar/chessground/blob/master/LICENSE))
 * [chess.js](https://github.com/jhlywa/chess.js) ([MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE))
 * [Gaviota tablebases](https://github.com/michiguel/Gaviota-Tablebases) ([MIT](https://github.com/michiguel/Gaviota-Tablebases/blob/master/license.txt))
 * [aiohttp](http://aiohttp.readthedocs.org/en/stable/) ([Apache 2](https://github.com/KeepSafe/aiohttp/blob/master/LICENSE.txt))
