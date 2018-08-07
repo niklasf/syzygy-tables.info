@@ -428,8 +428,6 @@ def make_app(config):
     # Setup routes.
     app.router.add_routes(routes)
     app.router.add_static("/static", "static")
-    app.router.add_route("GET", "/favicon.ico", static("favicon.ico"))
-    app.router.add_route("GET", "/favicon.png", static("favicon.png"))
     app.router.add_route("GET", "/stats.json", static("stats.json"))
     return app
 
