@@ -98,12 +98,16 @@
         {% if stats.blessed %}<div class="list-group-item black-win frustrated" title="Unique positions with frustrated black wins">{{ "{:,}".format(stats.blessed) }} ({{ stats.blessed_pct }}%)</div>{% endif %}
         {% if stats.black %}<div class="list-group-item black-win" title="Unique positions with black wins">{{ "{:,}".format(stats.black) }} ({{ stats.black_pct }}%)</div>{% endif %}
       </div>
-      <h3>Longest {{ material }} endgames</h3>
-      <ul>
-        {% for longest in stats.longest %}
-          <li><a href="/?fen={{ longest.fen|replace(" ", "_") }}">{{ longest.label }}</a></li>
-        {% endfor %}
-      </ul>
+
+      {% if stats.longest %}
+        <h3>Longest {{ material }} endgames</h3>
+        <ul>
+          {% for longest in stats.longest %}
+            <li><a href="/?fen={{ longest.fen|replace(" ", "_") }}">{{ longest.label }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
       <h3>Histogram</h3>
       <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
         <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
