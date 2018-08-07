@@ -93,6 +93,10 @@ def material(board):
     return name
 
 
+def asset_url(path):
+    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join("static", path)))
+
+
 class Frontend(object):
 
     def __init__(self, config, stats):
@@ -106,6 +110,7 @@ class Frontend(object):
         self.jinja.globals["STARTING_FEN"] = chess.STARTING_FEN
 
         self.jinja.globals["development"] = self.config.getboolean("server", "development")
+        self.jinja.globals["asset_url"] = asset_url
 
     def backend_session(self, request):
         return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
