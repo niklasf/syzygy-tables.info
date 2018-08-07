@@ -47,10 +47,10 @@ def process(f):
             data[side]["wdl"][1] = int(num)
         elif "positions are losses" in line:
             num, _ = line.split(None, 1)
-            data[side]["wdl"][-1] = int(num)
+            data[side]["wdl"][-2] = int(num)
         elif "positions are cursed losses" in line:
             num, _ = line.split(None, 1)
-            data[side]["wdl"][-2] = int(num)
+            data[side]["wdl"][-1] = int(num)
         elif "positions are draws" in line:
             num, _ = line.split(None, 1)
             data[side]["wdl"][0] = int(num)
