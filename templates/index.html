@@ -3,11 +3,9 @@
 {% block title %}{{ material }} – Syzygy endgame tablebases{% endblock %}
 
 {% block head %}
-<script src="{{ asset_url("js/client.min.js") }}"></script>
-<meta name="description" content="User interface and public API for probing Syzygy endgame tablebases">
+  <script src="{{ asset_url("js/client.min.js") }}"></script>
+  <meta name="description" content="User interface and public API for probing Syzygy endgame tablebases">
 {% endblock %}
-
-{% block apidoc_query %}?fen={{ fen|urlencode }}{% endblock %}
 
 {% block leftside %}
   <h1 class="main"><a href="/">Syzygy endgame tablebases</a></h1>

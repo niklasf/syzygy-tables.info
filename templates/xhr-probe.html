@@ -59,27 +59,26 @@
   {% endfor %}
   </div>
 
-
   <div id="info">
-  {% if illegal %}
-    <p>The given position is not a legal chess position.</p>
-  {% elif insufficient_material %}
-    <p><strong>The game is drawn</strong> because with the remaining
-      material no sequence of legal moves can lead to a checkmate.</p>
-  {% elif unknown_moves %}
-    {% if fen == STARTING_FEN %}
-      <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
-        yet solved.</a></p>
+    {% if illegal %}
+      <p>The given position is not a legal chess position.</p>
+    {% elif insufficient_material %}
+      <p><strong>The game is drawn</strong> because with the remaining
+        material no sequence of legal moves can lead to a checkmate.</p>
+    {% elif unknown_moves %}
+      {% if fen == STARTING_FEN %}
+        <p><a href="https://en.wikipedia.org/wiki/Solving_chess">Chess is not
+          yet solved.</a></p>
+      {% endif %}
+      <p>Syzygy tables only provide information for positions with up to 7 pieces and
+        no castling rights.</p>
+    {% elif blessed_loss %}
+      <p><strong>This is a blessed loss.</strong> Mate can be forced, but a
+        draw can be achieved under the fifty-move rule.</p>
+    {% elif cursed_win %}
+      <p><strong>This is a cursed win.</strong> Mate can be forced, but a
+        draw can be achieved under the fifty-move rule.</p>
     {% endif %}
-    <p>Syzygy tables only provide information for positions with up to 7 pieces and
-      no castling rights.</p>
-  {% elif blessed_loss %}
-    <p><strong>This is a blessed loss.</strong> Mate can be forced, but a
-      draw can be achieved under the fifty-move rule.</p>
-  {% elif cursed_win %}
-    <p><strong>This is a cursed win.</strong> Mate can be forced, but a
-      draw can be achieved under the fifty-move rule.</p>
-  {% endif %}
   </div>
 
   {% if not illegal %}
@@ -88,6 +87,7 @@
       {{ material }}.pgn
   </a>
   {% endif %}
+
   {% if not unknown_moves %}
     <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
       <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
