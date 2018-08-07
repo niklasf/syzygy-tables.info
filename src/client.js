@@ -127,13 +127,14 @@ Controller.prototype.setPosition = function (position) {
 function BoardView(controller) {
   var self = this;
 
-  this.fenPart = controller.position.fen().split(/\s+/)[0];
-
   this.ground = Chessground(document.getElementById('board'), {
-    fen: this.fenPart,
+    fen: controller.position.fen(),
     autoCastle: false,
     events: {
       move: function (orig, dest) {
+        // If the change is a legal move, play it.
+        if (controller.pushMove(orig, dest)) return;
+
         // Otherwise just change to position.
         var fenParts = controller.position.fen().split(/\s+/);
         fenParts[0] = self.fenPart = self.ground.getFen();
@@ -170,11 +171,9 @@ function BoardView(controller) {
 }
 
 BoardView.prototype.setPosition = function (position) {
-  var newFenPart = position.fen().split(/\s+/)[0];
-  if (this.fenPart !== newFenPart) {
-    this.ground.set({ fen: newFenPart });
-    this.fenPart = newFenPart;
-  }
+  this.ground.set({
+    fen: position.fen()
+  });
 };
 
 BoardView.prototype.flip = function () {
