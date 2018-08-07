@@ -91,9 +91,6 @@ td, th {
   text-align: center;
   padding-bottom: 40px;
 }
-#board {
-  margin: 15px 0;
-}
 #board-toolbar {
   margin: 10px 0;
 }
@@ -217,6 +214,17 @@ a.list-group-item:focus, a.list-group-item:hover {
 footer > .inner {
   text-align: center;
   padding-top: 40px;
+}
+
+/* Board */
+
+#board {
+  width: 296px;
+  height: 296px;
+  margin: 25px auto;
+}
+.cg-board-wrap {
+  background-image: url('/static/brown-board.svg');
 }
 
 /* Glyphicons */

@@ -17,7 +17,7 @@
       <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|replace(" ", "_") }}">Black to move</a>
     </div>
 
-    <div id="board" data-fen="{{ fen }}">
+    <div id="board" data-fen="{{ fen }}" class="is2d">
       <noscript>JavaScript required for interactive board view.</noscript>
     </div>
 

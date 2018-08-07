@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "chess.js": "^0.10.2",
+    "chessground": "^7.3.2",
     "jquery": "^3.3.1"
   }
 }

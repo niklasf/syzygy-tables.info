@@ -17,8 +17,8 @@
  */
 
 var $ = require('jquery');
-window.$ = $;
 var Chess = require('chess.js').Chess;
+var Chessground = require('chessground').Chessground;
 
 
 var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
@@ -129,7 +129,18 @@ function BoardView(controller) {
 
   this.fenPart = controller.position.fen().split(/\s+/)[0];
 
-  this.board = new ChessBoard('board', {
+  this.ground = Chessground(document.getElementById('board'), {
+    fen: this.fenPart,
+    events: {
+      move: function (orig, dest) {
+        // Otherwise just change to position.
+        var fenParts = controller.position.fen().split(/\s+/);
+        fenParts[0] = self.fenPart = self.ground.getFen();
+        controller.push(new Chess(fenParts.join(' ')));
+      }
+    }
+  });
+  /* XXX this.board = new ChessBoard('board', {
     position: self.fenPart,
     pieceTheme: '/static/pieces/{piece}.svg',
     draggable: true,
@@ -150,7 +161,7 @@ function BoardView(controller) {
       fenParts[0] = ChessBoard.objToFen(newPos);
       controller.push(new Chess(fenParts.join(' ')));
     }
-  });
+  }); */
 
   controller.bind('positionChanged', function (position) {
     self.setPosition(position);
@@ -160,13 +171,13 @@ function BoardView(controller) {
 BoardView.prototype.setPosition = function (position) {
   var newFenPart = position.fen().split(/\s+/)[0];
   if (this.fenPart !== newFenPart) {
-    this.board.position(newFenPart);
+    this.ground.set({ fen: newFenPart });
     this.fenPart = newFenPart;
   }
 };
 
 BoardView.prototype.flip = function () {
-  this.board.flip();
+  this.ground.toggleOrientation();
 };
 
 
@@ -317,15 +328,18 @@ function TablebaseView(controller) {
         var fen = $(this).attr('data-fen');
         var uci = $(this).attr('data-uci');
         controller.push(new Chess(fen));
+        // XXX
         $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
         $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
       })
       .mouseenter(function () {
+        // XXX
         var uci = $(this).attr('data-uci');
         $('#board .square-' + uci.substr(0, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
         $('#board .square-' + uci.substr(2, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
       })
       .mouseleave(function () {
+        // XXX
         var uci = $(this).attr('data-uci');
         $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
         $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');

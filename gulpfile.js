@@ -8,6 +8,8 @@ const browserify = require('browserify');
 
 const css = [
   'static/css/chessboard-0.3.0.css',
+  'static/css/chessground.css',
+  'static/css/cburnett.css',
   'static/css/style.css'
 ];
 
@@ -32,7 +34,7 @@ gulp.task('js', () => {
     .bundle()
     .pipe(source('client.min.js'))
     .pipe(buffer())
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(gulp.dest('static/js'));
 });
 
