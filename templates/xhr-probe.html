@@ -99,6 +99,11 @@
         {% if stats.black %}<div class="list-group-item black-win" title="Unique positions with black wins">{{ "{:,}".format(stats.black) }} ({{ stats.black_pct }}%)</div>{% endif %}
       </div>
 
+      <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
+        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+        {{ material }}.json
+      </a>
+
       {% if stats.longest %}
         <h3>Longest {{ material }} endgames</h3>
         <ul>
@@ -108,11 +113,16 @@
         </ul>
       {% endif %}
 
-      <h3>Histogram</h3>
-      <a href="/stats/{{ material }}.json" aria-label="Machine readable statistics for {{ material }}" title="Machine readable statistics for {{ material }}">
-        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-        {{ material }}.json
-      </a>
+      {% if stats.histogram %}
+        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }}</h3>
+        {% for row in stats.histogram %}
+          {% if row.empty %}
+            <div class="hist-empty" title="{{ row.empty }} plies skipped">⋮</div>
+          {% else %}
+            <div class="hist{% if row.active %} active{% endif %}" style="width: {{ row.width }}%;" title="{{ "{:,}".format(row.num) }} unique positions with {{ stats.material_side }} {{ stats.verb }} in {{ row.ply }}"></div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     </section>
   {% endif %}
 </section>

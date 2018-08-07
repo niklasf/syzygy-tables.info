@@ -379,6 +379,18 @@ input[type=text] {
   color: white;
 }
 
+.hist {
+  height: 8px;
+  background: #eee;
+  margin-bottom: 2px;
+}
+.hist.active {
+  background: #777;
+}
+.hist-empty {
+  color: #777;
+}
+
 /* Code */
 
 pre {

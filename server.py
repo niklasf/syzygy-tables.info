@@ -33,6 +33,8 @@ import logging
 import warnings
 import datetime
 import functools
+import itertools
+import math
 
 try:
     import htmlmin
@@ -83,7 +85,7 @@ def backend_session(request):
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
 
 
-def prepare_stats(request, material):
+def prepare_stats(request, material, fen, dtz):
     render = {}
 
     # Get stats and side.
@@ -96,6 +98,8 @@ def prepare_stats(request, material):
         other = "w"
     if stats is None:
         return None
+
+    render["material_side"] = material_side = material.split("v", 1)[0]
 
     # Basic statistics.
     outcomes = {
@@ -116,7 +120,6 @@ def prepare_stats(request, material):
 
     # Longest endgames.
     for longest in stats["longest"]:
-        material_side = material.split("v", 1)[0]
         label = "{} {} in {}{}".format(
             material_side,
             "winning" if (longest["wdl"] > 0) == ((" " + side) in longest["epd"]) else "losing",
@@ -126,6 +129,46 @@ def prepare_stats(request, material):
         longest["fen"] = longest["epd"] + " 0 1"
 
     render["longest"] = stats["longest"]
+
+    # Histogram.
+    if not dtz:
+        return render
+
+    side_winning = (" w" in fen) == (dtz > 0)
+    render["verb"] = "winning" if side_winning else "losing"
+
+    win_hist = stats[side]["win_hist" if side_winning else "loss_hist"]
+    loss_hist = stats[other]["loss_hist" if side_winning else "win_hist"]
+    hist = [a + b for a, b in itertools.zip_longest(win_hist, loss_hist, fillvalue=0)]
+    if not any(hist):
+        return render
+
+    maximum = max(math.log(num) if num else 0 for num in hist)
+
+    render["histogram"] = []
+    empty = 0
+    for ply, num in enumerate(hist):
+        if num == 0:
+            empty += 1
+            continue
+
+        if empty > 5:
+            render["histogram"].append({"empty": empty})
+        else:
+            for i in range(empty):
+                render["histogram"].append({
+                    "ply": ply - empty + i,
+                    "num": 0,
+                    "width": 0,
+                })
+        empty = 0
+
+        render["histogram"].append({
+            "ply": ply,
+            "num": num,
+            "width": round((math.log(num) if num else 0) * 100 / maximum, 1),
+            "active": abs(dtz) == ply or abs(dtz) + 1 == ply,
+        })
 
     return render
 
@@ -263,6 +306,8 @@ async def index(request):
     # Moves are going to be grouped by WDL.
     grouped_moves = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
 
+    dtz = None
+
     if not board.is_valid():
         render["status"] = "Invalid position"
         render["illegal"] = True
@@ -287,6 +332,8 @@ async def index(request):
                         charset=res.charset)
 
                 probe = await res.json()
+
+        dtz = probe["dtz"]
 
         render["blessed_loss"] = probe["wdl"] == -1
         render["cursed_win"] = probe["wdl"] == 1
@@ -386,7 +433,7 @@ async def index(request):
     render["unknown_moves"] = grouped_moves[None]
 
     # Stats.
-    render["stats"] = prepare_stats(request, material)
+    render["stats"] = prepare_stats(request, material, render["fen"], dtz)
 
     if "xhr" in request.query:
         template = request.app["jinja"].get_template("xhr-probe.html")
