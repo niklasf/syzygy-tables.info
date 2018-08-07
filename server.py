@@ -361,9 +361,7 @@ async def index(request):
     else:
         template = request.app["jinja"].get_template("index.html")
 
-    return aiohttp.web.Response(
-        text=html_minify(template.render(render)),
-        content_type="text/html")
+    return aiohttp.web.Response(text=html_minify(template.render(render)), content_type="text/html")
 
 @routes.get("/legal")
 def legal(request):
