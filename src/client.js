@@ -213,10 +213,11 @@ SideToMoveView.prototype.setPosition = function (position) {
 function FenInputView(controller) {
   var self = this;
 
-  $('#form-set-fen').submit(function (event) {
-    event.preventDefault();
-
-    var parts = $('#fen').val().trim().split(/\s+/);
+  function parseFen(fen) {
+    var parts = fen.trim().split(/\s+/);
+    if (parts[0] === '') {
+      parts[0] = DEFAULT_FEN.split(/\s+/)[0];
+    }
     if (parts.length === 1) {
       parts.push(controller.position.turn());
     }
@@ -233,12 +234,31 @@ function FenInputView(controller) {
       parts.push('1');
     }
 
-    var fen = parts.join(' ');
     var position = new Chess();
-    if (!position.load(fen)) {
-      controller.push(new Chess(DEFAULT_FEN));
+    if (position.load(parts.join(' '))) {
+      return position;
+    }
+  }
+
+  var input = document.getElementById('fen');
+  if (input.setCustomValidity) {
+    input.oninput = input.onchange = function() {
+      if (parseFen(input.value)) {
+        input.setCustomValidity('');
+      } else {
+        input.setCustomValidity('Invalid FEN');
+      }
+    };
+  }
+
+  $('#form-set-fen').submit(function (event) {
+    event.preventDefault();
+
+    var position = parseFen(input.value);
+    if (position) {
+      controller.push(position);
     } else {
-      controller.push(new Chess(fen));
+      input.focus();
     }
   });
 
