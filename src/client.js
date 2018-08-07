@@ -131,6 +131,7 @@ function BoardView(controller) {
 
   this.ground = Chessground(document.getElementById('board'), {
     fen: this.fenPart,
+    autoCastle: false,
     events: {
       move: function (orig, dest) {
         // Otherwise just change to position.
