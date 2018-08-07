@@ -16,6 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var $ = require('jquery');
+window.$ = $;
+var Chess = require('chess.js').Chess;
+
+
 var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 

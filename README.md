@@ -14,12 +14,12 @@ Install dependencies (with Python >= 3.5.3):
 
 Node.js:
 
-    npm install -g grunt-cli
+    npm install -g gulp-cli
     npm install
 
 Create combined JavaScript and CSS files using Grunt:
 
-    grunt
+    gulp
 
 Start the server on port 5000:
 
@@ -37,7 +37,7 @@ Hacking
 -------
 
 Have a look at `server.py` for server side code. The client side code is in
-`static/js/client.js`.
+`src/client.js`. `gulp watch` can be useful.
 
 License
 -------

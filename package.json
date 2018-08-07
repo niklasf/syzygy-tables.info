@@ -24,9 +24,17 @@
     "url": "https://github.com/niklasf/syzygy-tables.info.git"
   },
   "devDependencies": {
-    "grunt": "^1.0.2",
-    "grunt-contrib-cssmin": "^2.2.1",
-    "grunt-contrib-uglify": "^3.3.0",
-    "grunt-contrib-watch": "^1.0.0"
+    "browserify": "^16.2.2",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.4",
+    "gulp-concat": "^2.6.1",
+    "gulp-uglify": "^3.0.1",
+    "gulp-watch": "^5.0.1",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "chess.js": "^0.10.2",
+    "jquery": "^3.3.1"
   }
 }
