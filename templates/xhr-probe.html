@@ -90,6 +90,26 @@
 
   {% if stats %}
     <section id="stats">
+      {% if stats.histogram %}
+        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }}</h3>
+        {% for row in stats.histogram %}
+          {% if row.empty %}
+            <div class="hist-empty" title="{{ row.empty }} plies skipped">⋮</div>
+          {% else %}
+            <div class="hist{% if row.active %} active{% endif %}" style="width: {{ row.width }}%;" title="{{ "{:,}".format(row.num) }} unique positions with {{ stats.material_side }} {{ stats.verb }} in {{ row.ply }} (log scale)"></div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {% if stats.longest %}
+        <h3>Longest {{ material }} endgames</h3>
+        <ul>
+          {% for longest in stats.longest %}
+            <li><a href="/?fen={{ longest.fen|replace(" ", "_") }}">{{ longest.label }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
       <h3>{{ material }} statistics</h3>
       <div class="list-group stats">
         {% if stats.white %}<div class="list-group-item white-win" title="Unique positions with white wins">{{ "{:,}".format(stats.white) }} ({{ stats.white_pct }}%)</div>{% endif %}
@@ -104,25 +124,6 @@
         {{ material }}.json
       </a>
 
-      {% if stats.longest %}
-        <h3>Longest {{ material }} endgames</h3>
-        <ul>
-          {% for longest in stats.longest %}
-            <li><a href="/?fen={{ longest.fen|replace(" ", "_") }}">{{ longest.label }}</a></li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-
-      {% if stats.histogram %}
-        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }}</h3>
-        {% for row in stats.histogram %}
-          {% if row.empty %}
-            <div class="hist-empty" title="{{ row.empty }} plies skipped">⋮</div>
-          {% else %}
-            <div class="hist{% if row.active %} active{% endif %}" style="width: {{ row.width }}%;" title="{{ "{:,}".format(row.num) }} unique positions with {{ stats.material_side }} {{ stats.verb }} in {{ row.ply }}"></div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
     </section>
   {% endif %}
 </section>
