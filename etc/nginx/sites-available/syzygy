@@ -1,0 +1,84 @@
+upstream backend {
+  server 127.0.0.1:5000;
+}
+
+server {
+  server_name www.syzygy-tables.info;
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+  include syzygy-ssl.conf;
+
+  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload" always;
+
+  return 301 https://syzygy-tables.info$request_uri;
+}
+
+server {
+  server_name syzygy-tables.info www.syzygy-tables.info;
+  listen 80;
+  listen [::]:80;
+
+  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload" always;
+
+  location /.well-known/ {
+    alias /var/www/.well-known/;
+  }
+
+  location / {
+    return 301 https://syzygy-tables.info$request_uri;
+  }
+}
+
+server {
+  server_name syzygy-tables.info;
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+  include syzygy-ssl.conf;
+
+  gzip_on; # only static content, so no worries about BREACH
+  gzip_types text/plain text/css application/json application/javascript text/javascript image/svg+xml text/html;
+
+  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload" always;
+  add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';" always;
+
+  if ($http_user_agent ~ "Yandex") {
+    return 444;
+  }
+
+  location /gaviota/ {
+    rewrite ^/gaviota/(.*)$ https://tablebase.lichess.ovh/tables/standard/Gaviota/$1 permanent;
+  }
+  location /atomic/ {
+    rewrite ^/atomic/(.*)$ https://tablebase.lichess.ovh/tables/atomic/$1 permanent;
+  }
+  location /giveaway/ {
+    rewrite ^/giveaway/(.*)$ https://tablebase.lichess.ovh/tables/antichess/$1 permanent;
+  }
+  location /suicide/ {
+    rewrite ^/suicide/(.*)$ https://tablebase.lichess.ovh/tables/antichess/$1 permanent;
+  }
+  location /regular/ {
+    rewrite ^/regular/(.*)$ https://tablebase.lichess.ovh/tables/standard/$1 permanent;
+  }
+
+  location /static/ {
+    root /opt/syzygy-tables.info/;
+    expires 1M;
+    access_log off;
+  }
+
+  location /google675e347e646e7c68.html {
+    return 200 "google-site-verification: google675e347e646e7c68.html";
+  }
+
+  location /syzygy-vs-syzygy/ {
+    proxy_buffering off;
+    proxy_http_version 1.1;
+    proxy_pass http://backend;
+  }
+
+  location / {
+    expires 1h;
+    proxy_pass http://backend;
+  }
+}
