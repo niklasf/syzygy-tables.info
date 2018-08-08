@@ -3,8 +3,11 @@
 {% block title %}{{ material }} – Syzygy endgame tablebases{% endblock %}
 
 {% block head %}
-  <script src="{{ asset_url("js/client.min.js") }}"></script>
   <meta name="description" content="User interface and public API for probing Syzygy endgame tablebases">
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ asset_url("js/client.min.js") }}" async defer></script>
 {% endblock %}
 
 {% block leftside %}
