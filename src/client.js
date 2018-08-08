@@ -180,6 +180,16 @@ BoardView.prototype.flip = function () {
   this.ground.toggleOrientation();
 };
 
+BoardView.prototype.unsetHovering = function() {
+  this.ground.setAutoShapes([]);
+};
+
+BoardView.prototype.setHovering = function(uci) {
+  this.ground.setAutoShapes([
+    { orig: uci.substr(0, 2), dest: uci.substr(2, 2), brush: 'green' }
+  ]);
+};
+
 
 function SideToMoveView(controller) {
   var self = this;
@@ -328,7 +338,7 @@ function ToolBarView(controller, boardView) {
 }
 
 
-function TablebaseView(controller) {
+function TablebaseView(controller, boardView) {
   function bindMoveLink(moveLink) {
     moveLink
       .click(function (event) {
@@ -337,21 +347,13 @@ function TablebaseView(controller) {
         var fen = $(this).attr('data-fen');
         var from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
         controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
-        // XXX
-        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
-        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+        boardView.unsetHovering();
       })
       .mouseenter(function () {
-        // XXX
-        var uci = $(this).attr('data-uci');
-        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
-        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', 'inset 0 0 3px 3px yellow');
+        boardView.setHovering($(this).attr('data-uci'));
       })
       .mouseleave(function () {
-        // XXX
-        var uci = $(this).attr('data-uci');
-        $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
-        $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
+        boardView.unsetHovering();
       });
   }
 
@@ -407,5 +409,5 @@ $(function () {
   new ToolBarView(controller, boardView);
 
   new DocumentTitle(controller);
-  new TablebaseView(controller);
+  new TablebaseView(controller, boardView);
 });
