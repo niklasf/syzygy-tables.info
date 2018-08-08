@@ -179,10 +179,13 @@ BoardView.prototype.setPosition = function (position) {
     if (moves.length) dests[s] = moves;
   });
 
+  const turn = (position.turn() === 'w') ? 'white' : 'black';
+
   this.ground.set({
     lastMove: history[history.length - 1],
     fen: position.fen(),
-    turnColor: (position.turn() === 'w') ? 'white' : 'black',
+    turnColor: turn,
+    check: position.in_check() ? turn : false,
     movable: {
       dests: dests
     }
