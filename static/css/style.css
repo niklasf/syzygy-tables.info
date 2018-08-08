@@ -306,7 +306,7 @@ footer > .inner {
   background-color: #fff;
   border-color: #ccc;
 }
-.btn-default.active, .btn-default:active, .btn-default:focus, .btn-default:hover {
+.btn-default.active, .btn-default:active, .btn-default:hover {
   background-color: #e6e6e6;
   border-color: #adadad;
   color: #333;
