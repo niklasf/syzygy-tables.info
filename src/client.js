@@ -357,7 +357,7 @@ function TablebaseView(controller, boardView) {
       });
   }
 
-  bindMoveLink($('.list-group-item'));
+  bindMoveLink($('a.list-group-item'));
 
   controller.bind('positionChanged', function (position) {
     $('.right-side > .inner')
@@ -371,7 +371,7 @@ function TablebaseView(controller, boardView) {
                 .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
                 .append($('<div id="info"></div>').text(xhr.statusText)));
         } else {
-          bindMoveLink($('.list-group-item'));
+          bindMoveLink($('a.list-group-item'));
         }
       });
   });
