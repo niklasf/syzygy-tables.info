@@ -19,8 +19,24 @@
       <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|replace(" ", "_") }}">Black to move</a>
     </div>
 
+    <div class="spare top">
+      <piece class="black pawn" data-color="black" data-role="pawn"></piece>
+      <piece class="black knight" data-color="black" data-role="knight"></piece>
+      <piece class="black bishop" data-color="black" data-role="bishop"></piece>
+      <piece class="black rook" data-color="black" data-role="rook"></piece>
+      <piece class="black queen" data-color="black" data-role="queen"></piece>
+      <piece class="black king" data-color="black" data-role="king"></piece>
+    </div>
     <div id="board" data-fen="{{ fen }}">
       <noscript>JavaScript required for interactive board view.</noscript>
+    </div>
+    <div class="spare bottom">
+      <piece class="white pawn" data-color="white" data-role="pawn"></piece>
+      <piece class="white knight" data-color="white" data-role="knight"></piece>
+      <piece class="white bishop" data-color="white" data-role="bishop"></piece>
+      <piece class="white rook" data-color="white" data-role="rook"></piece>
+      <piece class="white queen" data-color="white" data-role="queen"></piece>
+      <piece class="white king" data-color="white" data-role="king"></piece>
     </div>
 
     <div id="board-toolbar" role="toolbar">

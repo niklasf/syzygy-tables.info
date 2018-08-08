@@ -118,7 +118,7 @@ Controller.prototype.setPosition = function (position) {
 /* Board view */
 
 function BoardView(controller) {
-  this.ground = Chessground(document.getElementById('board'), {
+  const ground = this.ground = Chessground(document.getElementById('board'), {
     fen: controller.position.fen(),
     autoCastle: false,
     movable: {
@@ -144,6 +144,14 @@ function BoardView(controller) {
         controller.push(new Chess(fenParts.join(' ')));
       }
     }
+  });
+
+  $('.spare piece').mousedown(function (event) {
+    event.preventDefault();
+    ground.dragNewPiece({
+      color: $(this).attr('data-color'),
+      role: $(this).attr('data-role')
+    }, event, true);
   });
 
   this.setPosition(controller.position);

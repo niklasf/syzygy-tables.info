@@ -221,10 +221,22 @@ footer > .inner {
 #board {
   width: 296px;
   height: 296px;
-  margin: 25px auto;
+  margin: 0 auto;
 }
 .cg-board-wrap {
   background-image: url('/static/brown-board.svg');
+}
+.spare.top {
+  margin: 20px 0 2px 0;
+}
+.spare.bottom {
+  margin: 12px 0 20px 0;
+}
+.spare piece {
+  display: inline-block;
+  width: 37px;
+  height: 37px;
+  background-size: cover;
 }
 
 /* Glyphicons */
@@ -513,8 +525,8 @@ pre code {
     display: none;
   }
 }
-@media(min-width: 680px) and (max-height: 380px) {
-  #side-to-move, #form-set-fen, .spare-pieces-7492f {
+@media(min-width: 680px) and (max-height: 400px) {
+  #side-to-move, #form-set-fen, .spare {
     display: none;
   }
   #board {
