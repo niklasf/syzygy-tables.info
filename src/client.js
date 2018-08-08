@@ -16,16 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var $ = require('zepto-browserify').$;
-var Chess = require('chess.js').Chess;
-var Chessground = require('chessground').Chessground;
+const $ = require('zepto-browserify').$;
+const Chess = require('chess.js').Chess;
+const Chessground = require('chessground').Chessground;
 
-var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
+const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 
 function strRepeat(str, num) {
-  var r = '';
-  for (var i = 0; i < num; i++) r += str;
+  let r = '';
+  for (let i = 0; i < num; i++) r += str;
   return r;
 }
 
@@ -35,7 +35,7 @@ function strCount(haystack, needle) {
 
 
 function normFen(position) {
-  var parts = position.fen().split(/\s+/);
+  const parts = position.fen().split(/\s+/);
   parts[4] = '0';
   parts[5] = '1';
   return parts.join(' ');
@@ -43,24 +43,22 @@ function normFen(position) {
 
 
 function Controller(fen) {
-  var self = this;
-
   this.events = {};
   this.position = new Chess(fen || DEFAULT_FEN);
 
-  window.addEventListener('popstate', function (event) {
+  window.addEventListener('popstate', (event) => {
     if (event.state && event.state.fen) {
-      var position = new Chess(event.state.fen);
+      const position = new Chess(event.state.fen);
       if (event.state.lastMove) position.move(event.state.lastMove);
-      self.setPosition(position);
+      this.setPosition(position);
     } else {
       // Extract the FEN from the query string.
-      var query = location.search.substr(1);
-      query.split('&').forEach(function (part) {
-        var item = part.split('=');
+      const query = location.search.substr(1);
+      query.split('&').forEach((part) => {
+        const item = part.split('=');
         if (item[0] == 'fen') {
-          var fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
-          self.setPosition(new Chess(fen));
+          const fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
+          this.setPosition(new Chess(fen));
         }
       });
     }
@@ -73,17 +71,16 @@ Controller.prototype.bind = function (event, cb) {
 };
 
 Controller.prototype.trigger = function (event) {
-  var self = this;
-  var args = arguments;
-  (this.events[event] || []).forEach(function (cb) {
-    cb.apply(self, Array.prototype.slice.call(args, 1));
+  const args = arguments;
+  (this.events[event] || []).forEach((cb) => {
+    cb.apply(this, Array.prototype.slice.call(args, 1));
   });
 };
 
 Controller.prototype.push = function (position) {
-  var fen = normFen(position);
+  const fen = normFen(position);
   if (normFen(this.position) != fen && 'pushState' in history) {
-    var lastMove = position.undo();
+    const lastMove = position.undo();
     history.pushState({
       fen: position.fen(),
       lastMove: lastMove
@@ -95,8 +92,8 @@ Controller.prototype.push = function (position) {
 };
 
 Controller.prototype.pushMove = function (from, to, promotion) {
-  var position = new Chess(this.position.fen());
-  var moves = position.moves({ verbose: true }).filter(function (m) {
+  const position = new Chess(this.position.fen());
+  const moves = position.moves({ verbose: true }).filter((m) => {
     return m.from == from && m.to === to && m.promotion == promotion;
   });
 
@@ -117,8 +114,6 @@ Controller.prototype.setPosition = function (position) {
 
 
 function BoardView(controller) {
-  var self = this;
-
   this.ground = Chessground(document.getElementById('board'), {
     fen: controller.position.fen(),
     autoCastle: false,
@@ -134,40 +129,34 @@ function BoardView(controller) {
       deleteOnDropOff: true
     },
     events: {
-      move: function (orig, dest) {
+      move: (orig, dest) => {
         // If the change is a legal move, play it.
         controller.pushMove(orig, dest);
       },
-      change: function() {
+      change: () => {
         // Otherwise just change to position.
         var fenParts = normFen(controller.position).split(/\s+/);
-        fenParts[0] = self.fenPart = self.ground.getFen();
+        fenParts[0] = this.fenPart = this.ground.getFen();
         controller.push(new Chess(fenParts.join(' ')));
       }
     }
   });
 
-  self.setPosition(controller.position);
-  controller.bind('positionChanged', function (position) {
-    self.setPosition(position);
-  });
+  this.setPosition(controller.position);
+  controller.bind('positionChanged', (pos) => this.setPosition(pos));
 }
 
 BoardView.prototype.setPosition = function (position) {
-  const history = position.history({ verbose: true }).map(function (h) {
-    return [h.from, h.to];
-  });
+  const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
 
   const dests = {};
   position.SQUARES.forEach(function (s) {
-    const moves = position.moves({ square: s, verbose: true }).map(function (m) {
-      return m.to;
-    });
+    const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
     if (moves.length) dests[s] = moves;
   });
 
   this.ground.set({
-    lastMove: history.length ? history[history.length - 1] : undefined,
+    lastMove: history[history.length - 1],
     fen: position.fen(),
     turnColor: (position.turn() === 'w') ? 'white' : 'black',
     movable: {
@@ -185,33 +174,31 @@ BoardView.prototype.unsetHovering = function() {
 };
 
 BoardView.prototype.setHovering = function(uci) {
-  this.ground.setAutoShapes([
-    { orig: uci.substr(0, 2), dest: uci.substr(2, 2), brush: 'green' }
-  ]);
+  this.ground.setAutoShapes([{
+    orig: uci.substr(0, 2),
+    dest: uci.substr(2, 2),
+    brush: 'green'
+  }]);
 };
 
 
 function SideToMoveView(controller) {
-  var self = this;
-
-  $('#btn-white').click(function (event) {
+  $('#btn-white').click((event) => {
     event.preventDefault();
-    var fenParts = normFen(controller.position).split(/\s+/);
+    const fenParts = normFen(controller.position).split(/\s+/);
     fenParts[1] = 'w';
     controller.push(new Chess(fenParts.join(' ')));
   });
 
   $('#btn-black').click(function (event) {
     event.preventDefault();
-    var fenParts = normFen(controller.position).split(/\s+/);
+    const fenParts = normFen(controller.position).split(/\s+/);
     fenParts[1] = 'b';
     controller.push(new Chess(fenParts.join(' ')));
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', function (position) {
-    self.setPosition(position);
-  });
+  controller.bind('positionChanged', (pos) => this.setPosition(pos));
 }
 
 SideToMoveView.prototype.setPosition = function (position) {
@@ -266,9 +253,7 @@ function FenInputView(controller) {
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', function (position) {
-    self.setPosition(position);
-  });
+  controller.bind('positionChanged', (pos) => this.setPosition(pos));
 }
 
 FenInputView.prototype.setPosition = function (position) {
@@ -359,7 +344,7 @@ function TablebaseView(controller, boardView) {
 
   bindMoveLink($('a.list-group-item'));
 
-  controller.bind('positionChanged', function (position) {
+  controller.bind('positionChanged', (position) => {
     $('.right-side > .inner')
       .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
       .load('/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe', function (url, status, xhr) {
@@ -379,8 +364,8 @@ function TablebaseView(controller, boardView) {
 
 
 function DocumentTitle(controller) {
-  controller.bind('positionChanged', function (position) {
-    var fen = normFen(position).split(/\s/)[0];
+  controller.bind('positionChanged', (position) => {
+    const fen = position.fen().split(/\s/)[0];
 
     document.title = (
       strRepeat('K', strCount(fen, 'K')) +
@@ -402,8 +387,8 @@ function DocumentTitle(controller) {
 
 
 $(function () {
-  var controller = new Controller($('#board').attr('data-fen'));
-  var boardView = new BoardView(controller);
+  const controller = new Controller($('#board').attr('data-fen'));
+  const boardView = new BoardView(controller);
   new SideToMoveView(controller);
   new FenInputView(controller);
   new ToolBarView(controller, boardView);
