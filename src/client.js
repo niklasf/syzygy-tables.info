@@ -136,8 +136,9 @@ function BoardView(controller) {
     events: {
       move: function (orig, dest) {
         // If the change is a legal move, play it.
-        if (controller.pushMove(orig, dest)) return;
-
+        controller.pushMove(orig, dest);
+      },
+      change: function() {
         // Otherwise just change to position.
         var fenParts = normFen(controller.position).split(/\s+/);
         fenParts[0] = self.fenPart = self.ground.getFen();
