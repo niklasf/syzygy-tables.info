@@ -42,6 +42,8 @@ function normFen(position) {
 }
 
 
+/* Controller */
+
 function Controller(fen) {
   this.events = {};
   this.position = new Chess(fen || DEFAULT_FEN);
@@ -113,6 +115,8 @@ Controller.prototype.setPosition = function (position) {
 };
 
 
+/* Board view */
+
 function BoardView(controller) {
   this.ground = Chessground(document.getElementById('board'), {
     fen: controller.position.fen(),
@@ -135,7 +139,7 @@ function BoardView(controller) {
       },
       change: () => {
         // Otherwise just change to position.
-        var fenParts = normFen(controller.position).split(/\s+/);
+        const fenParts = normFen(controller.position).split(/\s+/);
         fenParts[0] = this.fenPart = this.ground.getFen();
         controller.push(new Chess(fenParts.join(' ')));
       }
@@ -150,7 +154,7 @@ BoardView.prototype.setPosition = function (position) {
   const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
 
   const dests = {};
-  position.SQUARES.forEach(function (s) {
+  position.SQUARES.forEach((s) => {
     const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
     if (moves.length) dests[s] = moves;
   });
@@ -169,11 +173,11 @@ BoardView.prototype.flip = function () {
   this.ground.toggleOrientation();
 };
 
-BoardView.prototype.unsetHovering = function() {
+BoardView.prototype.unsetHovering = function () {
   this.ground.setAutoShapes([]);
 };
 
-BoardView.prototype.setHovering = function(uci) {
+BoardView.prototype.setHovering = function (uci) {
   this.ground.setAutoShapes([{
     orig: uci.substr(0, 2),
     dest: uci.substr(2, 2),
@@ -181,6 +185,8 @@ BoardView.prototype.setHovering = function(uci) {
   }]);
 };
 
+
+/* Side to move buttons */
 
 function SideToMoveView(controller) {
   $('#btn-white').click((event) => {
@@ -190,7 +196,7 @@ function SideToMoveView(controller) {
     controller.push(new Chess(fenParts.join(' ')));
   });
 
-  $('#btn-black').click(function (event) {
+  $('#btn-black').click((event) => {
     event.preventDefault();
     const fenParts = normFen(controller.position).split(/\s+/);
     fenParts[1] = 'b';
@@ -207,11 +213,11 @@ SideToMoveView.prototype.setPosition = function (position) {
 };
 
 
-function FenInputView(controller) {
-  var self = this;
+/* FEN input */
 
+function FenInputView(controller) {
   function parseFen(fen) {
-    var parts = fen.trim().split(/\s+/);
+    const parts = fen.trim().split(/\s+/);
     if (parts[0] === '') {
       parts[0] = DEFAULT_FEN.split(/\s+/)[0];
     }
@@ -231,23 +237,21 @@ function FenInputView(controller) {
       parts.push('1');
     }
 
-    var position = new Chess();
-    if (position.load(parts.join(' '))) {
-      return position;
-    }
+    const position = new Chess();
+    if (position.load(parts.join(' '))) return position;
   }
 
-  var input = document.getElementById('fen');
+  const input = document.getElementById('fen');
   if (input.setCustomValidity) {
-    input.oninput = input.onchange = function() {
+    input.oninput = input.onchange = () => {
       input.setCustomValidity(parseFen(input.value) ? '' : 'Invalid FEN');
     };
   }
 
-  $('#form-set-fen').submit(function (event) {
+  $('#form-set-fen').submit((event) => {
     event.preventDefault();
 
-    var position = parseFen(input.value);
+    const position = parseFen(input.value);
     if (position) controller.push(position);
     else if (!input.setCustomValidity) input.focus();
   });
@@ -257,32 +261,32 @@ function FenInputView(controller) {
 }
 
 FenInputView.prototype.setPosition = function (position) {
-  var fen = normFen(position);
+  const fen = normFen(position);
   $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
 };
 
 
-function ToolBarView(controller, boardView) {
-  $('#btn-flip-board').click(function (event) {
-    boardView.flip();
-  });
+/* Toolbar */
 
-  $('#btn-clear-board').click(function (event) {
+function ToolBarView(controller, boardView) {
+  $('#btn-flip-board').click(() => boardView.flip());
+
+  $('#btn-clear-board').click((event) => {
     event.preventDefault();
 
-    var parts = normFen(controller.position).split(/\s+/);
-    var defaultParts = DEFAULT_FEN.split(/\s+/);
-    var fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
+    const parts = normFen(controller.position).split(/\s/);
+    const defaultParts = DEFAULT_FEN.split(/\s+/);
+    const fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
     controller.push(new Chess(fen));
   });
 
-  $('#btn-swap-colors').click(function (event) {
+  $('#btn-swap-colors').click((event) => {
     event.preventDefault();
 
-    var parts = normFen(controller.position).split(/\s+/);
+    const parts = normFen(controller.position).split(/\s+/);
 
-    var fenPart = '';
-    for (var i = 0; i < parts[0].length; i++) {
+    let fenPart = '';
+    for (let i = 0; i < parts[0].length; i++) {
       if (parts[0][i] === parts[0][i].toLowerCase()) {
         fenPart += parts[0][i].toUpperCase();
       } else {
@@ -297,49 +301,49 @@ function ToolBarView(controller, boardView) {
     controller.push(new Chess(parts.join(' ')));
   });
 
-  $('#btn-mirror-horizontal').click(function (event) {
+  $('#btn-mirror-horizontal').click((event) => {
     event.preventDefault();
 
-    var parts = normFen(controller.position).split(/\s+/);
-    var positionParts = parts[0].split(/\//);
-    for (var i = 0; i < positionParts.length; i++) {
+    const parts = normFen(controller.position).split(/\s+/);
+    const positionParts = parts[0].split(/\//);
+    for (let i = 0; i < positionParts.length; i++) {
       positionParts[i] = positionParts[i].split('').reverse().join('');
     }
 
-    var fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
+    const fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
     controller.push(new Chess(fen));
   });
 
-  $('#btn-mirror-vertical').click(function (event) {
+  $('#btn-mirror-vertical').click((event) => {
     event.preventDefault();
 
-    var parts = normFen(controller.position).split(/\s+/);
-    var positionParts = parts[0].split(/\//);
+    const parts = normFen(controller.position).split(/\s+/);
+    const positionParts = parts[0].split(/\//);
     positionParts.reverse();
 
-    var fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
+    const fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
     controller.push(new Chess(fen));
   });
 }
 
+
+/* Tablebase view */
 
 function TablebaseView(controller, boardView) {
   function bindMoveLink(moveLink) {
     moveLink
       .click(function (event) {
         event.preventDefault();
-        var uci = $(this).attr('data-uci');
-        var fen = $(this).attr('data-fen');
-        var from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
+        const uci = $(this).attr('data-uci');
+        const fen = $(this).attr('data-fen');
+        const from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
         controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
         boardView.unsetHovering();
       })
       .mouseenter(function () {
         boardView.setHovering($(this).attr('data-uci'));
       })
-      .mouseleave(function () {
-        boardView.unsetHovering();
-      });
+      .mouseleave(() => boardView.unsetHovering());
   }
 
   bindMoveLink($('a.list-group-item'));
@@ -347,21 +351,21 @@ function TablebaseView(controller, boardView) {
   controller.bind('positionChanged', (position) => {
     $('.right-side > .inner')
       .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
-      .load('/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe', function (url, status, xhr) {
-        if (status == 'error') {
+      .load('/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe', (url, status, xhr) => {
+        if (status !== 'error') bindMoveLink($('a.list-group-item'));
+        else {
           $('.right-side > .inner')
             .empty()
-            .append(
-              $('<section>')
-                .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
-                .append($('<div id="info"></div>').text(xhr.statusText)));
-        } else {
-          bindMoveLink($('a.list-group-item'));
+            .append($('<section>')
+              .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
+              .append($('<div id="info"></div>').text(xhr.statusText)));
         }
       });
   });
 }
 
+
+/* Document title */
 
 function DocumentTitle(controller) {
   controller.bind('positionChanged', (position) => {
@@ -386,7 +390,9 @@ function DocumentTitle(controller) {
 }
 
 
-$(function () {
+/* Initialize */
+
+$(() => {
   const controller = new Controller($('#board').attr('data-fen'));
   const boardView = new BoardView(controller);
   new SideToMoveView(controller);
