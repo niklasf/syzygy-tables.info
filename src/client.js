@@ -137,6 +137,18 @@ function BoardView(controller) {
         // If the change is a legal move, play it.
         controller.pushMove(orig, dest);
       },
+      dropNewPiece: (piece, key) => {
+        // Move the existing king, even when dropping a new one.
+        if (piece.role !== 'king') return;
+        const king = Object.keys(ground.state.pieces).find(key => {
+          const p = ground.state.pieces[key];
+          return p.role === 'king' && p.color === piece.color;
+        });
+        const diff = {};
+        if (king) diff[king] = null;
+        diff[key] = piece;
+        ground.setPieces(diff);
+      },
       change: () => {
         // Otherwise just change to position.
         const fenParts = normFen(controller.position).split(/\s/);
