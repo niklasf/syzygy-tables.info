@@ -70,7 +70,6 @@
   background-size: cover;
   z-index: 2;
   will-change: transform;
-  pointer-events: none;
 }
 .cg-board piece.dragging {
   cursor: move;
@@ -82,9 +81,6 @@
 .cg-board piece.fading {
   z-index: 1;
   opacity: 0.5;
-}
-.cg-board-wrap square.move-dest:hover {
-  background-color: rgba(20, 85, 30, 0.3);
 }
 .cg-board-wrap piece.ghost {
   opacity: 0.3;
