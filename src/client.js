@@ -20,21 +20,25 @@ var $ = require('jquery');
 var Chess = require('chess.js').Chess;
 var Chessground = require('chessground').Chessground;
 
-
 var DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 
 function strRepeat(str, num) {
   var r = '';
-  for (var i = 0; i < num; i++) {
-    r += str;
-  }
+  for (var i = 0; i < num; i++) r += str;
   return r;
 }
 
-
 function strCount(haystack, needle) {
   return haystack.split(needle).length - 1;
+}
+
+
+function normFen(position) {
+  var parts = position.fen().split(/\s+/);
+  parts[4] = '0';
+  parts[5] = '1';
+  return parts.join(' ');
 }
 
 
@@ -45,22 +49,21 @@ function Controller(fen) {
   this.position = new Chess(fen || DEFAULT_FEN);
 
   window.addEventListener('popstate', function (event) {
-    var fen = DEFAULT_FEN;
-
     if (event.state && event.state.fen) {
-      fen = event.state.fen;
+      var position = new Chess(event.state.fen);
+      if (event.state.lastMove) position.move(event.state.lastMove);
+      self.setPosition(position);
     } else {
       // Extract the FEN from the query string.
       var query = location.search.substr(1);
       query.split('&').forEach(function (part) {
         var item = part.split('=');
         if (item[0] == 'fen') {
-          fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
+          var fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
+          self.setPosition(new Chess(fen));
         }
       });
     }
-
-    self.setPosition(new Chess(fen));
   });
 }
 
@@ -71,53 +74,42 @@ Controller.prototype.bind = function (event, cb) {
 
 Controller.prototype.trigger = function (event) {
   var self = this;
-  if (!this.events[event]) {
-    return;
-  }
-
   var args = arguments;
-  this.events[event].forEach(function (cb) {
+  (this.events[event] || []).forEach(function (cb) {
     cb.apply(self, Array.prototype.slice.call(args, 1));
   });
 };
 
 Controller.prototype.push = function (position) {
-  var fenParts = position.fen().split(/\s+/);
-  fenParts[4] = '0';
-  fenParts[5] = '1';
-  var fen = fenParts.join(' ');
-
-  if (this.position.fen() != fen) {
-    if ('pushState' in history) {
-      history.pushState({
-        fen: fen
-      }, null, '/?fen=' + fen.replace(/\s/g, '_'));
-    }
-
-    this.setPosition(new Chess(fen));
+  var fen = normFen(position);
+  if (normFen(this.position) != fen && 'pushState' in history) {
+    var lastMove = position.undo();
+    history.pushState({
+      fen: position.fen(),
+      lastMove: lastMove
+    }, null, '/?fen=' + fen.replace(/\s/g, '_'));
+    if (lastMove) position.move(lastMove);
   }
+
+  this.setPosition(position);
 };
 
 Controller.prototype.pushMove = function (from, to) {
-  var tmpBoard = new Chess(this.position.fen());
-  var legalMoves = tmpBoard.moves({ verbose: true });
+  var position = new Chess(this.position.fen());
+  var moves = position.moves({ verbose: true }).filter(function (m) {
+    return m.from == from && m.to === to;
+  });
 
-  for (var i = 0; i < legalMoves.length; i++) {
-    var legalMove = legalMoves[i];
-    if (!legalMove.promotion && legalMove.from === from && legalMove.to === to) {
-      tmpBoard.move(legalMove);
-      this.push(tmpBoard);
-      return true;
-    }
+  if (moves.length !== 1) return false;
+  else {
+    position.move(moves[0]);
+    this.push(position);
+    return true;
   }
-
-  return false;
 };
 
 Controller.prototype.setPosition = function (position) {
-  var self = this;
-
-  if (this.position.fen() != position.fen()) {
+  if (normFen(this.position) != normFen(position)) {
     this.position = position;
     this.trigger('positionChanged', position);
   }
@@ -128,6 +120,7 @@ function BoardView(controller) {
   var self = this;
 
   this.ground = Chessground(document.getElementById('board'), {
+    fen: controller.position.fen(),
     autoCastle: false,
     movable: {
       free: true,
@@ -146,7 +139,7 @@ function BoardView(controller) {
         if (controller.pushMove(orig, dest)) return;
 
         // Otherwise just change to position.
-        var fenParts = controller.position.fen().split(/\s+/);
+        var fenParts = normFen(controller.position).split(/\s+/);
         fenParts[0] = self.fenPart = self.ground.getFen();
         controller.push(new Chess(fenParts.join(' ')));
       }
@@ -193,7 +186,6 @@ BoardView.prototype.setPosition = function (position) {
     });
     if (moves.length) dests[s] = moves;
   });
-  console.log(dests);
 
   this.ground.set({
     lastMove: history.length ? history[history.length - 1] : undefined,
@@ -215,14 +207,14 @@ function SideToMoveView(controller) {
 
   $('#btn-white').click(function (event) {
     event.preventDefault();
-    var fenParts = controller.position.fen().split(/\s+/);
+    var fenParts = normFen(controller.position).split(/\s+/);
     fenParts[1] = 'w';
     controller.push(new Chess(fenParts.join(' ')));
   });
 
   $('#btn-black').click(function (event) {
     event.preventDefault();
-    var fenParts = controller.position.fen().split(/\s+/);
+    var fenParts = normFen(controller.position).split(/\s+/);
     fenParts[1] = 'b';
     controller.push(new Chess(fenParts.join(' ')));
   });
@@ -272,11 +264,7 @@ function FenInputView(controller) {
   var input = document.getElementById('fen');
   if (input.setCustomValidity) {
     input.oninput = input.onchange = function() {
-      if (parseFen(input.value)) {
-        input.setCustomValidity('');
-      } else {
-        input.setCustomValidity('Invalid FEN');
-      }
+      input.setCustomValidity(parseFen(input.value) ? '' : 'Invalid FEN');
     };
   }
 
@@ -284,11 +272,8 @@ function FenInputView(controller) {
     event.preventDefault();
 
     var position = parseFen(input.value);
-    if (position) {
-      controller.push(position);
-    } else {
-      input.focus();
-    }
+    if (position) controller.push(position);
+    else if (!input.setCustomValidity) input.focus();
   });
 
   this.setPosition(controller.position);
@@ -298,12 +283,8 @@ function FenInputView(controller) {
 }
 
 FenInputView.prototype.setPosition = function (position) {
-  var fen = position.fen();
-  if (fen === DEFAULT_FEN) {
-    $('#fen').val('');
-  } else {
-    $('#fen').val(fen);
-  }
+  var fen = normFen(position);
+  $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
 };
 
 
@@ -315,17 +296,16 @@ function ToolBarView(controller, boardView) {
   $('#btn-clear-board').click(function (event) {
     event.preventDefault();
 
-    var parts = controller.position.fen().split(/\s+/);
+    var parts = normFen(controller.position).split(/\s+/);
     var defaultParts = DEFAULT_FEN.split(/\s+/);
     var fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
-
     controller.push(new Chess(fen));
   });
 
   $('#btn-swap-colors').click(function (event) {
     event.preventDefault();
 
-    var parts = controller.position.fen().split(/\s+/);
+    var parts = normFen(controller.position).split(/\s+/);
 
     var fenPart = '';
     for (var i = 0; i < parts[0].length; i++) {
@@ -346,7 +326,7 @@ function ToolBarView(controller, boardView) {
   $('#btn-mirror-horizontal').click(function (event) {
     event.preventDefault();
 
-    var parts = controller.position.fen().split(/\s+/);
+    var parts = normFen(controller.position).split(/\s+/);
     var positionParts = parts[0].split(/\//);
     for (var i = 0; i < positionParts.length; i++) {
       positionParts[i] = positionParts[i].split('').reverse().join('');
@@ -359,7 +339,7 @@ function ToolBarView(controller, boardView) {
   $('#btn-mirror-vertical').click(function (event) {
     event.preventDefault();
 
-    var parts = controller.position.fen().split(/\s+/);
+    var parts = normFen(controller.position).split(/\s+/);
     var positionParts = parts[0].split(/\//);
     positionParts.reverse();
 
@@ -400,7 +380,7 @@ function TablebaseView(controller) {
   controller.bind('positionChanged', function (position) {
     $('.right-side > .inner')
       .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
-      .load('/?fen=' + encodeURIComponent(position.fen()) + '&xhr=probe', function (url, status, xhr) {
+      .load('/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe', function (url, status, xhr) {
         if (status == 'error') {
           $('.right-side > .inner')
             .empty()
@@ -418,7 +398,7 @@ function TablebaseView(controller) {
 
 function DocumentTitle(controller) {
   controller.bind('positionChanged', function (position) {
-    var fen = position.fen().split(/\s/)[0];
+    var fen = normFen(position).split(/\s/)[0];
 
     document.title = (
       strRepeat('K', strCount(fen, 'K')) +
