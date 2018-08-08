@@ -128,8 +128,18 @@ function BoardView(controller) {
   var self = this;
 
   this.ground = Chessground(document.getElementById('board'), {
-    fen: controller.position.fen(),
     autoCastle: false,
+    movable: {
+      free: true,
+      color: 'both',
+      showDests: true
+    },
+    selectable: {
+      enabled: false
+    },
+    draggable: {
+      deleteOnDropOff: true
+    },
     events: {
       move: function (orig, dest) {
         // If the change is a legal move, play it.
@@ -165,14 +175,33 @@ function BoardView(controller) {
     }
   }); */
 
+  self.setPosition(controller.position);
   controller.bind('positionChanged', function (position) {
     self.setPosition(position);
   });
 }
 
 BoardView.prototype.setPosition = function (position) {
+  const history = position.history({ verbose: true }).map(function (h) {
+    return [h.from, h.to];
+  });
+
+  const dests = {};
+  position.SQUARES.forEach(function (s) {
+    const moves = position.moves({ square: s, verbose: true }).map(function (m) {
+      return m.to;
+    });
+    if (moves.length) dests[s] = moves;
+  });
+  console.log(dests);
+
   this.ground.set({
-    fen: position.fen()
+    lastMove: history.length ? history[history.length - 1] : undefined,
+    fen: position.fen(),
+    turnColor: (position.turn() === 'w') ? 'white' : 'black',
+    movable: {
+      dests: dests
+    }
   });
 };
 
