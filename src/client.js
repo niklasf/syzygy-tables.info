@@ -158,7 +158,7 @@ function BoardView(controller) {
     }
   });
 
-  $('.spare piece').mousedown(function (event) {
+  $('.spare piece').on('touchstart mousedown', function (event) {
     event.preventDefault();
     ground.dragNewPiece({
       color: $(this).attr('data-color'),
