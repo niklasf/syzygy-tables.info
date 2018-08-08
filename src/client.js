@@ -139,7 +139,7 @@ function BoardView(controller) {
       },
       change: () => {
         // Otherwise just change to position.
-        const fenParts = normFen(controller.position).split(/\s+/);
+        const fenParts = normFen(controller.position).split(/\s/);
         fenParts[0] = this.fenPart = this.ground.getFen();
         controller.push(new Chess(fenParts.join(' ')));
       }
@@ -206,14 +206,14 @@ BoardView.prototype.setHovering = function (uci) {
 function SideToMoveView(controller) {
   $('#btn-white').click((event) => {
     event.preventDefault();
-    const fenParts = normFen(controller.position).split(/\s+/);
+    const fenParts = normFen(controller.position).split(/\s/);
     fenParts[1] = 'w';
     controller.push(new Chess(fenParts.join(' ')));
   });
 
   $('#btn-black').click((event) => {
     event.preventDefault();
-    const fenParts = normFen(controller.position).split(/\s+/);
+    const fenParts = normFen(controller.position).split(/\s/);
     fenParts[1] = 'b';
     controller.push(new Chess(fenParts.join(' ')));
   });
@@ -234,7 +234,7 @@ function FenInputView(controller) {
   function parseFen(fen) {
     const parts = fen.trim().split(/\s+/);
     if (parts[0] === '') {
-      parts[0] = DEFAULT_FEN.split(/\s+/)[0];
+      parts[0] = DEFAULT_FEN.split(/\s/)[0];
     }
     if (parts.length === 1) {
       parts.push(controller.position.turn());
@@ -290,7 +290,7 @@ function ToolBarView(controller, boardView) {
     event.preventDefault();
 
     const parts = normFen(controller.position).split(/\s/);
-    const defaultParts = DEFAULT_FEN.split(/\s+/);
+    const defaultParts = DEFAULT_FEN.split(/\s/);
     const fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
     controller.push(new Chess(fen));
   });
@@ -298,7 +298,7 @@ function ToolBarView(controller, boardView) {
   $('#btn-swap-colors').click((event) => {
     event.preventDefault();
 
-    const parts = normFen(controller.position).split(/\s+/);
+    const parts = normFen(controller.position).split(/\s/);
 
     let fenPart = '';
     for (let i = 0; i < parts[0].length; i++) {
@@ -319,7 +319,7 @@ function ToolBarView(controller, boardView) {
   $('#btn-mirror-horizontal').click((event) => {
     event.preventDefault();
 
-    const parts = normFen(controller.position).split(/\s+/);
+    const parts = normFen(controller.position).split(/\s/);
     const positionParts = parts[0].split(/\//);
     for (let i = 0; i < positionParts.length; i++) {
       positionParts[i] = positionParts[i].split('').reverse().join('');
@@ -332,7 +332,7 @@ function ToolBarView(controller, boardView) {
   $('#btn-mirror-vertical').click((event) => {
     event.preventDefault();
 
-    const parts = normFen(controller.position).split(/\s+/);
+    const parts = normFen(controller.position).split(/\s/);
     const positionParts = parts[0].split(/\//);
     positionParts.reverse();
 
