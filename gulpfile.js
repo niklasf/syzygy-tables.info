@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const cleanCss = require('gulp-clean-css');
+const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const source = require('vinyl-source-stream');
@@ -34,7 +35,11 @@ gulp.task('js', () => {
     .bundle()
     .pipe(source('client.min.js'))
     .pipe(buffer())
-    //.pipe(uglify())
+    .pipe(babel({
+      presets: ['env']
+    }))
+    .pipe(uglify())
+    .on('error', (err) => { console.log(`[ERROR] ${err.toString()}`); })
     .pipe(gulp.dest('static/js'));
 });
 
