@@ -9,7 +9,7 @@
 
   <div id="winning" class="list-group {{ turn }}-turn">
   {% for move in winning_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">
       {{ move.san }}
       {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
       <span class="badge">{{ move.badge }}</span>
@@ -19,7 +19,7 @@
 
   <div id="cursed" class="list-group {{ turn }}-turn">
   {% for move in cursed_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">
       {{ move.san }}
       {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
       <span class="badge">{{ move.badge }}</span>
@@ -29,19 +29,19 @@
 
   <div id="drawing" class="list-group">
   {% for move in drawing_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
   {% endfor %}
   </div>
 
   <div id="unknown" class="list-group">
   {% for move in unknown_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">{{ move.san }} <span class="badge">{{ move.badge }}</span></a>
   {% endfor %}
   </div>
 
   <div id="blessed" class="list-group {{ turn }}-turn">
   {% for move in blessed_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">
       {{ move.san }}
       {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
       <span class="badge">{{ move.badge }}</span>
@@ -51,7 +51,7 @@
 
   <div id="losing" class="list-group {{ turn }}-turn">
   {% for move in losing_moves %}
-    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}" data-fen="{{ move.fen }}">
+    <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">
       {{ move.san }}
       {% if move.dtm %} <span class="badge">DTM {{ move.dtm }}</span>{% endif %}
       <span class="badge">{{ move.badge }}</span>
