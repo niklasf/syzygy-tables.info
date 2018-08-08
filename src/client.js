@@ -178,7 +178,14 @@ BoardView.prototype.setPosition = function (position) {
 };
 
 BoardView.prototype.flip = function () {
+  var other = this.ground.state.orientation;
   this.ground.toggleOrientation();
+  $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
+  $('.spare.bottom piece').toggleClass('white', this.ground.state.orientation === 'white');
+  $('.spare.bottom piece').toggleClass('black', this.ground.state.orientation === 'black');
+  $('.spare.top piece').attr('data-color', other);
+  $('.spare.top piece').toggleClass('white', other === 'white');
+  $('.spare.top piece').toggleClass('black', other === 'black');
 };
 
 BoardView.prototype.unsetHovering = function () {
