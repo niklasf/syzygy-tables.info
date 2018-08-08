@@ -94,10 +94,10 @@ Controller.prototype.push = function (position) {
   this.setPosition(position);
 };
 
-Controller.prototype.pushMove = function (from, to) {
+Controller.prototype.pushMove = function (from, to, promotion) {
   var position = new Chess(this.position.fen());
   var moves = position.moves({ verbose: true }).filter(function (m) {
-    return m.from == from && m.to === to;
+    return m.from == from && m.to === to && m.promotion == promotion;
   });
 
   if (moves.length !== 1) return false;
@@ -145,28 +145,6 @@ function BoardView(controller) {
       }
     }
   });
-  /* XXX this.board = new ChessBoard('board', {
-    position: self.fenPart,
-    pieceTheme: '/static/pieces/{piece}.svg',
-    draggable: true,
-    dropOffBoard: 'trash',
-    sparePieces: true,
-    onDrop: function (from, to, piece, newPos, oldPos, orientation) {
-      self.fenPart = ChessBoard.objToFen(newPos);
-
-      // If the change is a legal move, do it.
-      if (from != 'spare' && to != 'trash') {
-        if (controller.pushMove(from, to)) {
-          return;
-        }
-      }
-
-      // Otherwise just change to position.
-      var fenParts = controller.position.fen().split(/\s+/);
-      fenParts[0] = ChessBoard.objToFen(newPos);
-      controller.push(new Chess(fenParts.join(' ')));
-    }
-  }); */
 
   self.setPosition(controller.position);
   controller.bind('positionChanged', function (position) {
@@ -354,9 +332,10 @@ function TablebaseView(controller) {
     moveLink
       .click(function (event) {
         event.preventDefault();
-        var fen = $(this).attr('data-fen');
         var uci = $(this).attr('data-uci');
-        controller.push(new Chess(fen));
+        var fen = $(this).attr('data-fen');
+        var from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
+        controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
         // XXX
         $('#board .square-' + uci.substr(0, 2)).css('box-shadow', '');
         $('#board .square-' + uci.substr(2, 2)).css('box-shadow', '');
