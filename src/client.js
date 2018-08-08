@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var $ = require('jquery');
+var $ = require('zepto-browserify').$;
 var Chess = require('chess.js').Chess;
 var Chessground = require('chessground').Chessground;
 
