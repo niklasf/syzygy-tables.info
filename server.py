@@ -119,16 +119,14 @@ def prepare_stats(request, material, fen, dtz):
         render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)
 
     # Longest endgames.
-    for longest in stats["longest"]:
-        label = "{} {} in {}{}".format(
+    render["longest"] = [{
+        "label": "{} {} in {}{}".format(
             material_side,
             "winning" if (longest["wdl"] > 0) == ((" " + side) in longest["epd"]) else "losing",
             longest["ply"],
-            " (frustrated)" if abs(longest["wdl"]) == 1 else "")
-        longest["label"] = label
-        longest["fen"] = longest["epd"] + " 0 1"
-
-    render["longest"] = stats["longest"]
+            " (frustrated)" if abs(longest["wdl"]) == 1 else ""),
+        "fen": longest["epd"] + " 0 1",
+    } for longest in stats["longest"]]
 
     # Histogram.
     if not dtz:
