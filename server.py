@@ -200,7 +200,6 @@ async def syzygy_vs_syzygy_pgn(request):
 
     # Force reverse proxies like nginx to send the first chunk.
     await response.write("[Event \"\"]\n".encode("utf-8"))
-    await response.drain()
 
     # Prepare PGN headers.
     game = chess.pgn.Game()
@@ -264,7 +263,6 @@ async def syzygy_vs_syzygy_pgn(request):
 
     # Send response.
     await response.write(str(game).encode("utf-8"))
-    await response.write_eof()
     return response
 
 @routes.get("/")
