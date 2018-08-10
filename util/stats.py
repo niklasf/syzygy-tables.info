@@ -3,7 +3,9 @@
 """Creates JSON files from tablebase generator output."""
 
 import sys
+import re
 import json
+import chess.syzygy
 
 
 def process(f):
@@ -73,10 +75,17 @@ def process(f):
     if eg is not None:
         yield eg, data
 
+
 def set_ply(h, ply, num):
     while len(h) <= ply:
         h.append(0)
     h[ply] = num
+
+
+def sort_key(eg):
+    w, b = eg.split("v", 1)
+    return len(eg), len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
+
 
 def main(args):
     result = {}
@@ -84,8 +93,12 @@ def main(args):
         with open(arg) as f:
             for eg, data in process(f):
                 result[eg] = data
-    return result
+
+    sorted_result = {}
+    for eg in sorted(result, key=sort_key):
+        sorted_result[eg] = result[eg]
+    return sorted_result
 
 
 if __name__ == "__main__":
-    print(json.dumps(main(sys.argv[1:])))
+    print(json.dumps(main(sys.argv[1:]), indent=2))
