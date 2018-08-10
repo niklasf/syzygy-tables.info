@@ -120,7 +120,7 @@ def prepare_stats(request, material, fen, dtz):
 
     # Longest endgames.
     render["longest"] = [{
-        "label": "{} {} in {}{}".format(
+        "label": "{} {} with DTZ {}{}".format(
             material_side,
             "winning" if (longest["wdl"] > 0) == ((" " + side) in longest["epd"]) else "losing",
             longest["ply"],

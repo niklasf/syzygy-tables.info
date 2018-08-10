@@ -91,18 +91,18 @@
   {% if stats %}
     <section id="stats">
       {% if stats.histogram %}
-        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }}</h3>
+        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }} (log&nbsp;scale)</h3>
         {% for row in stats.histogram %}
           {% if row.empty %}
-            <div class="hist-empty" title="{{ row.empty }} plies skipped">⋮</div>
+            <div class="hist-empty" title="{{ row.empty }} empty rows skipped">⋮</div>
           {% else %}
-            <div class="hist{% if row.active %} active{% endif %}" style="width: {{ row.width }}%;" title="{{ "{:,}".format(row.num) }} unique positions with {{ stats.material_side }} {{ stats.verb }} in {{ row.ply }} (log scale)"></div>
+            <div class="hist{% if row.active %} active{% endif %}" style="width: {{ row.width }}%;" title="{{ "{:,}".format(row.num) }} unique positions with {{ stats.material_side }} {{ stats.verb }} in {{ row.ply }} (DTZ)"></div>
           {% endif %}
         {% endfor %}
       {% endif %}
 
       {% if stats.longest %}
-        <h3>Longest {{ material }} endgames</h3>
+        <h3>Longest {{ material }} phases</h3>
         <ul>
           {% for longest in stats.longest %}
             <li><a href="/?fen={{ longest.fen|replace(" ", "_") }}">{{ longest.label }}</a></li>
