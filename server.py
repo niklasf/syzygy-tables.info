@@ -483,7 +483,7 @@ def stats_json(request):
 def endgames(request):
     def sort_key(endgame):
         w, b = endgame.split("v", 1)
-        return len(w), [chess.syzygy.PCHR.index(p) for p in w], len(b), [chess.syzygy.PCHR.index(p) for p in b]
+        return len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
 
     def longest_fen(endgame):
         if endgame == "KNvK":
@@ -510,7 +510,7 @@ def endgames(request):
             "material": material,
             "has_stats": material in request.app["stats"],
             "longest_fen": longest_fen(material),
-        } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key, reverse=True)],
+        } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key)],
     }
 
     template = request.app["jinja"].get_template("endgames.html")
