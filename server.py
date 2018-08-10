@@ -446,6 +446,7 @@ def legal(request):
 @routes.get("/sitemap.txt")
 def sitemap(request):
     entries = [
+        "endgames",
         "stats",
         "legal",
         "/?fen=QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-_0_1",
