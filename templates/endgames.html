@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}Endgame statistics – Syzygy endgame tablebases{% endblock %}
+
+{% block leftside %}
+  <h1>Endgames</h1>
+
+  <nav>
+    <div class="reload"><a class="btn btn-default" href="/">Back to board</a></div>
+  </nav>
+{% endblock %}
+
+{% block rightside %}
+  {% for num in num_pieces %}
+    <section id="{{ num }}-pieces">
+      <h2>{{ num }} pieces</h2>
+      <ul class="endgames">
+        {% for endgame in endgames %}
+          {% if endgame.num == num %}
+            <li{% if not endgame.has_stats %} class="no-stats"{% endif %}>
+              {% if endgame.longest_fen %}
+                <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">{{ endgame.material }}</a>
+              {% else %}
+                {{ endgame.material }}
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+{% endblock %}

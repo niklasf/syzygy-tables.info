@@ -436,6 +436,26 @@ pre code {
   background-color: transparent;
 }
 
+/* List of endgames */
+
+.endgames {
+  columns: 3;
+  column-gap: 0;
+  padding: 0;
+}
+.endgames li {
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+.endgames li.no-stats {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
 /* Single column */
 
 .left-side {

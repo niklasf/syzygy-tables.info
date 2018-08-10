@@ -479,6 +479,34 @@ def stats_json(request):
         return aiohttp.web.json_response(stats)
 
 
+@routes.get("/endgames")
+def endgames(request):
+    def sort_key(endgame):
+        w, b = endgame.split("v", 1)
+        return len(w), [chess.syzygy.PCHR.index(p) for p in w], len(b), [chess.syzygy.PCHR.index(p) for p in b]
+
+    def longest_fen(endgame):
+        stats = request.app["stats"].get(endgame)
+        if not stats:
+            return None
+        longest_fen, plies = None, -1
+        for longest in stats["longest"]:
+            if longest["ply"] > plies:
+                longest_fen = longest["epd"] + " 0 1"
+        return longest_fen
+
+    template = request.app["jinja"].get_template("endgames.html")
+    render = {}
+    render["num_pieces"] = [3, 4, 5, 6, 7]
+    render["endgames"] = [{
+        "num": len(material) - 1,
+        "material": material,
+        "has_stats": material in request.app["stats"],
+        "longest_fen": longest_fen(material),
+    } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key, reverse=True)]
+    return aiohttp.web.Response(text=html_minify(template.render(render)), content_type="text/html")
+
+
 def make_app(config):
     app = aiohttp.web.Application()
     app["config"] = config
