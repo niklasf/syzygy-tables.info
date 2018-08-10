@@ -478,7 +478,6 @@ def stats_json(request):
     else:
         return aiohttp.web.json_response(stats)
 
-
 @routes.get("/endgames")
 def endgames(request):
     def sort_key(endgame):
@@ -486,24 +485,34 @@ def endgames(request):
         return len(w), [chess.syzygy.PCHR.index(p) for p in w], len(b), [chess.syzygy.PCHR.index(p) for p in b]
 
     def longest_fen(endgame):
-        stats = request.app["stats"].get(endgame)
-        if not stats:
+        if endgame == "KNvK":
+            return "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1"
+        elif endgame == "KBvK":
+            return "4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"
+
+        try:
+            stats = request.app["stats"][endgame]
+        except KeyError:
             return None
-        longest_fen, plies = None, -1
-        for longest in stats["longest"]:
-            if longest["ply"] > plies:
-                longest_fen = longest["epd"] + " 0 1"
-        return longest_fen
+
+        try:
+            longest = max(stats["longest"], key=lambda e: e["ply"])
+        except ValueError:
+            return None
+        else:
+            return longest["epd"] + " 0 1"
+
+    render = {
+        "num_pieces": [3, 4, 5, 6, 7],
+        "endgames": [{
+            "num": len(material) - 1,
+            "material": material,
+            "has_stats": material in request.app["stats"],
+            "longest_fen": longest_fen(material),
+        } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key, reverse=True)],
+    }
 
     template = request.app["jinja"].get_template("endgames.html")
-    render = {}
-    render["num_pieces"] = [3, 4, 5, 6, 7]
-    render["endgames"] = [{
-        "num": len(material) - 1,
-        "material": material,
-        "has_stats": material in request.app["stats"],
-        "longest_fen": longest_fen(material),
-    } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key, reverse=True)]
     return aiohttp.web.Response(text=html_minify(template.render(render)), content_type="text/html")
 
 
