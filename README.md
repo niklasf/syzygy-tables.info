@@ -8,7 +8,7 @@ User interface and public API for probing Syzygy endgame tablebases.
 Running
 -------
 
-Install dependencies (with Python >= 3.5.3):
+Install dependencies (with Python >= 3.6):
 
     pip install -r requirements.txt
 
@@ -42,16 +42,16 @@ Have a look at `server.py` for server side code. The client side code is in
 License
 -------
 
-This project is licensed under the AGPLv3 with the following dependencies:
+This project is licensed under the AGPL-3.0+ with the following dependencies:
 
-* [python-chess](https://github.com/niklasf/python-chess) ([GPL3](https://github.com/niklasf/python-chess/blob/master/LICENSE))
-* [chessground](https://github.com/ornicar/chessground) ([GPL3](https://github.com/ornicar/chessground/blob/master/LICENSE))
+* [python-chess](https://github.com/niklasf/python-chess) ([GPL-3.0+](https://github.com/niklasf/python-chess/blob/master/LICENSE))
+* [chessground](https://github.com/ornicar/chessground) ([GPL-3.0+](https://github.com/ornicar/chessground/blob/master/LICENSE))
 * [chess.js](https://github.com/jhlywa/chess.js) ([MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE))
 * [Gaviota tablebases](https://github.com/michiguel/Gaviota-Tablebases) ([MIT](https://github.com/michiguel/Gaviota-Tablebases/blob/master/license.txt))
 * [aiohttp](http://aiohttp.readthedocs.org/en/stable/) ([Apache 2](https://github.com/KeepSafe/aiohttp/blob/master/LICENSE.txt))
 * [Jinja](http://jinja.pocoo.org/) ([BSD](https://github.com/mitsuhiko/jinja2/blob/master/LICENSE))
 * [htmlmin](https://htmlmin.readthedocs.org/en/latest/) ([BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE))
 * [Bootstrap](http://getbootstrap.com/) ([MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE))
-* [jQuery](https://jquery.com/) ([MIT](https://github.com/jquery/jquery/blob/master/LICENSE.txt))
+* [zepto.js](http://zeptojs.com/) ([MIT](https://github.com/madrobby/zepto/blob/master/MIT-LICENSE))
 
 Thanks to all of them and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
