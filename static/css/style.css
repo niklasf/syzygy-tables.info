@@ -439,16 +439,19 @@ pre code {
 /* List of endgames */
 
 .endgames {
-  columns: 3;
-  column-gap: 0;
   padding: 0;
+  font-size: 0;
 }
 .endgames li {
+  font-size: 14px;
   list-style: none;
   padding: 4px;
   margin: 0;
   border: 1px solid #ddd;
   text-align: center;
+  display: inline-block;
+  width: 33%;
+  box-sizing: border-box;
 }
 .endgames li.no-stats {
   color: #721c24;
