@@ -462,7 +462,7 @@ pre code {
 /* Single column */
 
 .left-side {
-  background: #fff url('/static/triangle-bg.svg');
+  background: #fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NjAiIGhlaWdodD0iODgwIj48Zz48cGF0aCBkPSJNNjYwIDQ0MEwzMzAgODgwIDAgNDQwVjBoNjYweiIgZmlsbD0iI2VlZSIvPjwvZz48L3N2Zz4=');
   background-position: center bottom;
 }
 
