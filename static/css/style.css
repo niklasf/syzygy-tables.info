@@ -224,7 +224,7 @@ footer > .inner {
   margin: 0 auto;
 }
 .cg-board-wrap {
-  background-image: url('/static/brown-board.svg');
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOng9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAgMCA4IDgiIHNoYXBlLXJlbmRlcmluZz0iZ2VvbWV0cmljUHJlY2lzaW9uIj48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjYjU4ODYzIi8+PGcgaWQ9ImEiPjxnIGlkPSJiIj48ZyBpZD0iYyI+PGcgaWQ9ImQiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNmMGQ5YjUiIGlkPSJlIi8+PHVzZSB4PSIyIiBocmVmPSIjZSIgeDpocmVmPSIjZSIvPjwvZz48dXNlIHg9IjQiIGhyZWY9IiNkIiB4OmhyZWY9IiNkIi8+PC9nPjx1c2UgeD0iMSIgeT0iMSIgaHJlZj0iI2MiIHg6aHJlZj0iI2MiLz48L2c+PHVzZSB5PSIyIiBocmVmPSIjYiIgeDpocmVmPSIjYiIvPjwvZz48dXNlIHk9IjQiIGhyZWY9IiNhIiB4OmhyZWY9IiNhIi8+PC9zdmc+');
 }
 .spare.top {
   margin: 20px 0 2px 0;
