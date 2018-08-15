@@ -34,25 +34,26 @@ h2 {
   border-radius: 4px;
   text-align: left;
 }
+
+h3 {
+  font-size: 1em;
+  font-weight: bold;
+  padding-top: 2em;
+}
+
 .white-win {
   background: white;
   color: black;
+}
+.black-win {
+  background: black;
+  color: white;
 }
 .white-win.frustrated {
   background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
 }
 .black-win.frustrated {
   background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
-}
-.black-win {
-  background: black;
-  color: white;
-}
-
-h3 {
-  font-size: 1em;
-  font-weight: bold;
-  padding-top: 2em;
 }
 
 a {
@@ -141,7 +142,6 @@ section {
   background-color: #ffffff;
   border: 1px solid transparent;
   border-radius: 4px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 .panel-body {
@@ -567,26 +567,17 @@ pre code {
   top: 0;
   left: 0;
 
-  -webkit-animation: bounce 2.0s infinite ease-in-out;
   animation: bounce 2.0s infinite ease-in-out;
 }
 
 .double-bounce2 {
-  -webkit-animation-delay: -1.0s;
   animation-delay: -1.0s;
-}
-
-@-webkit-keyframes bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
 }
 
 @keyframes bounce {
   0%, 100% {
     transform: scale(0.0);
-    -webkit-transform: scale(0.0);
   } 50% {
     transform: scale(1.0);
-    -webkit-transform: scale(1.0);
   }
 }
