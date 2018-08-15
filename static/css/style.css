@@ -479,8 +479,10 @@ pre code {
 
   .left-side {
     top: 0;
+    bottom: 0;
     position: fixed;
     background: none;
+    background: #eee;
   }
   .left-side > .inner {
     margin-right: 10%;
@@ -497,18 +499,6 @@ pre code {
     position: fixed;
     bottom: 40px;
     right: 55%;
-  }
-
-  .left-side::after {
-    content: '';
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 50%;
-    background: #eee;
-    z-index: -1;
   }
 
   .fork-me {
