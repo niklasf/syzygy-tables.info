@@ -526,7 +526,9 @@ def make_app(config):
     assert config.get("server", "base_url").endswith("/")
 
     # Configure templating.
-    app["jinja"] = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"))
+    app["jinja"] = jinja2.Environment(
+        loader=jinja2.FileSystemLoader("templates"),
+        autoescape=jinja2.select_autoescape(["html"]))
     app["jinja"].globals["DEFAULT_FEN"] = DEFAULT_FEN
     app["jinja"].globals["STARTING_FEN"] = chess.STARTING_FEN
     app["jinja"].globals["development"] = config.getboolean("server", "development")
