@@ -52,10 +52,21 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
+def kib(num):
+    for unit in ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"]:
+        if abs(num) < 1024:
+            return "%3.1f %s" % (num, unit)
+        num /= 1024
+    return "%.1f %s" % (num, "Yi")
+
+
 def static(path):
     def handler(request):
         return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path))
     return handler
+
+def asset_url(path):
+    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
 
 
 def swap_colors(fen):
@@ -75,10 +86,6 @@ def mirror_horizontal(fen):
 def clear_fen(fen):
     parts = fen.split()
     return DEFAULT_FEN.replace("w", parts[1])
-
-
-def asset_url(path):
-    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
 
 
 def backend_session(request):
@@ -533,6 +540,7 @@ def make_app(config):
     app["jinja"].globals["STARTING_FEN"] = chess.STARTING_FEN
     app["jinja"].globals["development"] = config.getboolean("server", "development")
     app["jinja"].globals["asset_url"] = asset_url
+    app["jinja"].globals["kib"] = kib
 
     # Load stats.
     with open("stats.json") as f:
