@@ -1,12 +1,6 @@
 <section>
   <h2 id="status"{% if winning_side %} class="{{ winning_side }}-win{% if frustrated %} frustrated{% endif %}"{% endif %}>{{ status }}</h2>
 
-  {% if piece_count >= 7 and not unknown_moves %}
-    <div class="warning" role="alert">
-      Careful, this is based on <strong>experimental</strong> 7-piece tables thankfully <a href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat">generated and shared by Bojun Guo</a>.
-    </div>
-  {% endif %}
-
   <div id="winning" class="list-group {{ turn }}-turn">
   {% for move in winning_moves %}
     <a class="list-group-item" href="/?fen={{ move.fen|replace(" ", "_") }}" data-uci="{{ move.uci }}">
@@ -147,8 +141,7 @@
       counter than to go for the shortest mate.</p>
     <p>6-piece tables were <a href="http://www.talkchess.com/forum3/viewtopic.php?t=47681">released</a> by Ronald de Man in April 2013, including
       <a href="https://github.com/syzygy1/tb">probing code and the generator</a>.</p>
-    <p>In 2018 Bojun Guo <a href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat">started</a> generating 7-piece tables.</p>
-    <p>The 7-piece tablebases will contain 423,836,835,667,331 <a href="https://kirill-kryukov.com/chess/nulp/results.html">unique legal positions</a> in about 18 Terabytes.</p>
+    <p>From May to August 2018 Bojun Guo <a href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat">generated</a> 7-piece tables. The 7-piece tablebase contains 423,836,835,667,331 <a href="https://kirill-kryukov.com/chess/nulp/results.html">unique legal positions</a> in about 18 Terabytes.</p>
 
     <h3>Selected positions</h3>
     <ul>
