@@ -88,8 +88,14 @@ def clear_fen(fen):
     return DEFAULT_FEN.replace("w", parts[1])
 
 
+@aiohttp.web.middleware
+async def trust_x_forwarded_for(request, handler):
+    if request.remote == "127.0.0.1":
+        request = request.clone(remote=request.headers.get("X-Forwarded-For", "127.0.0.1"))
+    return await handler(request)
+
 def backend_session(request):
-    return aiohttp.ClientSession(headers={"X-Forwarded-For": request.transport.get_extra_info("peername")[0]})
+    return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote})
 
 
 def prepare_stats(request, material, fen, dtz):
@@ -525,7 +531,7 @@ def endgames(request):
 
 
 def make_app(config):
-    app = aiohttp.web.Application()
+    app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
     app["config"] = config
 
     # Check configured base url.
