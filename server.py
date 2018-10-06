@@ -35,6 +35,7 @@ import datetime
 import functools
 import itertools
 import math
+import textwrap
 
 try:
     import htmlmin
@@ -455,6 +456,13 @@ async def index(request):
 def legal(request):
     template = request.app["jinja"].get_template("legal.html")
     return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
+
+@routes.get("/robots.txt")
+def robots(request):
+    return aiohttp.web.Response(text=textwrap.dedent("""\
+        User-agent: *
+        Disallow: /syzygy-vs-syzygy/
+        """))
 
 @routes.get("/sitemap.txt")
 def sitemap(request):
