@@ -247,7 +247,7 @@ SideToMoveView.prototype.setPosition = function (position) {
 
 function FenInputView(controller) {
   function parseFen(fen) {
-    const parts = fen.trim().split(/(\s|_)+/);
+    const parts = fen.trim().split(/[\s_]+/);
     if (parts[0] === '') {
       parts[0] = DEFAULT_FEN.split(/\s/)[0];
     }
