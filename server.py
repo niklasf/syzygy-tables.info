@@ -300,6 +300,8 @@ async def index(request):
     render["black_fen"] = board.fen()
     board.turn = original_turn
     render["fen"] = fen = board.fen()
+    render["board_fen"] = board.board_fen()
+    render["check_square"] = chess.SQUARE_NAMES[board.king(board.turn)] if board.is_check() else None
 
     # Mirrored and color swapped FENs for the toolbar.
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
