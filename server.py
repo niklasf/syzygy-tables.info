@@ -460,6 +460,12 @@ def legal(request):
 @routes.get("/robots.txt")
 def robots(request):
     return aiohttp.web.Response(text=textwrap.dedent("""\
+        User-agent: SemrushBot
+        User-agent: SemrushBot-SA
+        User-agent: AhrefsBot
+        User-agent: MegaIndex.ru
+        Disallow: /
+
         User-agent: *
         Disallow: /syzygy-vs-syzygy/
         """))
