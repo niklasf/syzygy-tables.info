@@ -39,7 +39,7 @@ server {
   gzip_types text/plain text/css application/json application/javascript text/javascript image/svg+xml text/html;
 
   add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload" always;
-  add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';" always;
+  add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none';" always;
 
   if ($http_user_agent ~ "Yandex") {
     return 444;
