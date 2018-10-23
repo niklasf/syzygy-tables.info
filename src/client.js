@@ -47,6 +47,7 @@ function normFen(position) {
 function Controller(fen) {
   this.events = {};
   this.position = new Chess(fen || DEFAULT_FEN);
+  this.flipped = false;
 
   window.addEventListener('popstate', (event) => {
     if (event.state && event.state.fen) {
@@ -77,6 +78,11 @@ Controller.prototype.trigger = function (event) {
   (this.events[event] || []).forEach((cb) => {
     cb.apply(this, Array.prototype.slice.call(args, 1));
   });
+};
+
+Controller.prototype.toggleFlipped = function () {
+  this.flipped = !this.flipped;
+  this.trigger('flipped', this.flipped);
 };
 
 Controller.prototype.push = function (position) {
@@ -168,6 +174,8 @@ function BoardView(controller) {
 
   this.setPosition(controller.position);
   controller.bind('positionChanged', (pos) => this.setPosition(pos));
+
+  controller.bind('flipped', (flipped) => this.setFlipped(flipped));
 }
 
 BoardView.prototype.setPosition = function (position) {
@@ -192,9 +200,9 @@ BoardView.prototype.setPosition = function (position) {
   });
 };
 
-BoardView.prototype.flip = function () {
-  var other = this.ground.state.orientation;
-  this.ground.toggleOrientation();
+BoardView.prototype.setFlipped = function (flipped) {
+  var other = flipped ? 'white' : 'black';
+  if (other === this.ground.state.orientation) this.ground.toggleOrientation();
   $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
   $('.spare.bottom piece').toggleClass('white', this.ground.state.orientation === 'white');
   $('.spare.bottom piece').toggleClass('black', this.ground.state.orientation === 'black');
@@ -298,8 +306,9 @@ FenInputView.prototype.setPosition = function (position) {
 
 /* Toolbar */
 
-function ToolBarView(controller, boardView) {
-  $('#btn-flip-board').click(() => boardView.flip());
+function ToolBarView(controller) {
+  $('#btn-flip-board').click(() => controller.toggleFlipped());
+  controller.bind('flipped', (flipped) => $('#btn-flip-board').toggleClass('active', flipped));
 
   $('#btn-clear-board').click((event) => {
     event.preventDefault();
