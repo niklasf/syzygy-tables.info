@@ -48,6 +48,7 @@ function Controller(fen) {
   this.events = {};
   this.position = new Chess(fen || DEFAULT_FEN);
   this.flipped = false;
+  this.editMode = false;
 
   window.addEventListener('popstate', (event) => {
     if (event.state && event.state.fen) {
@@ -83,6 +84,11 @@ Controller.prototype.trigger = function (event) {
 Controller.prototype.toggleFlipped = function () {
   this.flipped = !this.flipped;
   this.trigger('flipped', this.flipped);
+};
+
+Controller.prototype.toggleEditMode = function () {
+  this.editMode = !this.editMode;
+  this.trigger('editMode', this.editMode);
 };
 
 Controller.prototype.push = function (position) {
@@ -362,6 +368,12 @@ function ToolBarView(controller) {
 
     const fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
     controller.push(new Chess(fen));
+  });
+
+  $('#btn-edit').click(() => controller.toggleEditMode());
+
+  controller.bind('editMode', (editMode) => {
+    $('#btn-edit').toggleClass('active', editMode);
   });
 }
 

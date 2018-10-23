@@ -278,6 +278,9 @@ footer > .inner {
 .glyphicon-stats:before {
   content: "\e185";
 }
+.glyphicon-move:before {
+  content: "\e068";
+}
 
 /* Form controls */
 
