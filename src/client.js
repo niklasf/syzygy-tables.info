@@ -182,6 +182,14 @@ function BoardView(controller) {
   controller.bind('positionChanged', (pos) => this.setPosition(pos));
 
   controller.bind('flipped', (flipped) => this.setFlipped(flipped));
+
+  controller.bind('editMode', (editMode) => {
+    ground.set({
+      movable: {
+        showDests: !editMode
+      }
+    });
+  });
 }
 
 BoardView.prototype.setPosition = function (position) {
