@@ -147,7 +147,7 @@ function BoardView(controller) {
     events: {
       move: (orig, dest) => {
         // If the change is a legal move, play it.
-        controller.pushMove(orig, dest);
+        if (!controller.editMode) controller.pushMove(orig, dest);
       },
       dropNewPiece: (piece, key) => {
         // Move the existing king, even when dropping a new one.
