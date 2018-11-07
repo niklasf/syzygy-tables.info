@@ -8,7 +8,6 @@ const buffer = require('vinyl-buffer');
 const browserify = require('browserify');
 
 const css = [
-  'static/css/chessboard-0.3.0.css',
   'static/css/chessground.css',
   'static/css/cburnett.css',
   'static/css/style.css'
@@ -43,9 +42,10 @@ gulp.task('js', () => {
     .pipe(gulp.dest('static/js'));
 });
 
-gulp.task('watch', ['css', 'js'], () => {
-  gulp.watch(css, ['css']);
-  gulp.watch('src/client.js', ['js']);
+
+gulp.task('watch', () => {
+  gulp.watch(css, { ignoreInitial: false }, gulp.series('css'));
+  gulp.watch('src/client.js', { ignoreInitial: false }, gulp.series('js'));
 });
 
-gulp.task('default', ['css', 'js']);
+gulp.task('default', gulp.parallel('css', 'js'));
