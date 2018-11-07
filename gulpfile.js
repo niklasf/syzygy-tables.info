@@ -35,7 +35,7 @@ gulp.task('js', () => {
     .pipe(source('client.min.js'))
     .pipe(buffer())
     .pipe(babel({
-      presets: ['env']
+      presets: ['@babel/env']
     }))
     .pipe(uglify())
     .on('error', (err) => { console.log(`[ERROR] ${err.toString()}`); })
