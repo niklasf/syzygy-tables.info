@@ -6,3 +6,4 @@ static/css/style.min.css
 static/css/style.min.css.map
 node_modules
 config.ini
+.venv

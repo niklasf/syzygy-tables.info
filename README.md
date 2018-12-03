@@ -16,11 +16,11 @@ Build JavaScript and CSS files using Gulp. Requires node.js and npm:
 
 Install dependencies with Python (>= 3.6) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
 
-    pipenv install
+    PIPENV_VENV_IN_PROJECT=1 pipenv install
 
 Then start the server on port 5000.
 
-    pipenv run server
+    PIPENV_VENV_IN_PROJECT=1 pipenv run server
 
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables.

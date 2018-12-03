@@ -6,6 +6,7 @@ Requires=network.target
 [Service]
 User=www-data
 WorkingDirectory=/opt/syzygy-tables.info/
+Environment=PIPENV_VENV_IN_PROJECT=1
 ExecStart=/usr/bin/pipenv run server
 Restart=always
 KillSignal=SIGINT
