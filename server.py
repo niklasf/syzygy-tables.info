@@ -70,13 +70,10 @@ def asset_url(path):
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
 
 
-def swap_colors(fen):
-    parts = fen.split()
-    return parts[0].swapcase() + " " + parts[1] + " - - 0 1"
-
-def clear_fen(fen):
-    parts = fen.split()
-    return DEFAULT_FEN.replace("w", parts[1])
+def with_turn(board, turn):
+    board = board.copy(stack=False)
+    board.turn = turn
+    return board
 
 
 @aiohttp.web.middleware
@@ -280,16 +277,12 @@ async def index(request):
         except ValueError:
             board = chess.Board(DEFAULT_FEN)
     board.halfmove_clock = 0
-    board.fullmoves = 0
+    board.fullmoves = 1
 
     # Get FENs with the current side to move, black and white to move.
-    original_turn = board.turn
-    board.turn = chess.WHITE
-    render["white_fen"] = board.fen()
-    board.turn = chess.BLACK
-    render["black_fen"] = board.fen()
-    board.turn = original_turn
     render["fen"] = fen = board.fen()
+    render["white_fen"] = with_turn(board, chess.WHITE).fen()
+    render["black_fen"] = with_turn(board, chess.BLACK).fen()
     render["board_fen"] = board.board_fen()
     render["check_square"] = chess.SQUARE_NAMES[board.king(board.turn)] if board.is_check() else None
 
@@ -297,8 +290,8 @@ async def index(request):
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
     render["horizontal_fen"] = board.transform(chess.flip_horizontal).fen()
     render["vertical_fen"] = board.transform(chess.flip_vertical).fen()
-    render["swapped_fen"] = swap_colors(fen)
-    render["clear_fen"] = clear_fen(fen)
+    render["swapped_fen"] = with_turn(board, not board.turn).fen()
+    render["clear_fen"] = with_turn(chess.Board(DEFAULT_FEN), board.turn).fen()
     render["fen_input"] = "" if board.fen() == DEFAULT_FEN else board.fen()
 
     # Material key for the page title.
