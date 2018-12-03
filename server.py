@@ -74,16 +74,6 @@ def swap_colors(fen):
     parts = fen.split()
     return parts[0].swapcase() + " " + parts[1] + " - - 0 1"
 
-def mirror_vertical(fen):
-    parts = fen.split()
-    position_parts = "/".join(reversed(parts[0].split("/")))
-    return position_parts + " " + parts[1] + " - - 0 1"
-
-def mirror_horizontal(fen):
-    parts = fen.split()
-    position_parts = "/".join("".join(reversed(position_part)) for position_part in parts[0].split("/"))
-    return position_parts + " " + parts[1] + " - - 0 1"
-
 def clear_fen(fen):
     parts = fen.split()
     return DEFAULT_FEN.replace("w", parts[1])
@@ -305,8 +295,8 @@ async def index(request):
 
     # Mirrored and color swapped FENs for the toolbar.
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
-    render["horizontal_fen"] = mirror_horizontal(fen)
-    render["vertical_fen"] = mirror_vertical(fen)
+    render["horizontal_fen"] = board.transform(chess.flip_horizontal).fen()
+    render["vertical_fen"] = board.transform(chess.flip_vertical).fen()
     render["swapped_fen"] = swap_colors(fen)
     render["clear_fen"] = clear_fen(fen)
     render["fen_input"] = "" if board.fen() == DEFAULT_FEN else board.fen()
