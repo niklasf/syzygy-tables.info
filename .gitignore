@@ -1,11 +1,8 @@
 *.pyc
 *.swp
-venv
 static/js/client.min.js
 static/js/client.min.js.map
-static/css/purified.css
 static/css/style.min.css
 static/css/style.min.css.map
 node_modules
-six-men
 config.ini
