@@ -515,14 +515,25 @@ def endgames(request):
         else:
             return longest["epd"] + " 0 1"
 
+    def subgroup(endgames, num_pieces, num_pawns):
+        return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
+
+    endgames = list(chess.syzygy.tablenames(piece_count=7))
+    endgames.sort(key=sort_key)
+
     render = {
-        "num_pieces": [3, 4, 5, 6, 7],
-        "endgames": [{
-            "num": len(material) - 1,
-            "material": material,
-            "has_stats": material in request.app["stats"],
-            "longest_fen": longest_fen(material),
-        } for material in sorted(chess.syzygy.tablenames(piece_count=7), key=sort_key)],
+        "groups": [{
+            "num_pieces": num_pieces,
+            "split_pawns": num_pieces >= 5,
+            "subgroups": [{
+                "num_pawns": num_pawns,
+                "endgames": [{
+                    "material": endgame,
+                    "has_stats": endgame in request.app["stats"],
+                    "longest_fen": longest_fen(endgame),
+                } for endgame in subgroup(endgames, num_pieces, num_pawns)],
+            } for num_pawns in range(0, num_pieces - 2 + 1)],
+        } for num_pieces in range(3, 7 + 1)],
     }
 
     template = request.app["jinja"].get_template("endgames.html")

@@ -11,22 +11,36 @@
 {% endblock %}
 
 {% block rightside %}
-  {% for num in num_pieces %}
-    <section id="{{ num }}-pieces">
-      <h2>{{ num }} pieces</h2>
-      <ul class="endgames">
-        {% for endgame in endgames %}
-          {% if endgame.num == num %}
-            <li{% if not endgame.has_stats %} class="no-stats"{% endif %}>
-              {% if endgame.longest_fen %}
-                <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">{{ endgame.material }}</a>
+  {% for group in groups %}
+    <section id="{{ group.num_pieces }}-pieces">
+      <h2>{{ group.num_pieces }} pieces</h2>
+
+      {% if not group.split_pawns %}<ul class="endgames">{% endif %}
+        {% for subgroup in group.subgroups %}
+          {% if group.split_pawns %}
+            <h3>
+              {% if subgroup.num_pawns == 0 %}
+                No pawns
+              {% elif subgroup.num_pawns == 1 %}
+                1 pawn
               {% else %}
-                {{ endgame.material }}
+                {{ subgroup.num_pawns }} pawns
               {% endif %}
-            </li>
+            </h3>
+            <ul class="endgames">
           {% endif %}
+            {% for endgame in subgroup.endgames %}
+              <li{% if not endgame.has_stats %} class="no-stats"{% endif %}>
+                {% if endgame.longest_fen %}
+                  <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">{{ endgame.material }}</a>
+                {% else %}
+                  {{ endgame.material }}
+                {% endif %}
+              </li>
+            {% endfor %}
+          {% if group.split_pawns %}</ul>{% endif %}
         {% endfor %}
-      </ul>
+      {% if not group.split_pawns %}</ul>{% endif %}
     </section>
   {% endfor %}
 {% endblock %}
