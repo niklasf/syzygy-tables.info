@@ -100,7 +100,7 @@ def prepare_stats(request, material, fen, dtz):
     if stats is None:
         return None
 
-    render["material_side"] = material_side = material.split("v", 1)[0]
+    material_side, _ = render["material_side"], render["material_other"] = material.split("v", 1)
 
     # Basic statistics.
     outcomes = {

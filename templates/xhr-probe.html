@@ -85,7 +85,7 @@
   {% if stats %}
     <section id="stats">
       {% if stats.histogram %}
-        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }} (log&nbsp;scale)</h3>
+        <h3>Histogram: {{ stats.material_side }} {{ stats.verb }} vs. {{ stats.material_other }} (log&nbsp;scale)</h3>
         {% for row in stats.histogram %}
           {% if row.empty %}
             <div class="hist-empty" title="{{ row.empty }} empty rows skipped">⋮</div>
