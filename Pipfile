@@ -6,8 +6,8 @@ verify_ssl = true
 [packages]
 htmlmin = "~=0.1.12"
 Jinja2 = "~=2.10"
-python-chess = "~=0.24.2"
-aiohttp = "~=3.5.1"
+python-chess = "~=0.25.1"
+aiohttp = "~=3.5.4"
 
 [scripts]
 server = "python server.py"
