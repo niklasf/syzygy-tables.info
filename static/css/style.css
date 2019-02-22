@@ -115,8 +115,9 @@ section {
   margin-bottom: 15px;
   text-align: left;
 }
-#pgn-download {
+#pgn-download, #lichess-analysis {
   white-space: nowrap;
+  margin-right: 0.5em;
 }
 #losing.white-turn .badge, #winning.black-turn .badge {
   background: black;
@@ -280,6 +281,9 @@ footer > .inner {
 }
 .glyphicon-move:before {
   content: "\e068";
+}
+.glyphicon-knight:before {
+  content: "\e215";
 }
 
 /* Form controls */

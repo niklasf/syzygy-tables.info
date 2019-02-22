@@ -79,7 +79,11 @@
     <a id="pgn-download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|replace(" ", "_") }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
       <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
       {{ material }}.pgn
-  </a>
+    </a>
+    <a id="lichess-analysis" href="https://lichess.org/analysis/standard/{{ fen|replace(" ", "_") }}">
+      <span class="glyphicon glyphicon-knight" aria-hidden="true"></span>
+      lichess.org
+    </a>
   {% endif %}
 
   {% if stats %}
