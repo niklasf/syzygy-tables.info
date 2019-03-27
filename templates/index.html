@@ -21,6 +21,12 @@
       <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|replace(" ", "_") }}">Black to move</a>
     </div>
 
+    <div class="btn-group">
+      <a id="btn-edit" class="btn btn-default" title="Edit mode: Do not switch sides when playing moves">
+        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+      </a>
+    </div>
+
     <div class="spare top">
       <piece class="black pawn" data-color="black" data-role="pawn"></piece>
       <piece class="black knight" data-color="black" data-role="knight"></piece>
@@ -63,12 +69,6 @@
         </a>
         <a id="btn-mirror-vertical" href="/?fen={{ vertical_fen|replace(" ", "_") }}" class="btn btn-default" title="Mirror vertically">
           <span class="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
-        </a>
-      </div>
-
-      <div class="btn-group">
-        <a id="btn-edit" class="btn btn-default" title="Edit mode: Do not switch sides when playing moves">
-          <span class="glyphicon glyphicon-move" aria-hidden="true"></span>
         </a>
       </div>
     </div>

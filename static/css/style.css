@@ -280,11 +280,11 @@ footer > .inner {
 .glyphicon-stats:before {
   content: "\e185";
 }
-.glyphicon-move:before {
-  content: "\e068";
-}
 .glyphicon-knight:before {
   content: "\e215";
+}
+.glyphicon-lock:before {
+  content: "\e033";
 }
 
 /* Form controls */
