@@ -271,13 +271,10 @@ async def index(request):
     # Setup a board from the given valid FEN or fall back to the default FEN.
     try:
         board = chess.Board(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
+        board.halfmove_clock = 0
+        board.fullmoves = 1
     except ValueError:
-        try:
-            board, _ = chess.Board.from_epd(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
-        except ValueError:
-            board = chess.Board(DEFAULT_FEN)
-    board.halfmove_clock = 0
-    board.fullmoves = 1
+        board = chess.Board(DEFAULT_FEN)
 
     # Get FENs with the current side to move, black and white to move.
     render["fen"] = fen = board.fen()
