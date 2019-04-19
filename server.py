@@ -130,10 +130,7 @@ def prepare_stats(request, material, fen, dtz):
     } for longest in stats["longest"]]
 
     # Histogram.
-    if not dtz:
-        return render
-
-    side_winning = (" w" in fen) == (dtz > 0)
+    side_winning = (" w" in fen) == (dtz is not None and dtz > 0)
     render["verb"] = "winning" if side_winning else "losing"
 
     win_hist = stats[side]["win_hist" if side_winning else "loss_hist"]
@@ -166,7 +163,7 @@ def prepare_stats(request, material, fen, dtz):
             "ply": ply,
             "num": num,
             "width": round((math.log(num) if num else 0) * 100 / maximum, 1),
-            "active": abs(dtz) == ply or abs(dtz) + 1 == ply,
+            "active": abs(dtz or 0) == ply or (dtz is not None and abs(dtz) + 1 == ply),
         })
 
     return render
