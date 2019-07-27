@@ -24,8 +24,8 @@
     "url": "https://github.com/niklasf/syzygy-tables.info.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.5.4",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
     "browserify": "^16.3.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "chess.js": "^0.10.2",
-    "chessground": "^7.6.5",
+    "chessground": "^7.6.8",
     "zepto-browserify": "^1.1.6-1"
   }
 }
