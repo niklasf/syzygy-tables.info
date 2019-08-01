@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "chess.js": "^0.10.2",
-    "chessground": "^7.6.9",
+    "chessground": "=7.6.8",
     "zepto-browserify": "^1.1.6-1"
   }
 }
