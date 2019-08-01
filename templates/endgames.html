@@ -39,7 +39,7 @@
             <ul class="endgames">
           {% endif %}
             {% for endgame in subgroup.endgames %}
-              <li{% if not endgame.has_stats %} class="no-stats"{% endif %}>
+              <li>
                 {% if endgame.longest_fen %}
                   <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">{{ endgame.material }}</a>
                 {% else %}
