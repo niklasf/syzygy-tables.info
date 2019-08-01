@@ -462,6 +462,10 @@ pre code {
   box-sizing: border-box;
 }
 
+.endgames li.maximal {
+  background: #ddd;
+}
+
 /* Single column */
 
 .left-side {

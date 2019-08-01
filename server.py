@@ -525,6 +525,7 @@ def endgames(request):
                     "material": endgame,
                     "has_stats": endgame in request.app["stats"],
                     "longest_fen": longest_fen(endgame),
+                    "maximal": endgame in ["KRvK", "KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"],
                 } for endgame in subgroup(endgames, num_pieces, num_pawns)],
             } for num_pawns in range(0, num_pieces - 2 + 1)],
         } for num_pieces in range(3, 7 + 1)],

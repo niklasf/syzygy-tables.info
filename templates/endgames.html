@@ -39,9 +39,15 @@
             <ul class="endgames">
           {% endif %}
             {% for endgame in subgroup.endgames %}
-              <li>
+              <li{% if endgame.maximal %} class="maximal"{% endif %}>
                 {% if endgame.longest_fen %}
-                  <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">{{ endgame.material }}</a>
+                  <a href="/?fen={{ endgame.longest_fen|replace(" ", "_") }}">
+                    {% if endgame.maximal %}
+                      <strong>{{ endgame.material }}</strong>
+                    {% else %}
+                      {{ endgame.material }}
+                    {% endif %}
+                  </a>
                 {% else %}
                   {{ endgame.material }}
                 {% endif %}
