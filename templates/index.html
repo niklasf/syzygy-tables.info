@@ -16,15 +16,17 @@
   <h1 class="main"><a href="/">Syzygy endgame tablebases</a></h1>
 
   <nav>
-    <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
-      <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen|replace(" ", "_") }}">White to move</a>
-      <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|replace(" ", "_") }}">Black to move</a>
-    </div>
+    <div id="side-to-move-toolbar">
+      <div id="side-to-move" class="btn-group" role="group" aria-label="Side to move">
+        <a id="btn-white" class="btn btn-default{% if turn == "white" %} active{% endif %}" href="/?fen={{ white_fen|replace(" ", "_") }}">White to move</a>
+        <a id="btn-black" class="btn btn-default{% if turn == "black" %} active{% endif %}" href="/?fen={{ black_fen|replace(" ", "_") }}">Black to move</a>
+      </div>
 
-    <div class="btn-group">
-      <a id="btn-edit" class="btn btn-default" title="Edit mode: Do not switch sides when playing moves">
-        <span class="icon icon-lock-open"></span>
-      </a>
+      <div class="btn-group">
+        <a id="btn-edit" class="btn btn-default" title="Edit mode: Do not switch sides when playing moves">
+          <span class="icon icon-lock-open"></span>
+        </a>
+      </div>
     </div>
 
     <div class="spare top">
