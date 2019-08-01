@@ -382,6 +382,9 @@ function ToolBarView(controller) {
 
   controller.bind('editMode', (editMode) => {
     $('#btn-edit').toggleClass('active', editMode);
+    $('#btn-edit > span.icon')
+      .toggleClass('icon-lock', editMode)
+      .toggleClass('icon-lock-open', !editMode);
   });
 }
 
