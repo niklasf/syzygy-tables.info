@@ -447,6 +447,7 @@ def robots(request):
 
         User-agent: *
         Disallow: /syzygy-vs-syzygy/
+        Disallow: /endgames.pgn
         """))
 
 @routes.get("/sitemap.txt")
