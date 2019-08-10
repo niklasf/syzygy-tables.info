@@ -26,7 +26,7 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
-    "browserify": "^16.3.0",
+    "browserify": "^16.5.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.2.0",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "chess.js": "^0.10.2",
-    "chessground": "=7.6.8",
+    "chessground": "^7.6.10",
     "zepto-browserify": "^1.1.6-1"
   }
 }
