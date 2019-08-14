@@ -397,7 +397,6 @@ function TablebaseView(controller, boardView) {
       .click(function (event) {
         event.preventDefault();
         const uci = $(this).attr('data-uci');
-        const fen = $(this).attr('data-fen');
         const from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
         controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
         boardView.unsetHovering();
