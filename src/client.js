@@ -445,6 +445,7 @@ function TablebaseView(controller, boardView) {
       xhr.onload = () => {
         currentXhr = null;
         if (!pos && xhr.response.length) firstByte();
+        iframe.contentDocument.write(xhr.response.slice(pos));
         iframe.contentDocument.write('</x-streaming>');
         iframe.contentDocument.close();
         document.body.removeChild(iframe);
