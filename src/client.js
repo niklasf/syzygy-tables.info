@@ -409,19 +409,59 @@ function TablebaseView(controller, boardView) {
 
   bindMoveLink($('a.list-group-item'));
 
+  let currentXhr;
   controller.bind('positionChanged', (position) => {
-    $('.right-side > .inner')
-      .html('<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>')
-      .load('/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe', (url, status, xhr) => {
-        if (status !== 'error') bindMoveLink($('a.list-group-item'));
-        else {
-          $('.right-side > .inner')
-            .empty()
-            .append($('<section>')
-              .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
-              .append($('<div id="info"></div>').text(xhr.statusText)));
-        }
-      });
+    if (currentXhr) {
+      currentXhr.abort();
+      currentXhr = null;
+    }
+
+    const content = document.querySelector('.right-side > .inner');
+    content.innerHTML = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
+
+    // Streaming XHR, based on https://jakearchibald.com/2016/fun-hacks-faster-content/.
+    new Promise((resolve) => {
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.onload = () => {
+        iframe.onload = null;
+        resolve(iframe);
+      };
+      document.body.appendChild(iframe);
+      iframe.src = '';
+    }).then((iframe) => {
+      let pos = 0;
+      const xhr = currentXhr = new XMLHttpRequest();
+      const firstByte = () => {
+        iframe.contentDocument.write('<x-streaming>');
+        content.innerHTML = '';
+        content.appendChild(iframe.contentDocument.querySelector('x-streaming'));
+      };
+      xhr.onprogress = () => {
+        if (!pos && xhr.response.length) firstByte();
+        iframe.contentDocument.write(xhr.response.slice(pos));
+        pos = xhr.response.length;
+      };
+      xhr.onload = () => {
+        currentXhr = null;
+        if (!pos && xhr.response.length) firstByte();
+        iframe.contentDocument.write('</x-streaming>');
+        iframe.contentDocument.close();
+        document.body.removeChild(iframe);
+        bindMoveLink($('a.list-group-item'));
+      };
+      xhr.onerror = () => {
+        currentXhr = null;
+        $('.right-side > .inner')
+          .empty()
+          .append($('<section>')
+            .append($('<h2 id="status"></h2>').text('Network error ' + xhr.status))
+            .append($('<div id="info"></div>').text(xhr.statusText)));
+      };
+      xhr.responseType = 'text';
+      xhr.open('GET', '/?fen=' + encodeURIComponent(normFen(position)) + '&xhr=probe');
+      xhr.send();
+    });
   });
 }
 
