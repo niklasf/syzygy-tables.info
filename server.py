@@ -86,7 +86,7 @@ def backend_session(request):
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote})
 
 
-def prepare_stats(request, material, fen, dtz):
+def prepare_stats(request, material, fen, active_dtz):
     render = {}
 
     # Get stats and side.
@@ -130,7 +130,7 @@ def prepare_stats(request, material, fen, dtz):
     } for longest in stats["longest"]]
 
     # Histogram.
-    side_winning = (" w" in fen) == (dtz is not None and dtz > 0)
+    side_winning = (" w" in fen) == (active_dtz is not None and active_dtz > 0)
     render["verb"] = "winning" if side_winning else "losing"
 
     win_hist = stats[side]["win_hist" if side_winning else "loss_hist"]
@@ -163,7 +163,7 @@ def prepare_stats(request, material, fen, dtz):
             "ply": ply,
             "num": num,
             "width": round((math.log(num) if num else 0) * 100 / maximum, 1),
-            "active": abs(dtz or 0) == ply or (dtz is not None and abs(dtz) + 1 == ply),
+            "active": active_dtz is not None and (abs(active_dtz) == ply or (active_dtz and abs(active_dtz) + 1 == ply)),
         })
 
     return render
@@ -296,6 +296,7 @@ async def index(request):
     grouped_moves = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
 
     dtz = None
+    active_dtz = None
 
     if not board.is_valid():
         render["status"] = "Invalid position"
@@ -303,6 +304,7 @@ async def index(request):
     elif board.is_stalemate():
         render["status"] = "Draw by stalemate"
     elif board.is_checkmate():
+        active_dtz = 0
         if board.turn == chess.WHITE:
             render["status"] = "Black won by checkmate"
             render["winning_side"] = "black"
@@ -322,7 +324,7 @@ async def index(request):
 
                 probe = await res.json()
 
-        dtz = probe["dtz"]
+        dtz = active_dtz = probe["dtz"]
 
         render["blessed_loss"] = probe["wdl"] == -1
         render["cursed_win"] = probe["wdl"] == 1
@@ -422,7 +424,7 @@ async def index(request):
     render["unknown_moves"] = grouped_moves[None]
 
     # Stats.
-    render["stats"] = prepare_stats(request, material, render["fen"], dtz)
+    render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
 
     if "xhr" in request.query:
         template = request.app["jinja"].get_template("xhr-probe.html")
