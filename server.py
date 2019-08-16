@@ -324,7 +324,8 @@ async def index(request):
 
                 probe = await res.json()
 
-        dtz = active_dtz = probe["dtz"]
+        dtz = probe["dtz"]
+        active_dtz = dtz if dtz else None
 
         render["blessed_loss"] = probe["wdl"] == -1
         render["cursed_win"] = probe["wdl"] == 1
