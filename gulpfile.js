@@ -16,7 +16,6 @@ const css = [
 gulp.task('css', () => {
   return gulp.src(css)
     .pipe(cleanCss({
-      compability: 'ie8',
       level: {
         1: {
           specialComments: 0
