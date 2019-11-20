@@ -4,6 +4,12 @@
   --draw-bg-color: #777;
   --draw-color: #fff;
 
+  --white-bg-color: white;
+  --white-color: black;
+
+  --black-bg-color: black;
+  --black-color: white;
+
   --link-color: #337ab7;
   --visited-link-color: #23527c;
 
@@ -22,9 +28,15 @@
   --shadow-inset: 3px;
 }
 
-:root {
+/* :root {
   --draw-bg-color: #666;
   --draw-color: #d3d3d3;
+
+  --white-bg-color: #bababa;
+  --white-color: #161512;
+
+  --black-bg-color: #161512;
+  --black-color: #bababa;
 
   --body-color: #bababa;
   --body-bg-color: #161512;
@@ -41,7 +53,7 @@
 
   --shadow: rgba(255,255,255,.125);
   --shadow-inset: -3px;
-}
+} */
 
 body {
   margin: 0;
@@ -69,7 +81,7 @@ h1 a, h1 a:hover, h1 a:visited {
 
 h2 {
   margin: 0 0 1em 0;
-  border: 1px solid black;
+  border: 1px solid var(--border-color);
   font-size: 1.05em;
   padding: 10px 15px;
   background: var(--draw-bg-color);
@@ -86,12 +98,12 @@ h3 {
 }
 
 .white-win {
-  background: white;
-  color: black;
+  background: var(--white-bg-color);
+  color: var(--white-color);
 }
 .black-win {
-  background: black;
-  color: white;
+  background: var(--black-bg-color);
+  color: var(--black-color);
 }
 .white-win.frustrated {
   background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
@@ -155,13 +167,14 @@ section {
   margin-right: 0.5em;
 }
 #losing.white-turn .badge, #winning.black-turn .badge {
-  background: black;
-  color: white;
+  background: var(--black-bg-color);
+  color: var(--black-color);
+  border: 1px solid var(--black-color);
 }
 #losing.black-turn .badge, #winning.white-turn .badge {
-  background: white;
-  color: black;
-  border: 1px solid black;
+  background: var(--white-bg-color);
+  color: var(--white-color);
+  border: 1px solid var(--white-color);
 }
 #cursed.white-turn .badge, #blessed.black-turn .badge {
   background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
