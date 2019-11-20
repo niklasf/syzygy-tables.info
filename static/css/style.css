@@ -26,34 +26,53 @@
 
   --shadow: rgba(0,0,0,.125);
   --shadow-inset: 3px;
+
 }
 
-/* :root {
-  --draw-bg-color: #666;
-  --draw-color: #d3d3d3;
+.left-side {
+  background: var(--body-bg-color) url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NjAiIGhlaWdodD0iODgwIj48Zz48cGF0aCBkPSJNNjYwIDQ0MEwzMzAgODgwIDAgNDQwVjBoNjYweiIgZmlsbD0iI2VlZSIvPjwvZz48L3N2Zz4=');
+  background-position: center bottom;
+}
 
-  --white-bg-color: #bababa;
-  --white-color: #161512;
+@media (perfers-color-scheme: dark) {
+  :root {
+    --draw-bg-color: #999;
+    --draw-color: #eee;
 
-  --black-bg-color: #161512;
-  --black-color: #bababa;
+    --white-bg-color: #eee;
+    --white-color: #161512;
 
-  --body-color: #bababa;
-  --body-bg-color: #161512;
+    --black-bg-color: #161512;
+    --black-color: #eee;
 
-  --link-color: #3692e7;
-  --visited-link-color: #337ab7;
+    --body-color: #bababa;
+    --body-bg-color: #161512;
 
-  --border-color: #404040;
-  --grave-border-color: #404040;
+    --link-color: #3692e7;
+    --visited-link-color: #337ab7;
 
-  --shaded-bg-color: #262421;
+    --border-color: #404040;
+    --grave-border-color: #404040;
 
-  --code-bg-color: #262421;
+    --shaded-bg-color: #262421;
 
-  --shadow: rgba(255,255,255,.125);
-  --shadow-inset: -3px;
-} */
+    --code-bg-color: #262421;
+
+    --shadow: rgba(255,255,255,.125);
+    --shadow-inset: -3px;
+
+  }
+
+  .left-side {
+    background: var(--body-bg-color) url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NjAiIGhlaWdodD0iODgwIj48Zz48cGF0aCBkPSJNNjYwIDQ0MEwzMzAgODgwIDAgNDQwVjBoNjYweiIgZmlsbD0iIzI2MjQyMSIvPjwvZz48L3N2Zz4=');
+    background-position: center bottom;
+  }
+
+  div.spare.top {
+    box-shadow: inset 0 0 12px 12px var(--shaded-bg-color);
+    background: var(--border-color);
+  }
+}
 
 body {
   margin: 0;
@@ -81,7 +100,7 @@ h1 a, h1 a:hover, h1 a:visited {
 
 h2 {
   margin: 0 0 1em 0;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--grave-border-color);
   font-size: 1.05em;
   padding: 10px 15px;
   background: var(--draw-bg-color);
@@ -106,10 +125,10 @@ h3 {
   color: var(--black-color);
 }
 .white-win.frustrated {
-  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
+  background: repeating-linear-gradient(45deg, var(--draw-bg-color), var(--draw-bg-color) 8px, var(--white-bg-color) 8px, var(--white-bg-color) 20px);
 }
 .black-win.frustrated {
-  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
+  background: repeating-linear-gradient(45deg, var(--draw-bg-color), var(--draw-bg-color) 8px, var(--black-bg-color) 8px, var(--black-bg-color) 20px);
 }
 
 a {
@@ -177,13 +196,14 @@ section {
   border: 1px solid var(--white-color);
 }
 #cursed.white-turn .badge, #blessed.black-turn .badge {
-  background: repeating-linear-gradient(45deg, #e5e5e5, #e5e5e5 8px, white 8px, white 20px);
-  color: black;
-  border: 1px solid black;
+  background: repeating-linear-gradient(45deg, var(--draw-bg-color), var(--draw-bg-color) 8px, var(--white-bg-color) 8px, var(--white-bg-color) 20px);
+  color: var(--white-color);
+  border: 1px solid var(--white-color);
 }
 #cursed.black-turn .badge, #blessed.white-turn .badge {
-  background: repeating-linear-gradient(45deg, #777, #777 8px, black 8px, black 20px);
-  color: white;
+  background: repeating-linear-gradient(45deg, var(--draw-bg-color), var(--draw-bg-color) 8px, var(--black-bg-color) 8px, var(--black-bg-color) 20px);
+  color: var(--black-color);
+  border: 1px solid var(--black-color);
 }
 
 .panel {
@@ -493,13 +513,6 @@ pre code {
 .endgames li.maximal {
   border-color: var(--border-color);
   background: var(--shaded-bg-color);
-}
-
-/* Single column */
-
-.left-side {
-  background: var(--body-bg-color) url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NjAiIGhlaWdodD0iODgwIj48Zz48cGF0aCBkPSJNNjYwIDQ0MEwzMzAgODgwIDAgNDQwVjBoNjYweiIgZmlsbD0iI2VlZSIvPjwvZz48L3N2Zz4=');
-  background-position: center bottom;
 }
 
 /* Two columns */
