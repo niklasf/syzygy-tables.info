@@ -34,7 +34,7 @@
   background-position: center bottom;
 }
 
-@media (perfers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   :root {
     --draw-bg-color: #999;
     --draw-color: #eee;
@@ -68,8 +68,8 @@
     background-position: center bottom;
   }
 
-  div.spare.top {
-    box-shadow: inset 0 0 12px 12px var(--shaded-bg-color);
+  div.spare {
+    box-shadow: inset 0 0 12px 2px var(--shaded-bg-color);
     background: var(--border-color);
   }
 }
@@ -100,7 +100,7 @@ h1 a, h1 a:hover, h1 a:visited {
 
 h2 {
   margin: 0 0 1em 0;
-  border: 1px solid var(--grave-border-color);
+  border: 1px solid var(--body-color);
   font-size: 1.05em;
   padding: 10px 15px;
   background: var(--draw-bg-color);
@@ -459,10 +459,12 @@ input[type=text] {
 .hist {
   height: 8px;
   background: var(--shaded-bg-color);
+  border: 1px solid var(--border-color);
   margin-bottom: 2px;
 }
 .hist.active {
   background: var(--grave-border-color);
+  border: 1px solid var(--grave-border-color);
 }
 .hist-empty {
   color: var(--grave-border-color);
