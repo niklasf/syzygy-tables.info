@@ -124,13 +124,8 @@ h3 {
   background: var(--black-bg-color);
   color: var(--black-color);
 }
-.white-win.frustrated, #cursed.white-turn .badge, #blessed.black-turn .badge {
-  background: repeating-linear-gradient(45deg, var(--white-bg-color), var(--white-bg-color) 8px, var(--draw-bg-color) 8px, var(--draw-bg-color) 20px);
-  text-shadow: white 1px 1px 2px, white -1px -1px 2px;
-}
-.black-win.frustrated, #cursed.black-turn .badge, #blessed.white-turn .badge {
-  background: repeating-linear-gradient(45deg, var(--black-bg-color), var(--black-bg-color) 8px, var(--draw-bg-color) 8px, var(--draw-bg-color) 20px);
-  text-shadow: black 1px 1px 2px, white -1px -1px 2px;
+.frustrated, #cursed .badge, #blessed .badge {
+  box-shadow: inset 0 0 0 3px var(--draw-bg-color);
 }
 
 a {
@@ -198,12 +193,14 @@ section {
   border: 1px solid var(--white-color);
 }
 #cursed.white-turn .badge, #blessed.black-turn .badge {
+  background: var(--white-bg-color);
   color: var(--white-color);
-  border: 1px solid var(--white-color);
+  border: 1px solid var(--draw-bg-color);
 }
 #cursed.black-turn .badge, #blessed.white-turn .badge {
+  background: var(--black-bg-color);
   color: var(--black-color);
-  border: 1px solid var(--black-color);
+  border: 1px solid var(--draw-bg-color);
 }
 
 .panel {
