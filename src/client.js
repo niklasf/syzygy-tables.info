@@ -170,13 +170,17 @@ function BoardView(controller) {
     }
   });
 
-  $('.spare piece').on('touchstart mousedown', function (event) {
-    event.preventDefault();
-    ground.dragNewPiece({
-      color: $(this).attr('data-color'),
-      role: $(this).attr('data-role')
-    }, event, true);
-  });
+  for (const el of document.querySelectorAll('.spare piece')) {
+    for (const eventName of ['touchstart', 'mousedown']) {
+      el.addEventListener(eventName, e => {
+        e.preventDefault();
+        ground.dragNewPiece({
+          color: e.target.getAttribute('data-color'),
+          role: e.target.getAttribute('data-role')
+        }, e, true);
+      }, {passive: false});
+    }
+  }
 
   this.setPosition(controller.position);
   controller.bind('positionChanged', (pos) => this.setPosition(pos));
