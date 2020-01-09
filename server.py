@@ -355,9 +355,11 @@ async def index(request):
 
         # Label and group all legal moves.
         for move_info in probe["moves"]:
-            board.push_uci(move_info["uci"])
+            move = board.push_uci(move_info["uci"])
             move_info["fen"] = board.fen()
             board.pop()
+
+            move_info["capture"] = board.is_capture(move)
 
             move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
 
@@ -390,6 +392,7 @@ async def index(request):
     grouped_moves[-2].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
     grouped_moves[-2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     grouped_moves[-2].sort(key=lambda move: move["zeroing"], reverse=True)
+    grouped_moves[-2].sort(key=lambda move: move["capture"], reverse=True)
     grouped_moves[-2].sort(key=lambda move: move["checkmate"], reverse=True)
     render["winning_moves"] = grouped_moves[-2]
 
@@ -398,10 +401,13 @@ async def index(request):
     grouped_moves[-1].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
     grouped_moves[-1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     grouped_moves[-1].sort(key=lambda move: move["zeroing"], reverse=True)
+    grouped_moves[-1].sort(key=lambda move: move["capture"], reverse=True)
     render["cursed_moves"] = grouped_moves[-1]
 
     # Sort drawing moves.
     grouped_moves[0].sort(key=lambda move: move["uci"])
+    grouped_moves[0].sort(key=lambda move: move["zeroing"], reverse=True)
+    grouped_moves[0].sort(key=lambda move: move["capture"], reverse=True)
     grouped_moves[0].sort(key=lambda move: move["insufficient_material"], reverse=True)
     grouped_moves[0].sort(key=lambda move: move["stalemate"], reverse=True)
     render["drawing_moves"] = grouped_moves[0]
@@ -411,6 +417,7 @@ async def index(request):
     grouped_moves[1].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
     grouped_moves[1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     grouped_moves[1].sort(key=lambda move: move["zeroing"])
+    grouped_moves[1].sort(key=lambda move: move["capture"])
     render["blessed_moves"] = grouped_moves[1]
 
     # Sort losing moves.
@@ -418,10 +425,13 @@ async def index(request):
     grouped_moves[2].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
     grouped_moves[2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
     grouped_moves[2].sort(key=lambda move: move["zeroing"])
+    grouped_moves[1].sort(key=lambda move: move["capture"])
     render["losing_moves"] = grouped_moves[2]
 
     # Sort unknown moves.
     grouped_moves[None].sort(key=lambda move: move["uci"])
+    grouped_moves[None].sort(key=lambda move: move["zeroing"], reverse=True)
+    grouped_moves[None].sort(key=lambda move: move["capture"], reverse=True)
     render["unknown_moves"] = grouped_moves[None]
 
     # Stats.
