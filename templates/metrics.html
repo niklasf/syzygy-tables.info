@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}Metrics – Syzygy endgame tablebases{% endblock %}
+
+{% block leftside %}
+  <h1>Metrics</h1>
+
+  <p>Explanation of the information stored in Syzygy tablebases</p>
+
+  <nav>
+    <div class="reload"><a class="btn btn-default" href="/">Back to board</a></div>
+  </nav>
+{% endblock %}
+
+{% block rightside %}
+  <section id="wdl">
+    <h2>WDL<sub>50</sub></h2>
+
+    <p>5-valued <em>Win/Draw/Loss</em> information can be used to decide which positions to aim for.</p>
+
+    <div class="list-group stats">
+      <div class="list-group-item white-win">Win (+2)</div>
+      <div class="list-group-item white-win frustrated">Win prevented by 50-move rule (+1)</div>
+      <div class="list-group-item draws">Drawn (0)</div>
+      <div class="list-group-item black-win frustrated">Loss saved by 50-move rule (-1)</div>
+      <div class="list-group-item black-win">Loss (-2)</div>
+    </div>
+  </section>
+
+  <section id="dtz">
+    <h2>DTZ<sub>50</sub>&prime;&prime; with rounding</h2>
+
+    <p>Once a tablebase position has been reached, the <em>Distance To Zeroing</em>
+      (of the fifty-move counter by a capture or pawn move)
+      can be used to reliably make progress in favorable positions and stall
+      in unfavorable positions.</p>
+
+    <p>A DTZ value n with 100 &ge; n &ge; 1 means the position is winning, and a zeroing
+      move or checkmate can be forced in n or n + 1 half-moves.</p>
+
+    <p>For example, see how the DTZ repeats after the only-move in
+      <a href="/?fen=1kb5/8/1KN5/3N4/8/8/8/8_b_-_-_0_1">1kb5/8/1KN5/3N4/8/8/8/8 b - -</a>.
+      This ambiguity is due to the fact that some Syzygy tables store rounded moves
+      instead of half-moves, to save space. This means some primary tablebase lines
+      may waste up to 1 ply. Rounding is never used for endgame phases where this would
+      change the game theoretical outcome.</p>
+
+    <p>Users need to be careful in positions
+      that are nearly drawn under
+      the 50-move rule! Carelessly wasting 1 more ply
+      by not following the tablebase recommendation, for a total of 2 wasted plies,
+      may change the outcome of the game.
+    </p>
+
+    <p>A DTZ value n &gt 100 means the position is winning, but drawn under the 50-move rule.
+      A zeroing move or checkmate can be forced in n half-moves, or in n - 100 half-moves
+      if a later phase is responsible for the win.</p>
+
+    <p>
+      For example, in <a href="/?fen=8/8/2N5/8/3k4/7N/p2K4/8_b_-_-_0_1">8/8/2N5/8/3k4/7N/p2K4/8 b - -</a>
+      black plays a zeroing move in 7 ply, but the DTZ is 107,
+      indicating that white can hold a draw under the 50-move rule in a later phase of the endgame.</p>
+  </section>
+{% endblock %}

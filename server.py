@@ -449,6 +449,11 @@ def legal(request):
     template = request.app["jinja"].get_template("legal.html")
     return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
 
+@routes.get("/metrics")
+def metrics(request):
+    template = request.app["jinja"].get_template("metrics.html")
+    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
+
 @routes.get("/robots.txt")
 def robots(request):
     return aiohttp.web.Response(text=textwrap.dedent("""\
