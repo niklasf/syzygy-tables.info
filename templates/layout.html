@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 
 <html lang="en">
+  <!-- https://github.com/niklasf/syzygy-tables.info -->
   <head>
     <meta charset="utf-8">
     <link rel="preload" href="/static/fonts/fontello.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset_url("css/style.min.css") }}">
     {% block head %}{% endblock %}
     <title>{% block title %}Syzygy endgame tablebases{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes">
     <meta name="keywords" content="Syzygy,chess,endgame,tablebase">
     <meta name="author" content="Niklas Fiekas">
     <link rel="author" title="Legal" href="/legal">
@@ -19,7 +20,6 @@
     {% if development %}
       <div style="background: #c00; color: #fff; text-align: center; font-weight: bold; position: fixed; z-index: 1; width: 100%; top: 0;">Careful, this is an unreliable development version.</div>
     {% endif %}
-
     <div class="left-side">
       <div class="inner">
         {% block leftside %}{% endblock %}
@@ -43,7 +43,6 @@
         {% endblock %}
       </div>
     </footer>
-
     {% block scripts %}{% endblock %}
   </body>
 </html>
