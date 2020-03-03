@@ -130,6 +130,8 @@ Controller.prototype.setPosition = function (position) {
 /* Board view */
 
 function BoardView(controller) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
   const ground = this.ground = Chessground(document.getElementById('board'), {
     fen: controller.position.fen(),
     autoCastle: false,
@@ -143,6 +145,9 @@ function BoardView(controller) {
     },
     draggable: {
       deleteOnDropOff: true
+    },
+    animation: {
+      enabled: !reducedMotion.matches
     },
     events: {
       move: (orig, dest) => {
@@ -191,6 +196,14 @@ function BoardView(controller) {
     ground.set({
       movable: {
         showDests: !editMode
+      }
+    });
+  });
+
+  reducedMotion.addEventListener('change', () => {
+    ground.set({
+      animation: {
+        enabled: !reducedMotion.matches
       }
     });
   });

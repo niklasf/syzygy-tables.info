@@ -622,3 +622,9 @@ pre code {
     transform: scale(1.0);
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .double-bounce1, .double-bounce2 {
+    animation: none;
+  }
+}
