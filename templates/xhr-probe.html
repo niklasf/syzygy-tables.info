@@ -121,8 +121,26 @@
         <span class="icon icon-stats" aria-hidden="true"></span>
         {{ material }}.json <a href="/stats">(?)</a>
       </a>
-
     </section>
+  {% endif %}
+
+  {% if deps %}
+  <section id="dependencies">
+    <h3>{{ material }} dependencies</h3>
+    <p>
+      To probe all {{ material }} positions, these tables and their transitive
+      dependencies are also required:
+    </p>
+    <p>
+      {% for dep in deps %}
+        {% if dep["longest_fen"] %}
+          <a href="/?fen={{ dep["longest_fen"]|replace(" ", "_") }}">{{ dep["material"] }}</a>
+        {% else %}
+          {{ dep["material"] }}
+        {% endif %}
+     {% endfor %}
+    </p>
+  </section>
   {% endif %}
 </section>
 

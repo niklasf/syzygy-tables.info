@@ -169,6 +169,25 @@ def prepare_stats(request, material, fen, active_dtz):
     return render
 
 
+def longest_fen(stats, endgame):
+    if endgame == "KNvK":
+        return "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1"
+    elif endgame == "KBvK":
+        return "4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"
+
+    try:
+        stats = stats[endgame]
+    except KeyError:
+        return None
+
+    try:
+        longest = max(stats["longest"], key=lambda e: e["ply"])
+    except ValueError:
+        return None
+    else:
+        return longest["epd"] + " 0 1"
+
+
 routes = aiohttp.web.RouteTableDef()
 
 @routes.get("/syzygy-vs-syzygy/{material}.pgn")
@@ -437,6 +456,13 @@ async def index(request):
     # Stats.
     render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
 
+    # Dependencies.
+    if chess.syzygy.is_table_name(material):
+        render["deps"] = [{
+            "material": dep,
+            "longest_fen": longest_fen(request.app["stats"], dep),
+        } for dep in chess.syzygy.dependencies(material)]
+
     if "xhr" in request.query:
         template = request.app["jinja"].get_template("xhr-probe.html")
     else:
@@ -510,24 +536,6 @@ def endgames(request):
         w, b = endgame.split("v", 1)
         return len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
 
-    def longest_fen(endgame):
-        if endgame == "KNvK":
-            return "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1"
-        elif endgame == "KBvK":
-            return "4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"
-
-        try:
-            stats = request.app["stats"][endgame]
-        except KeyError:
-            return None
-
-        try:
-            longest = max(stats["longest"], key=lambda e: e["ply"])
-        except ValueError:
-            return None
-        else:
-            return longest["epd"] + " 0 1"
-
     def subgroup(endgames, num_pieces, num_pawns):
         return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
 
@@ -543,7 +551,7 @@ def endgames(request):
                 "endgames": [{
                     "material": endgame,
                     "has_stats": endgame in request.app["stats"],
-                    "longest_fen": longest_fen(endgame),
+                    "longest_fen": longest_fen(request.app["stats"], endgame),
                     "maximal": endgame in ["KRvK", "KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"],
                 } for endgame in subgroup(endgames, num_pieces, num_pawns)],
             } for num_pawns in range(0, num_pieces - 2 + 1)],
