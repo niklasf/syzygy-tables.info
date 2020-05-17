@@ -190,7 +190,7 @@ def longest_fen(stats, endgame):
 
 def sort_key(endgame):
     w, b = endgame.split("v", 1)
-    return len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
+    return len(endgame), len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
 
 
 routes = aiohttp.web.RouteTableDef()
