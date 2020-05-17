@@ -188,6 +188,11 @@ def longest_fen(stats, endgame):
         return longest["epd"] + " 0 1"
 
 
+def sort_key(endgame):
+    w, b = endgame.split("v", 1)
+    return len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
+
+
 routes = aiohttp.web.RouteTableDef()
 
 @routes.get("/syzygy-vs-syzygy/{material}.pgn")
@@ -547,8 +552,11 @@ def download_txt(request):
     except ValueError:
         raise aiohttp.web.HTTPBadRequest(reason="invalid piece count")
 
+    tables = list(chess.syzygy.all_dependencies(root))
+    tables.sort(key=sort_key, reverse="material" in request.match_info)
+
     result = []
-    for table in chess.syzygy.all_dependencies(root):
+    for table in tables:
         piece_count = len(table) - 1
         if piece_count > max_pieces or piece_count < min_pieces:
             continue
@@ -605,9 +613,6 @@ def download_txt(request):
 
 @routes.get("/endgames")
 def endgames(request):
-    def sort_key(endgame):
-        w, b = endgame.split("v", 1)
-        return len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
 
     def subgroup(endgames, num_pieces, num_pawns):
         return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
