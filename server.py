@@ -666,6 +666,7 @@ def make_app(config):
     # Setup routes.
     app.router.add_routes(routes)
     app.router.add_static("/static", "static")
+    app.router.add_static("/checksums", "checksums")
     app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn"))
     app.router.add_route("GET", "/stats.json", static("stats.json"))
     return app
