@@ -24,8 +24,8 @@
     "url": "https://github.com/niklasf/syzygy-tables.info.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/preset-env": "^7.8.6",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "browserify": "^16.5.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",

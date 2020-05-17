@@ -5,8 +5,8 @@ verify_ssl = true
 
 [packages]
 htmlmin = "~=0.1.12"
-Jinja2 = "~=2.11.1"
-python-chess = "~=0.30.1"
+Jinja2 = "~=2.11.2"
+python-chess = "~=0.31.1"
 aiohttp = "~=3.6.2"
 brotlipy = "~=0.7.0"
 
