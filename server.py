@@ -609,6 +609,7 @@ def download_txt(request):
         else:
             raise aiohttp.web.HTTPBadRequest(reason="unknown source")
 
+    result.append("")
     return aiohttp.web.Response(text="\n".join(result))
 
 @routes.get("/endgames")
