@@ -553,7 +553,7 @@ def download_txt(request):
         raise aiohttp.web.HTTPBadRequest(reason="invalid piece count")
 
     tables = list(chess.syzygy.all_dependencies(root))
-    tables.sort(key=sort_key, reverse="material" in request.match_info)
+    tables.sort(key=sort_key)
 
     result = []
     for table in tables:
@@ -566,55 +566,57 @@ def download_txt(request):
         if source in ["lichess", "lichess.org", "lichess.ovh", "tablebase.lichess.ovh"]:
             base = "https://tablebase.lichess.ovh/tables/standard"
             if len(table) <= 6:
-                if include_dtz:
-                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
                 if include_wdl:
                     result.append("{}/3-4-5/{}.rtbw".format(base, table))
-            elif len(table) <= 7:
                 if include_dtz:
-                    result.append("{}/6-dtz/{}.rtbz".format(base, table))
+                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
+            elif len(table) <= 7:
                 if include_wdl:
                     result.append("{}/6-wdl/{}.rtbw".format(base, table))
+                if include_dtz:
+                    result.append("{}/6-dtz/{}.rtbz".format(base, table))
             else:
                 suffix = "pawnful" if "P" in table else "pawnless"
                 w, b = table.split("v")
-                if include_dtz:
-                    result.append("{}/7/{}v{}_{}/{}.rtbz".format(base, len(w), len(b), suffix, table))
                 if include_wdl:
                     result.append("{}/7/{}v{}_{}/{}.rtbw".format(base, len(w), len(b), suffix, table))
+                if include_dtz:
+                    result.append("{}/7/{}v{}_{}/{}.rtbz".format(base, len(w), len(b), suffix, table))
         elif source in ["sesse", "sesse.net", "tablebase.sesse.net"]:
             base = "http://tablebase.sesse.net/syzygy"
             if len(table) <= 6:
-                if include_dtz:
-                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
                 if include_wdl:
                     result.append("{}/3-4-5/{}.rtbw".format(base, table))
-            elif len(table) <= 7:
                 if include_dtz:
-                    result.append("{}/6-DTZ/{}.rtbz".format(base, table))
+                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
+            elif len(table) <= 7:
                 if include_wdl:
                     result.append("{}/6-WDL/{}.rtbw".format(base, table))
-            else:
                 if include_dtz:
-                    result.append("{}/7-DTZ/{}.rtbz".format(base, table))
+                    result.append("{}/6-DTZ/{}.rtbz".format(base, table))
+            else:
                 if include_wdl:
                     result.append("{}/7-WDL/{}.rtbw".format(base, table))
+                if include_dtz:
+                    result.append("{}/7-DTZ/{}.rtbz".format(base, table))
         elif source in ["ipfs", "ipfs.syzygy-tables.info"]:
             if len(table) <= 6:
+                # More reliably seeded.
                 base = "QmNbKYpPyXFAHFMnAxoc2i28Jf7jhShM8EEnfWUMv6u2DQ"
             else:
+                # /ipns/ipfs.syzygy-tables.info
                 base = "QmVgcSADsoW5w19MkL2RNKNPGtaz7UhGhU62XRm6pQmzct"
-            if include_dtz:
-                result.append("/ipfs/{}/{}.rtbz".format(base, table))
             if include_wdl:
                 result.append("/ipfs/{}/{}.rtbw".format(base, table))
+            if include_dtz:
+                result.append("/ipfs/{}/{}.rtbz".format(base, table))
         elif source in ["stem", "material"]:
             result.append(table)
         elif source in ["file", "filename"]:
-            if include_dtz:
-                result.append("{}.rtbz".format(table))
             if include_wdl:
                 result.append("{}.rtbw".format(table))
+            if include_dtz:
+                result.append("{}.rtbz".format(table))
         else:
             raise aiohttp.web.HTTPBadRequest(reason="unknown source")
 
