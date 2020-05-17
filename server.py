@@ -309,6 +309,7 @@ async def index(request):
 
     # Material key for the page title.
     render["material"] = material = chess.syzygy.calc_key(board)
+    render["normalized_material"] = chess.syzygy.normalize_tablename(material)
     render["piece_count"] = chess.popcount(board.occupied)
 
     # Moves are going to be grouped by WDL.
@@ -457,7 +458,7 @@ async def index(request):
     render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
 
     # Dependencies.
-    if chess.syzygy.is_table_name(material):
+    if chess.syzygy.is_table_name(chess.syzygy.normalize_tablename(material)):
         render["deps"] = [{
             "material": dep,
             "longest_fen": longest_fen(request.app["stats"], dep),
