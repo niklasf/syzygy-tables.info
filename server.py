@@ -540,13 +540,13 @@ def download_txt(request):
         raise aiohttp.web.HTTPNotFound()
 
     source = request.query.get("source", "lichess")
-    dtz = request.query.get("dtz", "")
+    dtz = request.query.get("dtz", "all")
 
     result = []
     for table in chess.syzygy.all_dependencies(root):
         include_dtz = dtz in ["all", "only"] or (dtz == "root" and table in root)
         include_wdl = dtz != "only"
-        if source == "lichess":
+        if source in ["lichess", "lichess.org", "lichess.ovh", "tablebase.lichess.ovh"]:
             base = "https://tablebase.lichess.ovh/tables/standard"
             if len(table) <= 6:
                 if include_dtz:
@@ -565,6 +565,30 @@ def download_txt(request):
                     result.append("{}/7/{}v{}_{}/{}.rtbz".format(base, len(w), len(b), suffix, table))
                 if include_wdl:
                     result.append("{}/7/{}v{}_{}/{}.rtbw".format(base, len(w), len(b), suffix, table))
+        elif source in ["sesse", "sesse.net", "tablebase.sesse.net"]:
+            base = "http://tablebase.sesse.net/syzygy"
+            if len(table) <= 6:
+                if include_dtz:
+                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
+                if include_wdl:
+                    result.append("{}/3-4-5/{}.rtbw".format(base, table))
+            elif len(table) <= 7:
+                if include_dtz:
+                    result.append("{}/6-DTZ/{}.rtbz".format(base, table))
+                if include_wdl:
+                    result.append("{}/6-WDL/{}.rtbw".format(base, table))
+            else:
+                if include_dtz:
+                    result.append("{}/7-DTZ/{}.rtbz".format(base, table))
+                if include_wdl:
+                    result.append("{}/7-WDL/{}.rtbw".format(base, table))
+        elif source in ["stem", "material"]:
+            result.append(table)
+        elif source in ["file", "filename"]:
+            if include_dtz:
+                result.append("{}.rtbz".format(table))
+            if include_wdl:
+                result.append("{}.rtbw".format(table))
 
     return aiohttp.web.Response(text="\n".join(result))
 
