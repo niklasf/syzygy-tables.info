@@ -535,15 +535,24 @@ def stats_json(request):
 @routes.get("/download/{material}.txt")
 def download_txt(request):
     root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
-    print(root)
     if not all(chess.syzygy.is_table_name(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
 
     source = request.query.get("source", "lichess")
     dtz = request.query.get("dtz", "all")
 
+    try:
+        max_pieces = int(request.query.get("max-pieces", "7"))
+        min_pieces = int(request.query.get("min-pieces", "3"))
+    except ValueError:
+        raise aiohttp.web.HTTPBadRequest(reason="invalid piece count")
+
     result = []
     for table in chess.syzygy.all_dependencies(root):
+        piece_count = len(table) - 1
+        if piece_count > max_pieces or piece_count < min_pieces:
+            continue
+
         include_dtz = dtz in ["all", "only"] or (dtz == "root" and table in root)
         include_wdl = dtz != "only"
         if source in ["lichess", "lichess.org", "lichess.ovh", "tablebase.lichess.ovh"]:
@@ -589,6 +598,8 @@ def download_txt(request):
                 result.append("{}.rtbz".format(table))
             if include_wdl:
                 result.append("{}.rtbw".format(table))
+        else:
+            raise aiohttp.web.HTTPBadRequest(reason="unknown source")
 
     return aiohttp.web.Response(text="\n".join(result))
 
