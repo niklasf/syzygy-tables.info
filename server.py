@@ -531,6 +531,43 @@ def stats_json(request):
     else:
         return aiohttp.web.json_response(stats)
 
+@routes.get("/download.txt")
+@routes.get("/download/{material}.txt")
+def download_txt(request):
+    root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
+    print(root)
+    if not all(chess.syzygy.is_table_name(r) for r in root):
+        raise aiohttp.web.HTTPNotFound()
+
+    source = request.query.get("source", "lichess")
+    dtz = request.query.get("dtz", "")
+
+    result = []
+    for table in chess.syzygy.all_dependencies(root):
+        include_dtz = dtz in ["all", "only"] or (dtz == "root" and table in root)
+        include_wdl = dtz != "only"
+        if source == "lichess":
+            base = "https://tablebase.lichess.ovh/tables/standard"
+            if len(table) <= 6:
+                if include_dtz:
+                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
+                if include_wdl:
+                    result.append("{}/3-4-5/{}.rtbw".format(base, table))
+            elif len(table) <= 7:
+                if include_dtz:
+                    result.append("{}/6-dtz/{}.rtbz".format(base, table))
+                if include_wdl:
+                    result.append("{}/6-wdl/{}.rtbw".format(base, table))
+            else:
+                suffix = "pawnful" if "P" in table else "pawnless"
+                w, b = table.split("v")
+                if include_dtz:
+                    result.append("{}/7/{}v{}_{}/{}.rtbz".format(base, len(w), len(b), suffix, table))
+                if include_wdl:
+                    result.append("{}/7/{}v{}_{}/{}.rtbw".format(base, len(w), len(b), suffix, table))
+
+    return aiohttp.web.Response(text="\n".join(result))
+
 @routes.get("/endgames")
 def endgames(request):
     def sort_key(endgame):
