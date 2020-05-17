@@ -599,6 +599,15 @@ def download_txt(request):
                     result.append("{}/7-DTZ/{}.rtbz".format(base, table))
                 if include_wdl:
                     result.append("{}/7-WDL/{}.rtbw".format(base, table))
+        elif source in ["ipfs", "ipfs.syzygy-tables.info"]:
+            if len(table) <= 6:
+                base = "QmNbKYpPyXFAHFMnAxoc2i28Jf7jhShM8EEnfWUMv6u2DQ"
+            else:
+                base = "QmVgcSADsoW5w19MkL2RNKNPGtaz7UhGhU62XRm6pQmzct"
+            if include_dtz:
+                result.append("/ipfs/{}/{}.rtbz".format(base, table))
+            if include_wdl:
+                result.append("/ipfs/{}/{}.rtbw".format(base, table))
         elif source in ["stem", "material"]:
             result.append(table)
         elif source in ["file", "filename"]:
