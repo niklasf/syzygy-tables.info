@@ -177,7 +177,7 @@ td, th {
 section {
   padding-top: 40px;
 }
-#pgn-download, #lichess-analysis {
+.meta-link {
   white-space: nowrap;
   margin-right: 0.5em;
 }

@@ -76,11 +76,11 @@
   </div>
 
   {% if not illegal %}
-    <a id="pgn-download" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|replace(" ", "_") }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
+    <a class="meta-link" href="/syzygy-vs-syzygy/{{ material }}.pgn?fen={{ fen|replace(" ", "_") }}" aria-label="Download DTZ mainline" title="Download DTZ mainline">
       <span class="icon icon-download" aria-hidden="true"></span>
       {{ material }}.pgn
     </a>
-    <a id="lichess-analysis" href="https://lichess.org/analysis/standard/{{ fen|replace(" ", "_") }}#explorer">
+    <a class="meta-link" href="https://lichess.org/analysis/standard/{{ fen|replace(" ", "_") }}#explorer">
       <span class="icon icon-external" aria-hidden="true"></span>
       lichess.org
     </a>
@@ -142,9 +142,13 @@
      {% endfor %}
     </p>
     <p>
-      <a href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root" title="Download list">
+      <a class="meta-link" href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root" title="Download list">
         <span class="icon icon-list" aria-hidden="true"></span>
         {{ normalized_material }}.txt
+      </a>
+      <a class="meta-link" href="/graph/{{ normalized_material }}.dot" title="Dependency graph">
+        <span class="icon icon-graph" aria-hidden="true"></span>
+        {{ normalized_material }}.dot
       </a>
     </p>
   </section>

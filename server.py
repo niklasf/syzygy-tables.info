@@ -536,6 +536,36 @@ def stats_json(request):
     else:
         return aiohttp.web.json_response(stats)
 
+@routes.get("/graph.dot")
+@routes.get("/graph/{material}.dot")
+def graph_dot(request):
+    root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
+    if not all(chess.syzygy.is_table_name(r) for r in root):
+        raise aiohttp.web.HTTPNotFound()
+
+    closed = set()
+    target = root[:]
+
+    result = []
+    result.append("digraph Syzygy {")
+    while target:
+        material = target.pop()
+        if material in closed:
+            continue
+
+        deps = list(chess.syzygy.dependencies(material))
+        target.extend(deps)
+        if not deps and material in root:
+            result.append("  {};".format(material))
+        for dep in deps:
+            result.append("  {} -> {};".format(material, dep))
+
+        closed.add(material)
+    result.append("}")
+
+    result.append("")
+    return aiohttp.web.Response(text="\n".join(result))
+
 @routes.get("/download.txt")
 @routes.get("/download/{material}.txt")
 def download_txt(request):
