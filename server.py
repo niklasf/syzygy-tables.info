@@ -463,7 +463,8 @@ async def index(request):
     render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
 
     # Dependencies.
-    if chess.syzygy.is_table_name(chess.syzygy.normalize_tablename(material)):
+    render["is_table"] = chess.syzygy.is_table_name(chess.syzygy.normalize_tablename(material)) and material != "KvK"
+    if render["is_table"]:
         render["deps"] = [{
             "material": dep,
             "longest_fen": longest_fen(request.app["stats"], dep),
@@ -543,7 +544,7 @@ def graph_dot(request):
     if not all(chess.syzygy.is_table_name(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
 
-    closed = set()
+    closed = set(["KvK"])
     target = root[:]
 
     result = []
