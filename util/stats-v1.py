@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 """Creates JSON files from tablebase generator output."""
 
