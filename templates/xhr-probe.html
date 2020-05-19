@@ -125,33 +125,33 @@
   {% endif %}
 
   {% if deps %}
-  <section id="dependencies">
-    <h3>{{ material }} dependencies</h3>
-    <p>
-      To probe all {{ normalized_material }} positions, these tables and their transitive
-      dependencies are also required:
-    </p>
-    <p>
-      {% for dep in deps %}
-        {% if dep["longest_fen"] %}
-          <a href="/?fen={{ dep["longest_fen"]|replace(" ", "_") }}">{{ dep["material"] }}</a>
-        {% else %}
-          {{ dep["material"] }}
-        {% endif %}
-        {% if not loop.last %} &middot; {% endif %}
-     {% endfor %}
-    </p>
-    <p>
-      <a class="meta-link" href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root" title="Download list">
-        <span class="icon icon-list" aria-hidden="true"></span>
-        {{ normalized_material }}.txt
-      </a>
-      <a class="meta-link" href="/graph/{{ normalized_material }}.dot" title="Dependency graph">
-        <span class="icon icon-graph" aria-hidden="true"></span>
-        {{ normalized_material }}.dot
-      </a>
-    </p>
-  </section>
+    <section id="dependencies">
+      <h3>{{ material }} dependencies</h3>
+      <p>
+        To probe all {{ normalized_material }} positions, these tables and their transitive
+        dependencies are also required:
+      </p>
+      <p>
+        {% for dep in deps %}
+          {% if dep["longest_fen"] %}
+            <a href="/?fen={{ dep["longest_fen"]|replace(" ", "_") }}">{{ dep["material"] }}</a>
+          {% else %}
+            {{ dep["material"] }}
+          {% endif %}
+          {% if not loop.last %} &middot; {% endif %}
+       {% endfor %}
+      </p>
+      <p>
+        <a class="meta-link" href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root" title="Download list">
+          <span class="icon icon-list" aria-hidden="true"></span>
+          {{ normalized_material }}.txt
+        </a>
+        <a class="meta-link" href="/graph/{{ normalized_material }}.dot" title="Dependency graph">
+          <span class="icon icon-graph" aria-hidden="true"></span>
+          {{ normalized_material }}.dot
+        </a>
+      </p>
+    </section>
   {% endif %}
 </section>
 
