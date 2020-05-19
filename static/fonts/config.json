@@ -65,6 +65,18 @@
       "css": "link-ext",
       "code": 61582,
       "src": "fontawesome"
+    },
+    {
+      "uid": "48b87105bd38c20315f1b705b8c7b38c",
+      "css": "list",
+      "code": 59399,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "8a1d446e5555e76f82ddb1c8b526f579",
+      "css": "graph",
+      "code": 59400,
+      "src": "entypo"
     }
   ]
 }

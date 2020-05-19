@@ -625,7 +625,6 @@ def download_txt(request):
 
 @routes.get("/endgames")
 def endgames(request):
-
     def subgroup(endgames, num_pieces, num_pawns):
         return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
 

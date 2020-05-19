@@ -138,14 +138,14 @@
         {% else %}
           {{ dep["material"] }}
         {% endif %}
+        {% if not loop.last %} &middot; {% endif %}
      {% endfor %}
     </p>
     <p>
-      <a href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root">
-        <span class="icon icon-download" aria-hidden="true"></span>
+      <a href="/download/{{ normalized_material }}.txt?source=lichess&dtz=root" title="Download list">
+        <span class="icon icon-list" aria-hidden="true"></span>
         {{ normalized_material }}.txt
       </a>
-      (download list)
     </p>
   </section>
   {% endif %}
@@ -222,19 +222,19 @@
         <td><a href="http://tablebase.sesse.net/">tablebase.sesse.net</a></td>
         <td>http, EU</td>
         <td>7</td>
-        <td><a href="/download.txt?source=sesse&max-pieces=7"><span class="icon icon-download"></span></a></td>
+        <td><a href="/download.txt?source=sesse&max-pieces=7"><span class="icon icon-list"></span></a></td>
       </tr>
       <tr>
         <td><a href="https://tablebase.lichess.ovh/tables/">tablebase.lichess.ovh</a></td>
         <td>http, https, EU</td>
         <td>7</td>
-        <td><a href="/download.txt?source=lichess&max-pieces=7"><span class="icon icon-download"></span></a></td>
+        <td><a href="/download.txt?source=lichess&max-pieces=7"><span class="icon icon-list"></span></a></td>
       </tr>
       <tr>
         <td><a href="https://ipfs.syzygy-tables.info/">ipfs.syzygy-tables.info</a></td>
         <td>ipfs, Cloudflare</td>
         <td>7</td>
-        <td><a href="/download.txt?source=ipfs&max-pieces=7"><span class="icon icon-download"></span></a></td>
+        <td><a href="/download.txt?source=ipfs&max-pieces=7"><span class="icon icon-list"></span></a></td>
       </tr>
       <tr>
         <td><a href="http://oics.olympuschess.com/">oics.olympuschess.com</a></td>

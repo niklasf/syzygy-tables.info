@@ -333,6 +333,8 @@ footer > .inner {
 .icon-lock-open:before { content: '\f13e'; }
 .icon-external:before { content: '\f08e'; }
 .icon-eraser:before { content: '\f12d'; }
+.icon-list:before { content: '\e807'; }
+.icon-graph:before { content: '\e808'; }
 
 /* Form controls */
 
