@@ -61,7 +61,7 @@ def main():
         filename, h = line.strip().split(": ")
         internal[filename] = h
 
-    checksums = {"md5": {}, "sha512": {}}
+    checksums = {"md5": {}, "sha1": {}, "sha512": {}}
     for algo in checksums:
         for line in open("checksums/{}SUM".format(algo.upper())):
             h, filename = line.strip().split()
@@ -79,6 +79,7 @@ def main():
                 "bytes": sizes[f"{table}.rtbw"],
                 "tbcheck": internal[f"{table}.rtbw"],
                 "md5": checksums["md5"][f"{table}.rtbw"],
+                "sha1": checksums["sha1"][f"{table}.rtbw"],
                 "sha512": checksums["sha512"][f"{table}.rtbw"],
                 "ipfs": ipfs[f"{table}.rtbw"],
             },
@@ -86,6 +87,7 @@ def main():
                 "bytes": sizes[f"{table}.rtbz"],
                 "tbcheck": internal[f"{table}.rtbz"],
                 "md5": checksums["md5"][f"{table}.rtbz"],
+                "sha1": checksums["sha1"][f"{table}.rtbz"],
                 "sha512": checksums["sha512"][f"{table}.rtbz"],
                 "ipfs": ipfs[f"{table}.rtbz"],
             },
@@ -108,4 +110,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(json.dumps(result, indent=2, cls=JsonEncoder))
+    print(json.dumps(main(), indent=2, cls=JsonEncoder))
