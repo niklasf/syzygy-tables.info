@@ -91,12 +91,12 @@ def prepare_stats(request, material, fen, active_dtz):
 
     # Get stats and side.
     stats = request.app["stats"].get(material)
-    side = "w"
-    other = "b"
+    side = "white"
+    other = "black"
     if stats is None:
         stats = request.app["stats"].get(chess.syzygy.normalize_tablename(material))
-        side = "b"
-        other = "w"
+        side = "black"
+        other = "white"
     if stats is None:
         return None
 
@@ -104,11 +104,11 @@ def prepare_stats(request, material, fen, active_dtz):
 
     # Basic statistics.
     outcomes = {
-        "white": stats[side]["wdl"]["2"] + stats[other]["wdl"]["-2"],
-        "cursed": stats[side]["wdl"]["1"] + stats[other]["wdl"]["-1"],
-        "draws": stats[side]["wdl"]["0"] + stats[other]["wdl"]["0"],
-        "blessed": stats[side]["wdl"]["-1"] + stats[other]["wdl"]["1"],
-        "black": stats[side]["wdl"]["-2"] + stats[other]["wdl"]["2"],
+        "white": stats["histogram"][side]["wdl"]["2"] + stats["histogram"][other]["wdl"]["-2"],
+        "cursed": stats["histogram"][side]["wdl"]["1"] + stats["histogram"][other]["wdl"]["-1"],
+        "draws": stats["histogram"][side]["wdl"]["0"] + stats["histogram"][other]["wdl"]["0"],
+        "blessed": stats["histogram"][side]["wdl"]["-1"] + stats["histogram"][other]["wdl"]["1"],
+        "black": stats["histogram"][side]["wdl"]["-2"] + stats["histogram"][other]["wdl"]["2"],
     }
 
     total = sum(outcomes.values())
@@ -133,8 +133,8 @@ def prepare_stats(request, material, fen, active_dtz):
     side_winning = (" w" in fen) == (active_dtz is not None and active_dtz > 0)
     render["verb"] = "winning" if side_winning else "losing"
 
-    win_hist = stats[side]["win_hist" if side_winning else "loss_hist"]
-    loss_hist = stats[other]["loss_hist" if side_winning else "win_hist"]
+    win_hist = stats["histogram"][side]["win" if side_winning else "loss"]
+    loss_hist = stats["histogram"][other]["loss" if side_winning else "win"]
     hist = [a + b for a, b in itertools.zip_longest(win_hist, loss_hist, fillvalue=0)]
     if not any(hist):
         return render

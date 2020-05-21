@@ -36,37 +36,22 @@
     <h2>Example (KRNvKNN)</h2>
 
     <pre><code class="language-javascript">{
-  "w": { // white to move
-    "win_hist": [
-      0,
-      1924310948,
-      35087,
-      363845772,
-      37120,
-      138550471,
-      // ...
-    ]
-    "loss_hist": [
-      98698,
-      144,
-      3810,
-      0,
-      596,
-      0,
-      58
-    ],
-    "wdl": {
-      "-2": 0,
-      "-1": 103306,
-      "0": 1333429189,
-      "1": 162344388,
-      "2": 2959977091
-    }
+  "rtbw": {
+    "bytes": 290002640, // file size
+    "tbcheck": "a320ac...", // internal checksum
+    "md5": "6ee435...",
+    "sha1": "07a0e4...",
+    "sha256": "f3386d...",
+    "sha512": "c4bf73...",
+    "b2": "b970e0...", // blake 2
+    "ipfs": "QmXW4S..."
   },
-  "b": { // black to move
+  "rtbz": {
     // ...
   },
   "longest": [
+    // longest winning endgames for black/white
+    // with/without 50-move rule
     {
       "epd": "3n1n2/8/8/8/4R3/8/8/NK1k4 b - -",
       "ply": 100,
@@ -82,22 +67,38 @@
       "ply": 7,
       "wdl": 2
     }
-  ]
+  ],
+  "histogram": {
+    "white": { // white to move
+      "win": [
+        0,
+        1924310948,
+        35087,
+        363845772,
+        37120,
+        138550471,
+        // ...
+      ]
+      "loss": [
+        98698, // # of positions losing in 0
+        144, // # of positions losing in 1
+        3810, // # of positions losing in 2
+        0, // 3
+        596, // 4
+        0, // 5
+        58 // 6
+      ],
+      "wdl": { // # of positions with each wdl
+        "-2": 0,
+        "-1": 103306,
+        "0": 1333429189,
+        "1": 162344388,
+        "2": 2959977091
+      }
+    },
+    "b": { // black to move
+      // ...
+    },
+  }
 }</code></pre>
-    <p>
-      Information for <code>w</code> and <code>b</code> to move respectively.
-    </p>
-    <p>
-      Histograms <code>win_hist</code> and <code>loss_hist</code>: Number of
-      positions winning/losing in 0, 1, 2, ... plies until the next pawn move
-      or capture.
-    </p>
-    <p>
-      Number of positions with <code>wdl</code>.
-    </p>
-    <p>
-      <code>longest</code> endgames with white and black winning
-      and winning except for the fifty-move rule, if such endgames exist.
-    </p>
-  </section>
 {% endblock %}
