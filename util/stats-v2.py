@@ -61,7 +61,7 @@ def main():
         filename, h = line.strip().split(": ")
         internal[filename] = h
 
-    checksums = {"md5": {}, "sha1": {}, "sha512": {}}
+    checksums = {"md5": {}, "sha1": {}, "sha256": {}, "sha512": {}, "b2": {}}
     for algo in checksums:
         for line in open("checksums/{}SUM".format(algo.upper())):
             h, filename = line.strip().split()
@@ -80,7 +80,9 @@ def main():
                 "tbcheck": internal[f"{table}.rtbw"],
                 "md5": checksums["md5"][f"{table}.rtbw"],
                 "sha1": checksums["sha1"][f"{table}.rtbw"],
+                "sha256": checksums["sha256"][f"{table}.rtbw"],
                 "sha512": checksums["sha512"][f"{table}.rtbw"],
+                "b2": checksums["b2"][f"{table}.rtbw"],
                 "ipfs": ipfs[f"{table}.rtbw"],
             },
             "rtbz": {
@@ -88,7 +90,9 @@ def main():
                 "tbcheck": internal[f"{table}.rtbz"],
                 "md5": checksums["md5"][f"{table}.rtbz"],
                 "sha1": checksums["sha1"][f"{table}.rtbz"],
+                "sha256": checksums["sha256"][f"{table}.rtbz"],
                 "sha512": checksums["sha512"][f"{table}.rtbz"],
+                "b2": checksums["b2"][f"{table}.rtbz"],
                 "ipfs": ipfs[f"{table}.rtbz"],
             },
             "longest": stats[table]["longest"],
