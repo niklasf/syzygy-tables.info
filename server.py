@@ -464,7 +464,7 @@ async def index(request):
     render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
 
     # Dependencies.
-    render["is_table"] = chess.syzygy.is_table_name(chess.syzygy.normalize_tablename(material)) and material != "KvK"
+    render["is_table"] = chess.syzygy.is_tablename(material, normalized=False) and material != "KvK"
     if render["is_table"]:
         render["deps"] = [{
             "material": dep,
@@ -542,7 +542,7 @@ def stats_json(request):
 @routes.get("/graph/{material}.dot")
 def graph_dot(request):
     root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
-    if not all(chess.syzygy.is_table_name(r) for r in root):
+    if not all(chess.syzygy.is_tablename(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
 
     closed = set(["KvK"])
@@ -572,7 +572,7 @@ def graph_dot(request):
 @routes.get("/download/{material}.txt")
 def download_txt(request):
     root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
-    if not all(chess.syzygy.is_table_name(r) for r in root):
+    if not all(chess.syzygy.is_tablename(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
 
     source = request.query.get("source", "lichess")
