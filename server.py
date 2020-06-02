@@ -61,9 +61,10 @@ def kib(num):
     return "%.1f %s" % (num, "Yi")
 
 
-def static(path):
+def static(path, content_type=None):
     def handler(request):
-        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path))
+        headers = { "Content-Type": content_type } if content_type else None
+        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path), headers=headers)
     return handler
 
 def asset_url(path):
@@ -707,8 +708,15 @@ def make_app(config):
     # Setup routes.
     app.router.add_routes(routes)
     app.router.add_static("/static", "static")
-    app.router.add_static("/checksums", "checksums")
-    app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn"))
+    app.router.add_route("GET", "/checksums/bytes.tsv", static("checksums/bytes.tsv"))
+    app.router.add_route("GET", "/checksums/tbcheck.txt", static("checksums/tbcheck.txt", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/PackManifest", static("checksums/PackManifest", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/B2SUM", static("checksums/B2SUM", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/MD5SUM", static("checksums/MD5SUM", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA1SUM", static("checksums/SHA1SUM", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA256SUM", static("checksums/SHA256SUM", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA512SUM", static("checksums/SHA512SUM", content_type="text/plain"))
+    app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn", content_type="application/x-chess-pgn"))
     app.router.add_route("GET", "/stats.json", static("stats.json"))
     return app
 
