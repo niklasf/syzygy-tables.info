@@ -57,8 +57,8 @@
     </p>
 
     <p>A DTZ value <var>n</var> &gt 100 means the position is winning, but drawn under the 50-move rule.
-      A zeroing move or checkmate can be forced in <var>n</var> half-moves, or in <var>n</var> - 100 half-moves
-      if a later phase is responsible for the draw.</p>
+      A zeroing move or checkmate can be forced in <var>n</var> or <var>n</var> + 1 half-moves,
+      or in <var>n</var> - 100 or <var>n</var> + 1 - 100 half-moves if a later phase is responsible for the draw.</p>
 
     <a href="/?fen=8/8/2N5/8/3k4/7N/p2K4/8_b_-_-_0_1"><img width="300" height="300" alt="" src="https://backscattering.de/web-boardimage/board.svg?fen=8/8/2N5/8/3k4/7N/p2K4/8&check=d4"></a>
 
@@ -66,5 +66,8 @@
       For example, in <a href="/?fen=8/8/2N5/8/3k4/7N/p2K4/8_b_-_-_0_1">8/8/2N5/8/3k4/7N/p2K4/8 b - -</a>
       black promotes the pawn in 7 ply, but the DTZ is 107,
       indicating that white can hold a draw under the 50-move rule in a later phase of the endgame.</p>
+
+    <p>An in-depth discussion of rounding can be found in
+      <a href="http://www.talkchess.com/forum3/viewtopic.php?f=7&t=58488#p651293">this thread</a>.</p>
   </section>
 {% endblock %}
