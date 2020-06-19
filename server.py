@@ -161,11 +161,12 @@ def prepare_stats(request, material, fen, active_dtz):
                 })
         empty = 0
 
+        rounding = request.app["config"].getboolean("server", "rounding")
         render["histogram"].append({
             "ply": ply,
             "num": num,
             "width": round((math.log(num) if num else 0) * 100 / maximum, 1),
-            "active": active_dtz is not None and (abs(active_dtz) == ply or (active_dtz and abs(active_dtz) + 1 == ply)),
+            "active": active_dtz is not None and (abs(active_dtz) == ply or (rounding and active_dtz and abs(active_dtz) + 1 == ply)),
         })
 
     return render
