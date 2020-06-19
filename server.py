@@ -35,6 +35,7 @@ import datetime
 import functools
 import itertools
 import math
+import sys
 import textwrap
 
 try:
@@ -721,14 +722,14 @@ def make_app(config):
     return app
 
 
-def main():
+def main(argv):
     logging.basicConfig(level=logging.DEBUG)
 
     config = configparser.ConfigParser()
     config.read([
         os.path.join(os.path.dirname(__file__), "config.default.ini"),
         os.path.join(os.path.dirname(__file__), "config.ini"),
-    ])
+    ] + argv)
 
     bind = config.get("server", "bind")
     port = config.getint("server", "port")
@@ -741,4 +742,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
