@@ -37,7 +37,7 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
-    "chess.js": "^0.10.3",
+    "chess.js": "^0.11.0",
     "chessground": "^7.6.12",
     "zepto-browserify": "^1.1.6-1"
   }
