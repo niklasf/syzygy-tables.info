@@ -10,7 +10,7 @@ Running
 
 Build JavaScript and CSS files using Gulp. Requires node.js and npm:
 
-    npm install -g gulp-cli
+    npm add --global gulp-cli
     npm install
     gulp
 
@@ -34,7 +34,7 @@ Hacking
 -------
 
 Have a look at `server.py` for server side code. The client side code is in
-`src/client.js`. `gulp watch` can be useful.
+`src/client.js`. Run `gulp js` or `gulp css` to build, `gulp` for both.
 
 License
 -------
