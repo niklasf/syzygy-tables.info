@@ -171,8 +171,8 @@ function BoardView(controller) {
         const fenParts = normFen(controller.position).split(/\s/);
         fenParts[0] = this.fenPart = this.ground.getFen();
         controller.push(new Chess(fenParts.join(' ')));
-      }
-    }
+      },
+    },
   });
 
   for (const el of document.querySelectorAll('.spare piece')) {
