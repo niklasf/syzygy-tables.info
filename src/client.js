@@ -1,6 +1,6 @@
 /**
  * This file is part of the syzygy-tables.info tablebase probing website.
- * Copyright (C) 2015-2018 Niklas Fiekas <niklas.fiekas@backscattering.de>
+ * Copyright (C) 2015-2020 Niklas Fiekas <niklas.fiekas@backscattering.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
