@@ -51,14 +51,8 @@ function Controller(fen) {
       this.setPosition(position);
     } else {
       // Extract the FEN from the query string.
-      const query = location.search.substr(1);
-      for (const part of query.split('&')) {
-        const item = part.split('=');
-        if (item[0] == 'fen') {
-          const fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
-          this.setPosition(new Chess(fen));
-        }
-      }
+      const fen = location.searchParams.get('fen');
+      if (fen) this.setPosition(new Chess(fen.replace(/_/g, ' ')));
     }
   });
 }
