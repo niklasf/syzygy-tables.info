@@ -52,13 +52,13 @@ function Controller(fen) {
     } else {
       // Extract the FEN from the query string.
       const query = location.search.substr(1);
-      query.split('&').forEach((part) => {
+      for (const part of query.split('&')) {
         const item = part.split('=');
         if (item[0] == 'fen') {
           const fen = decodeURIComponent(item[1]).replace(/_/g, ' ');
           this.setPosition(new Chess(fen));
         }
-      });
+      }
     }
   });
 }
@@ -70,9 +70,9 @@ Controller.prototype.bind = function (event, cb) {
 
 Controller.prototype.trigger = function (event) {
   const args = arguments;
-  (this.events[event] || []).forEach((cb) => {
+  if (this.events[event]) for (const cb of this.events[event]) {
     cb.apply(this, Array.prototype.slice.call(args, 1));
-  });
+  }
 };
 
 Controller.prototype.toggleFlipped = function () {
@@ -205,10 +205,10 @@ BoardView.prototype.setPosition = function (position) {
   const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
 
   const dests = new Map();
-  position.SQUARES.forEach((s) => {
+  for (const s of position.SQUARES) {
     const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
     if (moves.length) dests.set(s, moves);
-  });
+  }
 
   const turn = (position.turn() === 'w') ? 'white' : 'black';
 
