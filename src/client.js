@@ -85,7 +85,7 @@ Controller.prototype.push = function (position) {
     const lastMove = position.undo();
     history.pushState({
       fen: position.fen(),
-      lastMove: lastMove
+      lastMove,
     }, null, '/?fen=' + fen.replace(/\s/g, '_'));
     if (lastMove) position.move(lastMove);
   }
@@ -126,16 +126,16 @@ function BoardView(controller) {
     movable: {
       free: true,
       color: 'both',
-      showDests: true
+      showDests: true,
     },
     selectable: {
-      enabled: false
+      enabled: false,
     },
     draggable: {
-      deleteOnDropOff: true
+      deleteOnDropOff: true,
     },
     animation: {
-      enabled: !reducedMotion.matches
+      enabled: !reducedMotion.matches,
     },
     events: {
       move: (orig, dest) => {
@@ -167,7 +167,7 @@ function BoardView(controller) {
         e.preventDefault();
         ground.dragNewPiece({
           color: e.target.getAttribute('data-color'),
-          role: e.target.getAttribute('data-role')
+          role: e.target.getAttribute('data-role'),
         }, e, true);
       }, {passive: false});
     }
@@ -181,16 +181,16 @@ function BoardView(controller) {
   controller.bind('editMode', (editMode) => {
     ground.set({
       movable: {
-        showDests: !editMode
-      }
+        showDests: !editMode,
+      },
     });
   });
 
   reducedMotion.addEventListener('change', () => {
     ground.set({
       animation: {
-        enabled: !reducedMotion.matches
-      }
+        enabled: !reducedMotion.matches,
+      },
     });
   });
 }
@@ -212,8 +212,8 @@ BoardView.prototype.setPosition = function (position) {
     turnColor: turn,
     check: position.in_check() ? turn : false,
     movable: {
-      dests: dests
-    }
+      dests,
+    },
   });
 };
 
@@ -236,7 +236,7 @@ BoardView.prototype.setHovering = function (uci) {
   this.ground.setAutoShapes([{
     orig: uci.substr(0, 2),
     dest: uci.substr(2, 2),
-    brush: 'green'
+    brush: 'green',
   }]);
 };
 
