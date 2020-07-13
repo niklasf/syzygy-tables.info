@@ -157,13 +157,11 @@ function BoardView(controller) {
       dropNewPiece: (piece, key) => {
         // Move the existing king, even when dropping a new one.
         if (piece.role !== 'king') return;
-        const king = Object.keys(ground.state.pieces).find(key => {
-          const p = ground.state.pieces[key];
-          return p.role === 'king' && p.color === piece.color;
-        });
-        const diff = {};
-        if (king) diff[king] = null;
-        diff[key] = piece;
+        const diff = new Map();
+        for (const [k, p] of ground.state.pieces) {
+          if (p.role === 'king' && p.color === piece.color) diff.set(k, undefined);
+        }
+        diff.set(key, piece);
         ground.setPieces(diff);
       },
       change: () => {
@@ -212,10 +210,10 @@ function BoardView(controller) {
 BoardView.prototype.setPosition = function (position) {
   const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
 
-  const dests = {};
+  const dests = new Map();
   position.SQUARES.forEach((s) => {
     const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
-    if (moves.length) dests[s] = moves;
+    if (moves.length) dests.set(s, moves);
   });
 
   const turn = (position.turn() === 'w') ? 'white' : 'black';
