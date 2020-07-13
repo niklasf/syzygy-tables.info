@@ -20,13 +20,12 @@ const $ = require('zepto-browserify').$;
 const Chess = require('chess.js').Chess;
 const Chessground = require('chessground').Chessground;
 
-const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
-
-
 function strCount(haystack, needle) {
   return haystack.split(needle).length - 1;
 }
 
+
+const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 function normFen(position) {
   const parts = position.fen().split(/\s+/);
