@@ -23,12 +23,6 @@ const Chessground = require('chessground').Chessground;
 const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 
-function strRepeat(str, num) {
-  let r = '';
-  for (let i = 0; i < num; i++) r += str;
-  return r;
-}
-
 function strCount(haystack, needle) {
   return haystack.split(needle).length - 1;
 }
@@ -489,19 +483,19 @@ function DocumentTitle(controller) {
     const fen = position.fen().split(/\s/)[0];
 
     document.title = (
-      strRepeat('K', strCount(fen, 'K')) +
-      strRepeat('Q', strCount(fen, 'Q')) +
-      strRepeat('R', strCount(fen, 'R')) +
-      strRepeat('B', strCount(fen, 'B')) +
-      strRepeat('N', strCount(fen, 'N')) +
-      strRepeat('P', strCount(fen, 'P')) +
+      'K'.repeat(strCount(fen, 'K')) +
+      'Q'.repeat(strCount(fen, 'Q')) +
+      'R'.repeat(strCount(fen, 'R')) +
+      'B'.repeat(strCount(fen, 'B')) +
+      'N'.repeat(strCount(fen, 'N')) +
+      'P'.repeat(strCount(fen, 'P')) +
       'v' +
-      strRepeat('K', strCount(fen, 'k')) +
-      strRepeat('Q', strCount(fen, 'q')) +
-      strRepeat('R', strCount(fen, 'r')) +
-      strRepeat('B', strCount(fen, 'b')) +
-      strRepeat('N', strCount(fen, 'n')) +
-      strRepeat('P', strCount(fen, 'p')) +
+      'K'.repeat(strCount(fen, 'k')) +
+      'Q'.repeat(strCount(fen, 'q')) +
+      'R'.repeat(strCount(fen, 'r')) +
+      'B'.repeat(strCount(fen, 'b')) +
+      'N'.repeat(strCount(fen, 'n')) +
+      'P'.repeat(strCount(fen, 'p')) +
       ' – Syzygy endgame tablebases');
   });
 }
