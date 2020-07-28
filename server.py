@@ -125,7 +125,7 @@ def prepare_stats(request, material, fen, active_dtz):
     render["longest"] = [{
         "label": "{} {} with DTZ {}{}".format(
             material_side,
-            "winning" if (longest["wdl"] > 0) == ((" " + side) in longest["epd"]) else "losing",
+            "winning" if (longest["wdl"] > 0) == ((" " + side[0]) in longest["epd"]) else "losing",
             longest["ply"],
             " (frustrated)" if abs(longest["wdl"]) == 1 else ""),
         "fen": longest["epd"] + " 0 1",
