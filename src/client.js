@@ -185,7 +185,7 @@ function BoardView(controller) {
     });
   });
 
-  reducedMotion.addEventListener('change', () => {
+  reducedMotion.addEventListener?.('change', () => {
     ground.set({
       animation: {
         enabled: !reducedMotion.matches,
