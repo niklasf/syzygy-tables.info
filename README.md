@@ -39,15 +39,6 @@ Have a look at `server.py` for server side code. The client side code is in
 License
 -------
 
-This project is licensed under the AGPL-3.0+ with the following dependencies:
+This project is licensed under the AGPL-3.0+.
 
-* [python-chess](https://github.com/niklasf/python-chess) ([GPL-3.0+](https://github.com/niklasf/python-chess/blob/master/LICENSE))
-* [chessground](https://github.com/ornicar/chessground) ([GPL-3.0+](https://github.com/ornicar/chessground/blob/master/LICENSE))
-* [chess.js](https://github.com/jhlywa/chess.js) ([MIT](https://github.com/jhlywa/chess.js/blob/master/LICENSE))
-* [aiohttp](http://aiohttp.readthedocs.org/en/stable/) ([Apache 2](https://github.com/KeepSafe/aiohttp/blob/master/LICENSE.txt))
-* [Jinja](http://jinja.pocoo.org/) ([BSD](https://github.com/mitsuhiko/jinja2/blob/master/LICENSE))
-* [htmlmin](https://htmlmin.readthedocs.org/en/latest/) ([BSD](https://github.com/mankyd/htmlmin/blob/master/LICENSE))
-* [Bootstrap](http://getbootstrap.com/) ([MIT](https://github.com/twbs/bootstrap/blob/master/LICENSE))
-* [zepto.js](http://zeptojs.com/) ([MIT](https://github.com/madrobby/zepto/blob/master/MIT-LICENSE))
-
-Thanks to all of them and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
+<a href="https://syzygy-tables.info/legal#thanks">Thanks to all dependencies</a> and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
