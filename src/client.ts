@@ -89,7 +89,7 @@ class Controller {
       history.pushState({
         fen: position.fen(),
         lastMove,
-      }, null, '/?fen=' + fen.replace(/\s/g, '_'));
+      }, '', '/?fen=' + fen.replace(/\s/g, '_'));
       if (lastMove) position.move(lastMove);
     }
 
@@ -125,7 +125,7 @@ class BoardView {
   constructor(controller: Controller) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    const ground = this.ground = Chessground(document.getElementById('board'), {
+    const ground = this.ground = Chessground(document.getElementById('board')!, {
       fen: controller.position.fen(),
       autoCastle: false,
       movable: {
@@ -277,7 +277,7 @@ class SideToMoveView {
 
 class FenInputView {
   constructor(controller: Controller) {
-    function parseFen(fen: string) {
+    function parseFen(fen: string): ChessInstance | undefined {
       const parts = fen.trim().split(/[\s_]+/);
       if (parts[0] === '') {
         parts[0] = DEFAULT_FEN.split(/\s/)[0];
@@ -299,7 +299,7 @@ class FenInputView {
       }
 
       const position = new Chess();
-      if (position.load(parts.join(' '))) return position;
+      return position.load(parts.join(' ')) ? position : undefined;
     }
 
     const input = document.getElementById('fen') as HTMLInputElement;
@@ -403,16 +403,16 @@ class TablebaseView {
   constructor(controller: Controller, boardView: BoardView) {
     function bindMoveLink($moveLink: Cash) {
       $moveLink
-        .on('click', function (event: MouseEvent) {
+        .on('click', function (this: HTMLElement, event: MouseEvent) {
           event.preventDefault();
-          const uci = $(this).attr('data-uci');
-          const fen = new URL($(this).attr('href'), location.href).searchParams.get('fen').replace(/_/g, ' ');
+          const uci = $(this).attr('data-uci')!;
+          const fen = new URL($(this).attr('href')!, location.href).searchParams.get('fen')!.replace(/_/g, ' ');
           const from = uci.substr(0, 2) as Square, to = uci.substr(2, 2) as Square, promotion = uci[4] as PieceType | undefined;
           controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
           boardView.unsetHovering();
         })
-        .on('mouseenter', function () {
-          boardView.setHovering($(this).attr('data-uci'));
+        .on('mouseenter', function (this: HTMLElement) {
+          boardView.setHovering($(this).attr('data-uci')!);
         })
         .on('mouseleave', () => boardView.unsetHovering());
     }
@@ -481,7 +481,7 @@ class DocumentTitle {
 
 
 $(() => {
-  const controller = new Controller($('#board').attr('data-fen'));
+  const controller = new Controller($('#board').attr('data-fen')!);
   const boardView = new BoardView(controller);
   new SideToMoveView(controller);
   new FenInputView(controller);

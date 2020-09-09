@@ -1,8 +1,17 @@
 {
   "include": ["src/*.ts"],
   "compilerOptions": {
+    "noEmitOnError": false,
     "target": "ES2016",
     "module": "commonjs",
-    "lib": ["ES2016", "DOM", "DOM.iterable"]
+    "moduleResolution": "node",
+    "lib": ["ES2016", "DOM", "DOM.iterable"],
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true
   }
 }
