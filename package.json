@@ -27,7 +27,6 @@
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^5.0.2",
-    "@types/chess.js": "^0.10.1",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
@@ -38,8 +37,8 @@
   },
   "dependencies": {
     "cash-dom": "^8.0.0",
-    "chess.js": "^0.11.0",
-    "chessground": "^7.9.2"
+    "chessground": "^7.9.2",
+    "chessops": "^0.6.0"
   },
   "scripts": {
     "prepare": "gulp"
