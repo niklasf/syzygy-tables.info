@@ -4,7 +4,7 @@ const concat = require('gulp-concat');
 const rollup = require('rollup');
 const resolve = require('@rollup/plugin-node-resolve').default;
 const commonjs = require('@rollup/plugin-commonjs');
-const babel = require('@rollup/plugin-babel').babel;
+const typescript = require('@rollup/plugin-typescript');
 const terser = require('rollup-plugin-terser').terser;
 
 const css = [
@@ -26,13 +26,14 @@ gulp.task('css', () => gulp.src(css)
 );
 
 gulp.task('js', () => rollup.rollup({
-  input: 'src/client.js',
+  input: 'src/client.ts',
   plugins: [
-    commonjs(),
     resolve(),
-    babel({
-      babelHelpers: 'bundled',
-      presets: ['@babel/env'],
+    typescript({
+      noEmitOnError: false,
+    }),
+    commonjs({
+      extensions: ['.js', '.ts'],
     }),
     terser({
       safari10: true,

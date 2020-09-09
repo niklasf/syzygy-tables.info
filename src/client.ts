@@ -19,6 +19,7 @@
 import $ from 'cash-dom';
 import { Chess } from 'chess.js';
 import { Chessground } from 'chessground';
+import { Color, Role } from 'chessground/types';
 
 
 function strCount(haystack, needle) {
@@ -51,7 +52,7 @@ function Controller(fen) {
       this.setPosition(position);
     } else {
       // Extract the FEN from the query string.
-      const fen = location.searchParams.get('fen');
+      const fen = new URLSearchParams(location.search).get('fen');
       if (fen) this.setPosition(new Chess(fen.replace(/_/g, ' ')));
     }
   });
@@ -165,9 +166,10 @@ function BoardView(controller) {
     for (const eventName of ['touchstart', 'mousedown']) {
       el.addEventListener(eventName, e => {
         e.preventDefault();
+        const target = e.target as HTMLElement;
         ground.dragNewPiece({
-          color: e.target.getAttribute('data-color'),
-          role: e.target.getAttribute('data-role'),
+          color: target.getAttribute('data-color') as Color,
+          role: target.getAttribute('data-role') as Role,
         }, e, true);
       }, {passive: false});
     }
@@ -296,7 +298,7 @@ function FenInputView(controller) {
     if (position.load(parts.join(' '))) return position;
   }
 
-  const input = document.getElementById('fen');
+  const input = document.getElementById('fen') as HTMLInputElement;
   if (input.setCustomValidity) {
     input.oninput = input.onchange = () => {
       input.setCustomValidity(parseFen(input.value) ? '' : 'Invalid FEN');
@@ -477,7 +479,7 @@ $(() => {
   const boardView = new BoardView(controller);
   new SideToMoveView(controller);
   new FenInputView(controller);
-  new ToolBarView(controller, boardView);
+  new ToolBarView(controller);
 
   new DocumentTitle(controller);
   new TablebaseView(controller, boardView);
