@@ -17,19 +17,20 @@
  */
 
 import $ from 'cash-dom';
-import { Chess } from 'chess.js';
+import { Cash } from 'cash-dom';
+import { Chess, ChessInstance, Square, PieceType } from 'chess.js';
 import { Chessground } from 'chessground';
 import { Color, Role } from 'chessground/types';
 
 
-function strCount(haystack, needle) {
+function strCount(haystack: string, needle: string): number {
   return haystack.split(needle).length - 1;
 }
 
 
 const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
-function normFen(position) {
+function normFen(position: ChessInstance): string {
   const parts = position.fen().split(/\s+/);
   parts[4] = '0';
   parts[5] = '1';
@@ -39,13 +40,13 @@ function normFen(position) {
 
 /* Controller */
 
-function Controller(fen) {
+function Controller(fen?: string) {
   this.events = {};
   this.position = new Chess(fen || DEFAULT_FEN);
   this.flipped = false;
   this.editMode = false;
 
-  window.addEventListener('popstate', (event) => {
+  window.addEventListener('popstate', event => {
     if (event.state && event.state.fen) {
       const position = new Chess(event.state.fen);
       if (event.state.lastMove) position.move(event.state.lastMove);
@@ -58,12 +59,12 @@ function Controller(fen) {
   });
 }
 
-Controller.prototype.bind = function (event, cb) {
+Controller.prototype.bind = function (event: string, cb: () => void) {
   this.events[event] = this.events[event] || [];
   this.events[event].push(cb);
 };
 
-Controller.prototype.trigger = function (event) {
+Controller.prototype.trigger = function (event: string) {
   const args = arguments;
   if (this.events[event]) for (const cb of this.events[event]) {
     cb.apply(this, Array.prototype.slice.call(args, 1));
@@ -80,7 +81,7 @@ Controller.prototype.toggleEditMode = function () {
   this.trigger('editMode', this.editMode);
 };
 
-Controller.prototype.push = function (position) {
+Controller.prototype.push = function (position: ChessInstance) {
   const fen = normFen(position);
   if (normFen(this.position) != fen && 'pushState' in history) {
     const lastMove = position.undo();
@@ -94,7 +95,7 @@ Controller.prototype.push = function (position) {
   this.setPosition(position);
 };
 
-Controller.prototype.pushMove = function (from, to, promotion) {
+Controller.prototype.pushMove = function (from: Square, to: Square, promotion?: PieceType) {
   const position = new Chess(this.position.fen());
   const moves = position.moves({ verbose: true }).filter((m) => {
     return m.from == from && m.to === to && m.promotion == promotion;
@@ -108,7 +109,7 @@ Controller.prototype.pushMove = function (from, to, promotion) {
   }
 };
 
-Controller.prototype.setPosition = function (position) {
+Controller.prototype.setPosition = function (position: ChessInstance) {
   if (normFen(this.position) != normFen(position)) {
     this.position = position;
     this.trigger('positionChanged', position);
@@ -176,11 +177,11 @@ function BoardView(controller) {
   }
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos) => this.setPosition(pos));
+  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
 
-  controller.bind('flipped', (flipped) => this.setFlipped(flipped));
+  controller.bind('flipped', (flipped: boolean) => this.setFlipped(flipped));
 
-  controller.bind('editMode', (editMode) => {
+  controller.bind('editMode', (editMode: boolean) => {
     ground.set({
       movable: {
         showDests: !editMode,
@@ -197,7 +198,7 @@ function BoardView(controller) {
   });
 }
 
-BoardView.prototype.setPosition = function (position) {
+BoardView.prototype.setPosition = function (position: ChessInstance) {
   const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
 
   const dests = new Map();
@@ -219,7 +220,7 @@ BoardView.prototype.setPosition = function (position) {
   });
 };
 
-BoardView.prototype.setFlipped = function (flipped) {
+BoardView.prototype.setFlipped = function (flipped: boolean) {
   var other = flipped ? 'white' : 'black';
   if (other === this.ground.state.orientation) this.ground.toggleOrientation();
   $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
@@ -234,7 +235,7 @@ BoardView.prototype.unsetHovering = function () {
   this.ground.setAutoShapes([]);
 };
 
-BoardView.prototype.setHovering = function (uci) {
+BoardView.prototype.setHovering = function (uci: string) {
   this.ground.setAutoShapes([{
     orig: uci.substr(0, 2),
     dest: uci.substr(2, 2),
@@ -261,10 +262,10 @@ function SideToMoveView(controller) {
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', pos => this.setPosition(pos));
+  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
 }
 
-SideToMoveView.prototype.setPosition = function (position) {
+SideToMoveView.prototype.setPosition = function (position: ChessInstance) {
   $('#btn-white').toggleClass('active', position.turn() === 'w');
   $('#btn-black').toggleClass('active', position.turn() === 'b');
 };
@@ -273,7 +274,7 @@ SideToMoveView.prototype.setPosition = function (position) {
 /* FEN input */
 
 function FenInputView(controller) {
-  function parseFen(fen) {
+  function parseFen(fen: string) {
     const parts = fen.trim().split(/[\s_]+/);
     if (parts[0] === '') {
       parts[0] = DEFAULT_FEN.split(/\s/)[0];
@@ -314,10 +315,10 @@ function FenInputView(controller) {
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', pos => this.setPosition(pos));
+  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
 }
 
-FenInputView.prototype.setPosition = function (position) {
+FenInputView.prototype.setPosition = function (position: ChessInstance) {
   const fen = normFen(position);
   $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
 };
@@ -327,7 +328,7 @@ FenInputView.prototype.setPosition = function (position) {
 
 function ToolBarView(controller) {
   $('#btn-flip-board').on('click', () => controller.toggleFlipped());
-  controller.bind('flipped', flipped => $('#btn-flip-board').toggleClass('active', flipped));
+  controller.bind('flipped', (flipped: boolean) => $('#btn-flip-board').toggleClass('active', flipped));
 
   $('#btn-clear-board').on('click', event => {
     event.preventDefault();
@@ -385,7 +386,7 @@ function ToolBarView(controller) {
 
   $('#btn-edit').on('click', () => controller.toggleEditMode());
 
-  controller.bind('editMode', editMode => {
+  controller.bind('editMode', (editMode: boolean) => {
     $('#btn-edit').toggleClass('active', editMode);
     $('#btn-edit > span.icon')
       .toggleClass('icon-lock', editMode)
@@ -397,13 +398,13 @@ function ToolBarView(controller) {
 /* Tablebase view */
 
 function TablebaseView(controller, boardView) {
-  function bindMoveLink($moveLink) {
+  function bindMoveLink($moveLink: Cash) {
     $moveLink
-      .on('click', function (event) {
+      .on('click', function (event: MouseEvent) {
         event.preventDefault();
         const uci = $(this).attr('data-uci');
         const from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
-        controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
+        controller.pushMove(from, to, promotion); // XXX: || controller.push(new Chess(fen));
         boardView.unsetHovering();
       })
       .on('mouseenter', function () {
@@ -414,8 +415,8 @@ function TablebaseView(controller, boardView) {
 
   bindMoveLink($('a.list-group-item'));
 
-  let abortController;
-  controller.bind('positionChanged', (position) => {
+  let abortController: AbortController | null = null;
+  controller.bind('positionChanged', (position: ChessInstance) => {
     if (abortController) abortController.abort();
     abortController = new AbortController();
 
@@ -450,7 +451,7 @@ function TablebaseView(controller, boardView) {
 /* Document title */
 
 function DocumentTitle(controller) {
-  controller.bind('positionChanged', position => {
+  controller.bind('positionChanged', (position: ChessInstance) => {
     const fen = position.fen().split(/\s/)[0];
 
     document.title = (
