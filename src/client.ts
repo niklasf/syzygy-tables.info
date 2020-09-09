@@ -20,6 +20,7 @@ import $ from 'cash-dom';
 import { Cash } from 'cash-dom';
 import { Chess, ChessInstance, Square, PieceType } from 'chess.js';
 import { Chessground } from 'chessground';
+import { Api as CgApi } from 'chessground/api';
 import { Color, Role } from 'chessground/types';
 
 
@@ -118,364 +119,366 @@ class Controller {
 }
 
 
-/* Board view */
+class BoardView {
+  private ground: CgApi;
 
-function BoardView(controller: Controller) {
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  constructor(controller: Controller) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  const ground = this.ground = Chessground(document.getElementById('board'), {
-    fen: controller.position.fen(),
-    autoCastle: false,
-    movable: {
-      free: true,
-      color: 'both',
-      showDests: true,
-    },
-    selectable: {
-      enabled: false,
-    },
-    draggable: {
-      deleteOnDropOff: true,
-    },
-    animation: {
-      enabled: !reducedMotion.matches,
-    },
-    events: {
-      move: (orig, dest) => {
-        // If the change is a legal move, play it.
-        if (!controller.editMode) controller.pushMove(orig as Square, dest as Square);
-      },
-      dropNewPiece: (piece, key) => {
-        // Move the existing king, even when dropping a new one.
-        if (piece.role !== 'king') return;
-        const diff = new Map();
-        for (const [k, p] of ground.state.pieces) {
-          if (p.role === 'king' && p.color === piece.color) diff.set(k, undefined);
-        }
-        diff.set(key, piece);
-        ground.setPieces(diff);
-      },
-      change: () => {
-        // Otherwise just change to position.
-        const fenParts = normFen(controller.position).split(/\s/);
-        fenParts[0] = this.fenPart = this.ground.getFen();
-        controller.push(new Chess(fenParts.join(' ')));
-      },
-    },
-  });
-
-  for (const el of document.querySelectorAll('.spare piece')) {
-    for (const eventName of ['touchstart', 'mousedown']) {
-      el.addEventListener(eventName, e => {
-        e.preventDefault();
-        const target = e.target as HTMLElement;
-        ground.dragNewPiece({
-          color: target.getAttribute('data-color') as Color,
-          role: target.getAttribute('data-role') as Role,
-        }, e, true);
-      }, {passive: false});
-    }
-  }
-
-  this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
-
-  controller.bind('flipped', (flipped: boolean) => this.setFlipped(flipped));
-
-  controller.bind('editMode', (editMode: boolean) => {
-    ground.set({
+    const ground = this.ground = Chessground(document.getElementById('board'), {
+      fen: controller.position.fen(),
+      autoCastle: false,
       movable: {
-        showDests: !editMode,
+        free: true,
+        color: 'both',
+        showDests: true,
       },
-    });
-  });
-
-  reducedMotion.addEventListener?.('change', () => {
-    ground.set({
+      selectable: {
+        enabled: false,
+      },
+      draggable: {
+        deleteOnDropOff: true,
+      },
       animation: {
         enabled: !reducedMotion.matches,
       },
+      events: {
+        move: (orig, dest) => {
+          // If the change is a legal move, play it.
+          if (!controller.editMode) controller.pushMove(orig as Square, dest as Square);
+        },
+        dropNewPiece: (piece, key) => {
+          // Move the existing king, even when dropping a new one.
+          if (piece.role !== 'king') return;
+          const diff = new Map();
+          for (const [k, p] of ground.state.pieces) {
+            if (p.role === 'king' && p.color === piece.color) diff.set(k, undefined);
+          }
+          diff.set(key, piece);
+          ground.setPieces(diff);
+        },
+        change: () => {
+          // Otherwise just change to position.
+          const fenParts = normFen(controller.position).split(/\s/);
+          fenParts[0] = this.ground.getFen();
+          controller.push(new Chess(fenParts.join(' ')));
+        },
+      },
     });
-  });
-}
 
-BoardView.prototype.setPosition = function (position: ChessInstance) {
-  const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
-
-  const dests = new Map();
-  for (const s of position.SQUARES) {
-    const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
-    if (moves.length) dests.set(s, moves);
-  }
-
-  const turn = (position.turn() === 'w') ? 'white' : 'black';
-
-  this.ground.set({
-    lastMove: history[history.length - 1],
-    fen: position.fen(),
-    turnColor: turn,
-    check: position.in_check() ? turn : false,
-    movable: {
-      dests,
-    },
-  });
-};
-
-BoardView.prototype.setFlipped = function (flipped: boolean) {
-  var other = flipped ? 'white' : 'black';
-  if (other === this.ground.state.orientation) this.ground.toggleOrientation();
-  $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
-  $('.spare.bottom piece').toggleClass('white', this.ground.state.orientation === 'white');
-  $('.spare.bottom piece').toggleClass('black', this.ground.state.orientation === 'black');
-  $('.spare.top piece').attr('data-color', other);
-  $('.spare.top piece').toggleClass('white', other === 'white');
-  $('.spare.top piece').toggleClass('black', other === 'black');
-};
-
-BoardView.prototype.unsetHovering = function () {
-  this.ground.setAutoShapes([]);
-};
-
-BoardView.prototype.setHovering = function (uci: string) {
-  this.ground.setAutoShapes([{
-    orig: uci.substr(0, 2),
-    dest: uci.substr(2, 2),
-    brush: 'green',
-  }]);
-};
-
-
-/* Side to move buttons */
-
-function SideToMoveView(controller: Controller) {
-  $('#btn-white').on('click', event => {
-    event.preventDefault();
-    const fenParts = normFen(controller.position).split(/\s/);
-    fenParts[1] = 'w';
-    controller.push(new Chess(fenParts.join(' ')));
-  });
-
-  $('#btn-black').on('click', event => {
-    event.preventDefault();
-    const fenParts = normFen(controller.position).split(/\s/);
-    fenParts[1] = 'b';
-    controller.push(new Chess(fenParts.join(' ')));
-  });
-
-  this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
-}
-
-SideToMoveView.prototype.setPosition = function (position: ChessInstance) {
-  $('#btn-white').toggleClass('active', position.turn() === 'w');
-  $('#btn-black').toggleClass('active', position.turn() === 'b');
-};
-
-
-/* FEN input */
-
-function FenInputView(controller: Controller) {
-  function parseFen(fen: string) {
-    const parts = fen.trim().split(/[\s_]+/);
-    if (parts[0] === '') {
-      parts[0] = DEFAULT_FEN.split(/\s/)[0];
-    }
-    if (parts.length === 1) {
-      parts.push(controller.position.turn());
-    }
-    if (parts.length === 2) {
-      parts.push('-');
-    }
-    if (parts.length === 3) {
-      parts.push('-');
-    }
-    if (parts.length === 4) {
-      parts.push('0');
-    }
-    if (parts.length === 5) {
-      parts.push('1');
-    }
-
-    const position = new Chess();
-    if (position.load(parts.join(' '))) return position;
-  }
-
-  const input = document.getElementById('fen') as HTMLInputElement;
-  if (input.setCustomValidity) {
-    input.oninput = input.onchange = () => {
-      input.setCustomValidity(parseFen(input.value) ? '' : 'Invalid FEN');
-    };
-  }
-
-  $('#form-set-fen').on('submit', event => {
-    event.preventDefault();
-
-    const position = parseFen(input.value);
-    if (position) controller.push(position);
-    else if (!input.setCustomValidity) input.focus();
-  });
-
-  this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
-}
-
-FenInputView.prototype.setPosition = function (position: ChessInstance) {
-  const fen = normFen(position);
-  $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
-};
-
-
-/* Toolbar */
-
-function ToolBarView(controller: Controller) {
-  $('#btn-flip-board').on('click', () => controller.toggleFlipped());
-  controller.bind('flipped', (flipped: boolean) => $('#btn-flip-board').toggleClass('active', flipped));
-
-  $('#btn-clear-board').on('click', event => {
-    event.preventDefault();
-
-    const parts = normFen(controller.position).split(/\s/);
-    const defaultParts = DEFAULT_FEN.split(/\s/);
-    const fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
-    controller.push(new Chess(fen));
-  });
-
-  $('#btn-swap-colors').on('click', event => {
-    event.preventDefault();
-
-    const parts = normFen(controller.position).split(/\s/);
-
-    let fenPart = '';
-    for (let i = 0; i < parts[0].length; i++) {
-      if (parts[0][i] === parts[0][i].toLowerCase()) {
-        fenPart += parts[0][i].toUpperCase();
-      } else {
-        fenPart += parts[0][i].toLowerCase();
+    for (const el of document.querySelectorAll('.spare piece')) {
+      for (const eventName of ['touchstart', 'mousedown']) {
+        el.addEventListener(eventName, e => {
+          e.preventDefault();
+          const target = e.target as HTMLElement;
+          ground.dragNewPiece({
+            color: target.getAttribute('data-color') as Color,
+            role: target.getAttribute('data-role') as Role,
+          }, e, true);
+        }, {passive: false});
       }
     }
-    parts[0] = fenPart;
 
-    parts[2] = '-';
-    parts[3] = '-';
+    this.setPosition(controller.position);
+    controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
 
-    controller.push(new Chess(parts.join(' ')));
-  });
+    controller.bind('flipped', (flipped: boolean) => this.setFlipped(flipped));
 
-  $('#btn-mirror-horizontal').on('click', event => {
-    event.preventDefault();
+    controller.bind('editMode', (editMode: boolean) => {
+      ground.set({
+        movable: {
+          showDests: !editMode,
+        },
+      });
+    });
 
-    const parts = normFen(controller.position).split(/\s/);
-    const positionParts = parts[0].split(/\//);
-    for (let i = 0; i < positionParts.length; i++) {
-      positionParts[i] = positionParts[i].split('').reverse().join('');
+    reducedMotion.addEventListener?.('change', () => {
+      ground.set({
+        animation: {
+          enabled: !reducedMotion.matches,
+        },
+      });
+    });
+  }
+
+  private setPosition(position: ChessInstance) {
+    const history = position.history({ verbose: true }).map((h) => [h.from, h.to]);
+
+    const dests = new Map();
+    for (const s of position.SQUARES) {
+      const moves = position.moves({ square: s, verbose: true }).map((m) => m.to);
+      if (moves.length) dests.set(s, moves);
     }
 
-    const fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
-    controller.push(new Chess(fen));
-  });
+    const turn = (position.turn() === 'w') ? 'white' : 'black';
 
-  $('#btn-mirror-vertical').on('click', event => {
-    event.preventDefault();
+    this.ground.set({
+      lastMove: history[history.length - 1],
+      fen: position.fen(),
+      turnColor: turn,
+      check: position.in_check() ? turn : false,
+      movable: {
+        dests,
+      },
+    });
+  }
 
-    const parts = normFen(controller.position).split(/\s/);
-    const positionParts = parts[0].split(/\//);
-    positionParts.reverse();
+  private setFlipped(flipped: boolean) {
+    var other = flipped ? 'white' : 'black';
+    if (other === this.ground.state.orientation) this.ground.toggleOrientation();
+    $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
+    $('.spare.bottom piece').toggleClass('white', this.ground.state.orientation === 'white');
+    $('.spare.bottom piece').toggleClass('black', this.ground.state.orientation === 'black');
+    $('.spare.top piece').attr('data-color', other);
+    $('.spare.top piece').toggleClass('white', other === 'white');
+    $('.spare.top piece').toggleClass('black', other === 'black');
+  }
 
-    const fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
-    controller.push(new Chess(fen));
-  });
+  unsetHovering() {
+    this.ground.setAutoShapes([]);
+  }
 
-  $('#btn-edit').on('click', () => controller.toggleEditMode());
-
-  controller.bind('editMode', (editMode: boolean) => {
-    $('#btn-edit').toggleClass('active', editMode);
-    $('#btn-edit > span.icon')
-      .toggleClass('icon-lock', editMode)
-      .toggleClass('icon-lock-open', !editMode);
-  });
+  setHovering(uci: string) {
+    this.ground.setAutoShapes([{
+      orig: uci.substr(0, 2) as Square,
+      dest: uci.substr(2, 2) as Square,
+      brush: 'green',
+    }]);
+  }
 }
 
 
-/* Tablebase view */
+class SideToMoveView {
+  constructor(controller: Controller) {
+    $('#btn-white').on('click', event => {
+      event.preventDefault();
+      const fenParts = normFen(controller.position).split(/\s/);
+      fenParts[1] = 'w';
+      controller.push(new Chess(fenParts.join(' ')));
+    });
 
-function TablebaseView(controller: Controller, boardView) {
-  function bindMoveLink($moveLink: Cash) {
-    $moveLink
-      .on('click', function (event: MouseEvent) {
-        event.preventDefault();
-        const uci = $(this).attr('data-uci');
-        const fen = new URL($(this).attr('href'), location.href).searchParams.get('fen').replace(/_/g, ' ');
-        const from = uci.substr(0, 2) as Square, to = uci.substr(2, 2) as Square, promotion = uci[4] as PieceType | undefined;
-        controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
-        boardView.unsetHovering();
-      })
-      .on('mouseenter', function () {
-        boardView.setHovering($(this).attr('data-uci'));
-      })
-      .on('mouseleave', () => boardView.unsetHovering());
+    $('#btn-black').on('click', event => {
+      event.preventDefault();
+      const fenParts = normFen(controller.position).split(/\s/);
+      fenParts[1] = 'b';
+      controller.push(new Chess(fenParts.join(' ')));
+    });
+
+    this.setPosition(controller.position);
+    controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
   }
 
-  bindMoveLink($('a.list-group-item'));
+  private setPosition(position: ChessInstance) {
+    $('#btn-white').toggleClass('active', position.turn() === 'w');
+    $('#btn-black').toggleClass('active', position.turn() === 'b');
+  }
+}
 
-  let abortController: AbortController | null = null;
-  controller.bind('positionChanged', (position: ChessInstance) => {
-    if (abortController) abortController.abort();
-    abortController = new AbortController();
 
-    const spinner = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
-    const $content = $('.right-side > .inner').html(spinner);
+class FenInputView {
+  constructor(controller: Controller) {
+    function parseFen(fen: string) {
+      const parts = fen.trim().split(/[\s_]+/);
+      if (parts[0] === '') {
+        parts[0] = DEFAULT_FEN.split(/\s/)[0];
+      }
+      if (parts.length === 1) {
+        parts.push(controller.position.turn());
+      }
+      if (parts.length === 2) {
+        parts.push('-');
+      }
+      if (parts.length === 3) {
+        parts.push('-');
+      }
+      if (parts.length === 4) {
+        parts.push('0');
+      }
+      if (parts.length === 5) {
+        parts.push('1');
+      }
 
-    const url = new URL('/', location.href);
-    url.searchParams.set('fen', normFen(position));
-    url.searchParams.set('xhr', 'probe');
+      const position = new Chess();
+      if (position.load(parts.join(' '))) return position;
+    }
 
-    fetch(url.href, {
-      signal: abortController.signal
-    }).then(res => {
-      if (res.ok) return res.text();
-      else throw res;
-    }).then(html => {
-      $content.html(html);
-      bindMoveLink($('a.list-group-item'));
-    }).catch(err => {
-      $content
-        .empty()
-        .append($('<section>')
-        .append($('<h2 id="status"></h2>').text('Network error ' + err.status))
-        .append($('<div id="info"></div>').text(err.statusText)));
-    }).finally(() => {
-      abortController = null;
+    const input = document.getElementById('fen') as HTMLInputElement;
+    if (input.setCustomValidity) {
+      input.oninput = input.onchange = () => {
+        input.setCustomValidity(parseFen(input.value) ? '' : 'Invalid FEN');
+      };
+    }
+
+    $('#form-set-fen').on('submit', event => {
+      event.preventDefault();
+
+      const position = parseFen(input.value);
+      if (position) controller.push(position);
+      else if (!input.setCustomValidity) input.focus();
     });
-  });
+
+    this.setPosition(controller.position);
+    controller.bind('positionChanged', (pos: ChessInstance) => this.setPosition(pos));
+  }
+
+  private setPosition(position: ChessInstance) {
+    const fen = normFen(position);
+    $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
+  }
+}
+
+
+class ToolBarView {
+  constructor(controller: Controller) {
+    $('#btn-flip-board').on('click', () => controller.toggleFlipped());
+    controller.bind('flipped', (flipped: boolean) => $('#btn-flip-board').toggleClass('active', flipped));
+
+    $('#btn-clear-board').on('click', event => {
+      event.preventDefault();
+
+      const parts = normFen(controller.position).split(/\s/);
+      const defaultParts = DEFAULT_FEN.split(/\s/);
+      const fen = defaultParts[0] + ' ' + parts[1] + ' - - 0 1';
+      controller.push(new Chess(fen));
+    });
+
+    $('#btn-swap-colors').on('click', event => {
+      event.preventDefault();
+
+      const parts = normFen(controller.position).split(/\s/);
+
+      let fenPart = '';
+      for (let i = 0; i < parts[0].length; i++) {
+        if (parts[0][i] === parts[0][i].toLowerCase()) {
+          fenPart += parts[0][i].toUpperCase();
+        } else {
+          fenPart += parts[0][i].toLowerCase();
+        }
+      }
+      parts[0] = fenPart;
+
+      parts[2] = '-';
+      parts[3] = '-';
+
+      controller.push(new Chess(parts.join(' ')));
+    });
+
+    $('#btn-mirror-horizontal').on('click', event => {
+      event.preventDefault();
+
+      const parts = normFen(controller.position).split(/\s/);
+      const positionParts = parts[0].split(/\//);
+      for (let i = 0; i < positionParts.length; i++) {
+        positionParts[i] = positionParts[i].split('').reverse().join('');
+      }
+
+      const fen = positionParts.join('/') + ' ' + parts[1] + ' - - 0 1';
+      controller.push(new Chess(fen));
+    });
+
+    $('#btn-mirror-vertical').on('click', event => {
+      event.preventDefault();
+
+      const parts = normFen(controller.position).split(/\s/);
+      const positionParts = parts[0].split(/\//);
+      positionParts.reverse();
+
+      const fen = positionParts.join('/') + ' '+ parts[1] + ' - - 0 1';
+      controller.push(new Chess(fen));
+    });
+
+    $('#btn-edit').on('click', () => controller.toggleEditMode());
+
+    controller.bind('editMode', (editMode: boolean) => {
+      $('#btn-edit').toggleClass('active', editMode);
+      $('#btn-edit > span.icon')
+        .toggleClass('icon-lock', editMode)
+        .toggleClass('icon-lock-open', !editMode);
+    });
+  }
+}
+
+
+class TablebaseView {
+  constructor(controller: Controller, boardView: BoardView) {
+    function bindMoveLink($moveLink: Cash) {
+      $moveLink
+        .on('click', function (event: MouseEvent) {
+          event.preventDefault();
+          const uci = $(this).attr('data-uci');
+          const fen = new URL($(this).attr('href'), location.href).searchParams.get('fen').replace(/_/g, ' ');
+          const from = uci.substr(0, 2) as Square, to = uci.substr(2, 2) as Square, promotion = uci[4] as PieceType | undefined;
+          controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
+          boardView.unsetHovering();
+        })
+        .on('mouseenter', function () {
+          boardView.setHovering($(this).attr('data-uci'));
+        })
+        .on('mouseleave', () => boardView.unsetHovering());
+    }
+
+    bindMoveLink($('a.list-group-item'));
+
+    let abortController: AbortController | null = null;
+    controller.bind('positionChanged', (position: ChessInstance) => {
+      if (abortController) abortController.abort();
+      abortController = new AbortController();
+
+      const spinner = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
+      const $content = $('.right-side > .inner').html(spinner);
+
+      const url = new URL('/', location.href);
+      url.searchParams.set('fen', normFen(position));
+      url.searchParams.set('xhr', 'probe');
+
+      fetch(url.href, {
+        signal: abortController.signal
+      }).then(res => {
+        if (res.ok) return res.text();
+        else throw res;
+      }).then(html => {
+        $content.html(html);
+        bindMoveLink($('a.list-group-item'));
+      }).catch(err => {
+        $content
+          .empty()
+          .append($('<section>')
+          .append($('<h2 id="status"></h2>').text('Network error ' + err.status))
+          .append($('<div id="info"></div>').text(err.statusText)));
+      }).finally(() => {
+        abortController = null;
+      });
+    });
+  }
 }
 
 
 /* Document title */
 
-function DocumentTitle(controller: Controller) {
-  controller.bind('positionChanged', (position: ChessInstance) => {
-    const fen = position.fen().split(/\s/)[0];
+class DocumentTitle {
+  constructor(controller: Controller) {
+    controller.bind('positionChanged', (position: ChessInstance) => {
+      const fen = position.fen().split(/\s/)[0];
 
-    document.title = (
-      'K'.repeat(strCount(fen, 'K')) +
-      'Q'.repeat(strCount(fen, 'Q')) +
-      'R'.repeat(strCount(fen, 'R')) +
-      'B'.repeat(strCount(fen, 'B')) +
-      'N'.repeat(strCount(fen, 'N')) +
-      'P'.repeat(strCount(fen, 'P')) +
-      'v' +
-      'K'.repeat(strCount(fen, 'k')) +
-      'Q'.repeat(strCount(fen, 'q')) +
-      'R'.repeat(strCount(fen, 'r')) +
-      'B'.repeat(strCount(fen, 'b')) +
-      'N'.repeat(strCount(fen, 'n')) +
-      'P'.repeat(strCount(fen, 'p')) +
-      ' – Syzygy endgame tablebases');
-  });
+      document.title = (
+        'K'.repeat(strCount(fen, 'K')) +
+        'Q'.repeat(strCount(fen, 'Q')) +
+        'R'.repeat(strCount(fen, 'R')) +
+        'B'.repeat(strCount(fen, 'B')) +
+        'N'.repeat(strCount(fen, 'N')) +
+        'P'.repeat(strCount(fen, 'P')) +
+        'v' +
+        'K'.repeat(strCount(fen, 'k')) +
+        'Q'.repeat(strCount(fen, 'q')) +
+        'R'.repeat(strCount(fen, 'r')) +
+        'B'.repeat(strCount(fen, 'b')) +
+        'N'.repeat(strCount(fen, 'n')) +
+        'P'.repeat(strCount(fen, 'p')) +
+        ' – Syzygy endgame tablebases');
+    });
+  }
 }
 
-
-/* Initialize */
 
 $(() => {
   const controller = new Controller($('#board').attr('data-fen'));
