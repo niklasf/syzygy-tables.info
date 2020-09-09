@@ -16,9 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const $ = require('zepto-browserify').$;
-const Chess = require('chess.js').Chess;
-const Chessground = require('chessground').Chessground;
+import $ from 'cash-dom';
+import { Chess } from 'chess.js';
+import { Chessground } from 'chessground';
+
 
 function strCount(haystack, needle) {
   return haystack.split(needle).length - 1;
@@ -243,14 +244,14 @@ BoardView.prototype.setHovering = function (uci) {
 /* Side to move buttons */
 
 function SideToMoveView(controller) {
-  $('#btn-white').click((event) => {
+  $('#btn-white').on('click', event => {
     event.preventDefault();
     const fenParts = normFen(controller.position).split(/\s/);
     fenParts[1] = 'w';
     controller.push(new Chess(fenParts.join(' ')));
   });
 
-  $('#btn-black').click((event) => {
+  $('#btn-black').on('click', event => {
     event.preventDefault();
     const fenParts = normFen(controller.position).split(/\s/);
     fenParts[1] = 'b';
@@ -258,7 +259,7 @@ function SideToMoveView(controller) {
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos) => this.setPosition(pos));
+  controller.bind('positionChanged', pos => this.setPosition(pos));
 }
 
 SideToMoveView.prototype.setPosition = function (position) {
@@ -302,7 +303,7 @@ function FenInputView(controller) {
     };
   }
 
-  $('#form-set-fen').submit((event) => {
+  $('#form-set-fen').on('submit', event => {
     event.preventDefault();
 
     const position = parseFen(input.value);
@@ -311,7 +312,7 @@ function FenInputView(controller) {
   });
 
   this.setPosition(controller.position);
-  controller.bind('positionChanged', (pos) => this.setPosition(pos));
+  controller.bind('positionChanged', pos => this.setPosition(pos));
 }
 
 FenInputView.prototype.setPosition = function (position) {
@@ -323,10 +324,10 @@ FenInputView.prototype.setPosition = function (position) {
 /* Toolbar */
 
 function ToolBarView(controller) {
-  $('#btn-flip-board').click(() => controller.toggleFlipped());
-  controller.bind('flipped', (flipped) => $('#btn-flip-board').toggleClass('active', flipped));
+  $('#btn-flip-board').on('click', () => controller.toggleFlipped());
+  controller.bind('flipped', flipped => $('#btn-flip-board').toggleClass('active', flipped));
 
-  $('#btn-clear-board').click((event) => {
+  $('#btn-clear-board').on('click', event => {
     event.preventDefault();
 
     const parts = normFen(controller.position).split(/\s/);
@@ -335,7 +336,7 @@ function ToolBarView(controller) {
     controller.push(new Chess(fen));
   });
 
-  $('#btn-swap-colors').click((event) => {
+  $('#btn-swap-colors').on('click', event => {
     event.preventDefault();
 
     const parts = normFen(controller.position).split(/\s/);
@@ -356,7 +357,7 @@ function ToolBarView(controller) {
     controller.push(new Chess(parts.join(' ')));
   });
 
-  $('#btn-mirror-horizontal').click((event) => {
+  $('#btn-mirror-horizontal').on('click', event => {
     event.preventDefault();
 
     const parts = normFen(controller.position).split(/\s/);
@@ -369,7 +370,7 @@ function ToolBarView(controller) {
     controller.push(new Chess(fen));
   });
 
-  $('#btn-mirror-vertical').click((event) => {
+  $('#btn-mirror-vertical').on('click', event => {
     event.preventDefault();
 
     const parts = normFen(controller.position).split(/\s/);
@@ -380,9 +381,9 @@ function ToolBarView(controller) {
     controller.push(new Chess(fen));
   });
 
-  $('#btn-edit').click(() => controller.toggleEditMode());
+  $('#btn-edit').on('click', () => controller.toggleEditMode());
 
-  controller.bind('editMode', (editMode) => {
+  controller.bind('editMode', editMode => {
     $('#btn-edit').toggleClass('active', editMode);
     $('#btn-edit > span.icon')
       .toggleClass('icon-lock', editMode)
@@ -396,17 +397,17 @@ function ToolBarView(controller) {
 function TablebaseView(controller, boardView) {
   function bindMoveLink(moveLink) {
     moveLink
-      .click(function (event) {
+      .on('click', function (event) {
         event.preventDefault();
         const uci = $(this).attr('data-uci');
         const from = uci.substr(0, 2), to = uci.substr(2, 2), promotion = uci[4];
         controller.pushMove(from, to, promotion) || controller.push(new Chess(fen));
         boardView.unsetHovering();
       })
-      .mouseenter(function () {
+      .on('mouseenter', function () {
         boardView.setHovering($(this).attr('data-uci'));
       })
-      .mouseleave(() => boardView.unsetHovering());
+      .on('mouseleave', () => boardView.unsetHovering());
   }
 
   bindMoveLink($('a.list-group-item'));
@@ -422,7 +423,7 @@ function TablebaseView(controller, boardView) {
     content.innerHTML = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
 
     // Streaming XHR, based on https://jakearchibald.com/2016/fun-hacks-faster-content/.
-    new Promise((resolve) => {
+    new Promise(resolve => {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
       iframe.onload = () => {
@@ -431,7 +432,7 @@ function TablebaseView(controller, boardView) {
       };
       document.body.appendChild(iframe);
       iframe.src = '';
-    }).then((iframe) => {
+    }).then(iframe => {
       let pos = 0;
       const xhr = currentXhr = new XMLHttpRequest();
       const firstByte = () => {
@@ -472,7 +473,7 @@ function TablebaseView(controller, boardView) {
 /* Document title */
 
 function DocumentTitle(controller) {
-  controller.bind('positionChanged', (position) => {
+  controller.bind('positionChanged', position => {
     const fen = position.fen().split(/\s/)[0];
 
     document.title = (
