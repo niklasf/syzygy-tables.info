@@ -21,21 +21,15 @@ import { Api as CgApi } from 'chessground/api';
 
 import { Result} from '@badrap/result';
 
-import { Color, Role, Move, SquareName, isDrop } from 'chessops/types';
-import { parseSquare, parseUci, makeSquare } from 'chessops/util';
+import { Color, Role, Move, SquareName } from 'chessops/types';
+import { parseSquare, parseUci } from 'chessops/util';
 import { SquareSet } from 'chessops/squareSet';
 import { Board } from 'chessops/board';
-import { Setup } from 'chessops/setup';
+import { Setup, MaterialSide } from 'chessops/setup';
 import { Chess } from 'chessops/chess';
-import { FenError, InvalidFen, makeFen, makeBoardFen, parseFen, parseBoardFen } from 'chessops/fen';
+import { FenError, InvalidFen, makeFen, makeBoardFen, makePocket, parseFen, parseBoardFen } from 'chessops/fen';
 import { transformSetup, flipVertical, flipHorizontal } from 'chessops/transform';
-import { chessgroundDests } from 'chessops/compat';
-
-
-function chessgroundLastMove(move: Move): SquareName[] {
-  if (isDrop(move)) return [makeSquare(move.to)];
-  else return [makeSquare(move.from), makeSquare(move.to)];
-}
+import { chessgroundDests, chessgroundMove } from 'chessops/compat';
 
 
 const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
@@ -204,7 +198,7 @@ class BoardView {
   private setPosition(setup: Setup) {
     const pos = Chess.fromSetup(setup);
     this.ground.set({
-      lastMove: this.controller.lastMove && chessgroundLastMove(this.controller.lastMove),
+      lastMove: this.controller.lastMove && chessgroundMove(this.controller.lastMove),
       fen: makeBoardFen(setup.board),
       turnColor: setup.turn,
       check: pos.unwrap(p => p.isCheck() && p.turn, _ => false),
@@ -413,13 +407,7 @@ class DocumentTitle {
   }
 
   private side(board: Board, color: Color) {
-    return (
-      'K'.repeat(board.pieces(color, 'king').size()) +
-      'Q'.repeat(board.pieces(color, 'queen').size()) +
-      'R'.repeat(board.pieces(color, 'rook').size()) +
-      'B'.repeat(board.pieces(color, 'bishop').size()) +
-      'N'.repeat(board.pieces(color, 'knight').size()) +
-      'P'.repeat(board.pieces(color, 'pawn').size()));
+    return makePocket(MaterialSide.fromBoard(board, color)).split('').reverse().join('').toUpperCase();
   }
 }
 
