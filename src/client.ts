@@ -19,13 +19,15 @@
 import { Chessground } from 'chessground';
 import { Api as CgApi } from 'chessground/api';
 
+import { Result} from '@badrap/result';
+
 import { Color, Role, Move, SquareName, isDrop } from 'chessops/types';
 import { parseSquare, parseUci, makeSquare } from 'chessops/util';
 import { SquareSet } from 'chessops/squareSet';
 import { Board } from 'chessops/board';
 import { Setup } from 'chessops/setup';
 import { Chess } from 'chessops/chess';
-import { makeFen, makeBoardFen, parseFen, parseBoardFen } from 'chessops/fen';
+import { FenError, InvalidFen, makeFen, makeBoardFen, parseFen, parseBoardFen } from 'chessops/fen';
 import { transformSetup, flipVertical, flipHorizontal } from 'chessops/transform';
 import { chessgroundDests } from 'chessops/compat';
 
@@ -42,22 +44,21 @@ const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 class Controller {
   private events: Record<string, Array<(...args: any) => void> | undefined> = {};
 
-  public setup: Setup;
+  public setup: Setup = parseFen(DEFAULT_FEN).unwrap();
   public lastMove?: Move;
 
   private flipped = false;
   public editMode = false;
 
   constructor(fen: string) {
-    this.setup = parseFen(DEFAULT_FEN).unwrap();
-    parseFen(fen).unwrap(setup => this.setPosition(setup), _ => {});
+    parseFen(fen).map(setup => this.setPosition(setup));
 
     window.addEventListener('popstate', event => {
-      const fen = event.state?.fen || new URLSearchParams(location.search).get('fen') || DEFAULT_FEN;
-      this.setPosition(parseFen(fen.replace(/_/g, ' ')).unwrap(
-        setup => setup,
-        _ => parseFen(DEFAULT_FEN).unwrap()
-      ), event.state?.lastMove);
+      const fen = event.state?.fen || new URLSearchParams(location.search).get('fen');
+      const setup = (fen ? Result.ok(fen) : Result.err(new FenError(InvalidFen.Fen))).chain(
+        fen => parseFen(fen.replace(/_/g, ' '))
+      ).unwrap(setup => setup, _ => parseFen(DEFAULT_FEN).unwrap());
+      this.setPosition(setup, event.state?.lastMove);
     });
   }
 
@@ -285,10 +286,7 @@ class FenInputView {
 
     document.getElementById('form-set-fen')!.addEventListener('submit', event => {
       event.preventDefault();
-      relaxedParseFen(input.value).unwrap(
-        setup => controller.push(setup),
-        _ => {}
-      );
+      relaxedParseFen(input.value).map(setup => controller.push(setup));
     });
 
     this.setPosition(controller.setup);
