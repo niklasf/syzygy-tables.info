@@ -40,7 +40,7 @@ const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 
 class Controller {
-  private events: Record<string, Array<(...args: any) => void>> = {};
+  private events: Record<string, Array<(...args: any) => void> | undefined> = {};
 
   public setup: Setup;
   public lastMove?: Move;
@@ -62,14 +62,11 @@ class Controller {
   }
 
   bind(event: string, cb: (...args: any) => void) {
-    this.events[event] ||= [];
-    this.events[event].push(cb);
+    this.events[event] = [...(this.events[event] || []), cb];
   }
 
   trigger(event: string, ...args: any) {
-    if (this.events[event]) for (const cb of this.events[event]) {
-      cb.apply(this, args);
-    }
+    for (const cb of (this.events[event] || [])) cb.apply(this, args);
   }
 
   toggleFlipped() {
@@ -102,7 +99,7 @@ class Controller {
   }
 
   private setPosition(setup: Setup, lastMove?: Move) {
-    if (makeFen(setup) == makeFen(this.setup)) return false;
+    if (makeFen(setup) === makeFen(this.setup)) return false;
     this.setup = {
       ...setup,
       halfmoves: 0,
@@ -192,6 +189,8 @@ class BoardView {
       });
     });
 
+    // Change listeners not supported in Safari.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     reducedMotion.addEventListener?.('change', () => {
       ground.set({
         animation: {
@@ -258,7 +257,7 @@ class SideToMoveView {
       controller.push({
         ...controller.setup,
         turn: 'black',
-      })
+      });
     });
 
     this.setPosition(controller.setup);
@@ -280,17 +279,15 @@ class FenInputView {
     }
 
     const input = document.getElementById('fen') as HTMLInputElement;
-    if (input.setCustomValidity) {
-      input.oninput = input.onchange = () => {
-        input.setCustomValidity(relaxedParseFen(input.value).unwrap(_ => '', _ => 'Invalid FEN'));
-      };
-    }
+    input.oninput = input.onchange = () => {
+      input.setCustomValidity(relaxedParseFen(input.value).unwrap(_ => '', _ => 'Invalid FEN'));
+    };
 
     document.getElementById('form-set-fen')!.addEventListener('submit', event => {
       event.preventDefault();
       relaxedParseFen(input.value).unwrap(
         setup => controller.push(setup),
-        _ => input.setCustomValidity || input.focus()
+        _ => {}
       );
     });
 
