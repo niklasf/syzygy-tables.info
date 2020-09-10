@@ -424,13 +424,12 @@ class DocumentTitle {
 }
 
 
-$(() => {
-  const controller = new Controller($('#board').attr('data-fen')!);
-  const boardView = new BoardView(controller);
-  new SideToMoveView(controller);
-  new FenInputView(controller);
-  new ToolBarView(controller);
+const controller = new Controller($('#board').attr('data-fen')!);
 
-  new DocumentTitle(controller);
-  new TablebaseView(controller, boardView);
-});
+const boardView = new BoardView(controller);
+new SideToMoveView(controller);
+new FenInputView(controller);
+new ToolBarView(controller);
+
+new DocumentTitle(controller);
+new TablebaseView(controller, boardView);
