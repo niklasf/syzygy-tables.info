@@ -62,7 +62,7 @@ class Controller {
   }
 
   bind(event: string, cb: (...args: any) => void) {
-    this.events[event] = this.events[event] || [];
+    this.events[event] ||= [];
     this.events[event].push(cb);
   }
 
