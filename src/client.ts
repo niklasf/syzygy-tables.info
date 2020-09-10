@@ -16,15 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'cash-dom';
-import { Cash } from 'cash-dom';
-
 import { Chessground } from 'chessground';
 import { Api as CgApi } from 'chessground/api';
 
 import { Color, Role, Move, SquareName, isDrop } from 'chessops/types';
 import { parseSquare, parseUci, makeSquare } from 'chessops/util';
 import { SquareSet } from 'chessops/squareSet';
+import { Board } from 'chessops/board';
 import { Setup } from 'chessops/setup';
 import { Chess } from 'chessops/chess';
 import { makeFen, makeBoardFen, parseFen, parseBoardFen } from 'chessops/fen';
@@ -50,9 +48,9 @@ class Controller {
   private flipped = false;
   public editMode = false;
 
-  constructor(fen?: string) {
+  constructor(fen: string) {
     this.setup = parseFen(DEFAULT_FEN).unwrap();
-    if (fen) parseFen(fen).unwrap(setup => this.setPosition(setup), _ => {});
+    parseFen(fen).unwrap(setup => this.setPosition(setup), _ => {});
 
     window.addEventListener('popstate', event => {
       const fen = event.state?.fen || new URLSearchParams(location.search).get('fen') || DEFAULT_FEN;
@@ -217,14 +215,18 @@ class BoardView {
   }
 
   private setFlipped(flipped: boolean) {
-    var other = flipped ? 'white' : 'black';
+    const other = flipped ? 'white' : 'black';
     if (other === this.ground.state.orientation) this.ground.toggleOrientation();
-    $('.spare.bottom piece').attr('data-color', this.ground.state.orientation);
-    $('.spare.bottom piece').toggleClass('white', this.ground.state.orientation === 'white');
-    $('.spare.bottom piece').toggleClass('black', this.ground.state.orientation === 'black');
-    $('.spare.top piece').attr('data-color', other);
-    $('.spare.top piece').toggleClass('white', other === 'white');
-    $('.spare.top piece').toggleClass('black', other === 'black');
+    for (const el of document.querySelectorAll('.spare.bottom piece')) {
+      el.setAttribute('data-color', this.ground.state.orientation);
+      el.classList.toggle('white', this.ground.state.orientation === 'white');
+      el.classList.toggle('black', this.ground.state.orientation === 'black');
+    }
+    for (const el of document.querySelectorAll('.spare.top piece')) {
+      el.setAttribute('data-color', other);
+      el.classList.toggle('white', other === 'white');
+      el.classList.toggle('black', other === 'black');
+    }
   }
 
   unsetHovering() {
@@ -243,7 +245,7 @@ class BoardView {
 
 class SideToMoveView {
   constructor(controller: Controller) {
-    $('#btn-white').on('click', event => {
+    document.getElementById('btn-white')!.addEventListener('click', event => {
       event.preventDefault();
       controller.push({
         ...controller.setup,
@@ -251,7 +253,7 @@ class SideToMoveView {
       });
     });
 
-    $('#btn-black').on('click', event => {
+    document.getElementById('btn-black')!.addEventListener('click', event => {
       event.preventDefault();
       controller.push({
         ...controller.setup,
@@ -264,8 +266,8 @@ class SideToMoveView {
   }
 
   private setPosition(setup: Setup) {
-    $('#btn-white').toggleClass('active', setup.turn === 'white');
-    $('#btn-black').toggleClass('active', setup.turn === 'black');
+    document.getElementById('btn-white')!.classList.toggle('active', setup.turn === 'white');
+    document.getElementById('btn-black')!.classList.toggle('active', setup.turn === 'black');
   }
 }
 
@@ -284,7 +286,7 @@ class FenInputView {
       };
     }
 
-    $('#form-set-fen').on('submit', event => {
+    document.getElementById('form-set-fen')!.addEventListener('submit', event => {
       event.preventDefault();
       relaxedParseFen(input.value).unwrap(
         setup => controller.push(setup),
@@ -298,17 +300,17 @@ class FenInputView {
 
   private setPosition(setup: Setup) {
     const fen = makeFen(setup);
-    $('#fen').val(fen === DEFAULT_FEN ? '' : fen);
+    (document.getElementById('fen') as HTMLInputElement).value = fen === DEFAULT_FEN ? '' : fen;
   }
 }
 
 
 class ToolBarView {
   constructor(controller: Controller) {
-    $('#btn-flip-board').on('click', () => controller.toggleFlipped());
-    controller.bind('flipped', (flipped: boolean) => $('#btn-flip-board').toggleClass('active', flipped));
+    document.getElementById('btn-flip-board')!.addEventListener('click', () => controller.toggleFlipped());
+    controller.bind('flipped', (flipped: boolean) => document.getElementById('btn-flip-board')!.classList.toggle('active', flipped));
 
-    $('#btn-clear-board').on('click', event => {
+    document.getElementById('btn-clear-board')!.addEventListener('click', event => {
       event.preventDefault();
       controller.push({
         ...controller.setup,
@@ -318,7 +320,7 @@ class ToolBarView {
       });
     });
 
-    $('#btn-swap-colors').on('click', event => {
+    document.getElementById('btn-swap-colors')!.addEventListener('click', event => {
       event.preventDefault();
 
       const board = controller.setup.board.clone();
@@ -334,75 +336,76 @@ class ToolBarView {
       });
     });
 
-    $('#btn-mirror-horizontal').on('click', event => {
+    document.getElementById('btn-mirror-horizontal')!.addEventListener('click', event => {
       event.preventDefault();
       controller.push(transformSetup(controller.setup, flipHorizontal));
     });
 
-    $('#btn-mirror-vertical').on('click', event => {
+    document.getElementById('btn-mirror-vertical')!.addEventListener('click', event => {
       event.preventDefault();
       controller.push(transformSetup(controller.setup, flipVertical));
     });
 
-    $('#btn-edit').on('click', () => controller.toggleEditMode());
+    document.getElementById('btn-edit')!.addEventListener('click', () => controller.toggleEditMode());
 
     controller.bind('editMode', (editMode: boolean) => {
-      $('#btn-edit').toggleClass('active', editMode);
-      $('#btn-edit > span.icon')
-        .toggleClass('icon-lock', editMode)
-        .toggleClass('icon-lock-open', !editMode);
+      const btn = document.getElementById('btn-edit')!;
+      btn.classList.toggle('active', editMode);
+      const icon = btn.querySelector('span.icon')!;
+      icon.classList.toggle('icon-lock', editMode);
+      icon.classList.toggle('icon-lock-open', !editMode);
     });
   }
 }
 
 
 class TablebaseView {
-  constructor(controller: Controller, boardView: BoardView) {
-    function bindMoveLink($moveLink: Cash) {
-      $moveLink
-        .on('click', function (this: HTMLElement, event: MouseEvent) {
-          event.preventDefault();
-          controller.pushMove(parseUci($(this).attr('data-uci')!)!);
-          boardView.unsetHovering();
-        })
-        .on('mouseenter', function (this: HTMLElement) {
-          boardView.setHovering($(this).attr('data-uci')!);
-        })
-        .on('mouseleave', () => boardView.unsetHovering());
-    }
+  abortController: AbortController | null = null;
 
-    bindMoveLink($('a.list-group-item'));
+  constructor(controller: Controller, private boardView: BoardView) {
+    this.bindMoveLinks();
 
-    let abortController: AbortController | null = null;
     controller.bind('setupChanged', (setup: Setup) => {
-      if (abortController) abortController.abort();
-      abortController = new AbortController();
+      if (this.abortController) this.abortController.abort();
+      this.abortController = new AbortController();
 
       const spinner = '<div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div>';
-      const $content = $('.right-side > .inner').html(spinner);
+      const content = document.querySelector('.right-side > .inner')!;
+      content.innerHTML = spinner;
 
       const url = new URL('/', location.href);
       url.searchParams.set('fen', makeFen(setup));
       url.searchParams.set('xhr', 'probe');
 
       fetch(url.href, {
-        signal: abortController.signal
+        signal: this.abortController.signal
       }).then(res => {
         if (res.ok) return res.text();
         else throw res;
       }).then(html => {
-        $content.html(html);
-        bindMoveLink($('a.list-group-item'));
+        content.innerHTML = html;
+        this.bindMoveLinks();
       }).catch(err => {
-        $content
-          .empty()
-          .append($('<section>')
-          .append($('<h2 id="status"></h2>').text('Network error ' + err.status))
-          .append($('<div id="info"></div>').text(err.statusText)));
+        content.innerHTML = `<section><h2 id="status">Network error ${err.status || 0}</h2><div id="info">${err.statusText || ''}</div></section>`;
       }).finally(() => {
-        abortController = null;
+        this.abortController = null;
       });
     });
+  }
+
+  private bindMoveLinks() {
+    const boardView = this.boardView;
+    for (const el of document.querySelectorAll('a.list-group-item')) {
+      el.addEventListener('click', function (this: HTMLElement, event: MouseEvent) {
+        event.preventDefault();
+        controller.pushMove(parseUci(this.getAttribute('data-uci')!)!);
+        boardView.unsetHovering();
+      });
+      el.addEventListener('mouseover', function(this: HTMLElement) {
+        boardView.setHovering(this.getAttribute('data-uci')!);
+      });
+      el.addEventListener('mouseleave', () => boardView.unsetHovering());
+    }
   }
 }
 
@@ -410,21 +413,23 @@ class TablebaseView {
 class DocumentTitle {
   constructor(controller: Controller) {
     controller.bind('setupChanged', (setup: Setup) => {
-      const board = setup.board;
-      const side = (color: Color) =>
-        'K'.repeat(board.pieces(color, 'king').size()) +
-        'Q'.repeat(board.pieces(color, 'queen').size()) +
-        'R'.repeat(board.pieces(color, 'rook').size()) +
-        'B'.repeat(board.pieces(color, 'bishop').size()) +
-        'N'.repeat(board.pieces(color, 'knight').size()) +
-        'P'.repeat(board.pieces(color, 'pawn').size());
-      document.title = side('white') + 'v' + side('black') + ' – Syzygy endgame tablebases';
+      document.title = `${this.side(setup.board, 'white')}v${this.side(setup.board, 'black')} – Syzygy endgame tablebases`;
     });
+  }
+
+  private side(board: Board, color: Color) {
+    return (
+      'K'.repeat(board.pieces(color, 'king').size()) +
+      'Q'.repeat(board.pieces(color, 'queen').size()) +
+      'R'.repeat(board.pieces(color, 'rook').size()) +
+      'B'.repeat(board.pieces(color, 'bishop').size()) +
+      'N'.repeat(board.pieces(color, 'knight').size()) +
+      'P'.repeat(board.pieces(color, 'pawn').size()));
   }
 }
 
 
-const controller = new Controller($('#board').attr('data-fen')!);
+const controller = new Controller(document.getElementById('board')!.getAttribute('data-fen')!);
 
 const boardView = new BoardView(controller);
 new SideToMoveView(controller);
