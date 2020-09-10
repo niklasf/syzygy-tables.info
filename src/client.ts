@@ -24,7 +24,6 @@ import { Result} from '@badrap/result';
 import { Color, Role, Move, SquareName } from 'chessops/types';
 import { parseSquare, parseUci } from 'chessops/util';
 import { SquareSet } from 'chessops/squareSet';
-import { Board } from 'chessops/board';
 import { Setup, MaterialSide } from 'chessops/setup';
 import { Chess } from 'chessops/chess';
 import { FenError, InvalidFen, makeFen, makeBoardFen, makePocket, parseFen, parseBoardFen } from 'chessops/fen';
@@ -402,12 +401,10 @@ class TablebaseView {
 class DocumentTitle {
   constructor(controller: Controller) {
     controller.bind('setupChanged', (setup: Setup) => {
-      document.title = `${this.side(setup.board, 'white')}v${this.side(setup.board, 'black')} – Syzygy endgame tablebases`;
+      const side = (color: Color) =>
+        makePocket(MaterialSide.fromBoard(setup.board, color)).split('').reverse().join('').toUpperCase();
+      document.title = `${side('white')}v${side('black')} – Syzygy endgame tablebases`;
     });
-  }
-
-  private side(board: Board, color: Color) {
-    return makePocket(MaterialSide.fromBoard(board, color)).split('').reverse().join('').toUpperCase();
   }
 }
 
