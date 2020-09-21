@@ -33,7 +33,7 @@
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
-    "rollup": "^2.26.11",
+    "rollup": "^2.27.1",
     "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.0.1",
     "typescript": "^4.0.2"
