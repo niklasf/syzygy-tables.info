@@ -511,8 +511,7 @@ pre code {
 }
 
 .endgames li.maximal {
-  border-color: var(--border-color);
-  background: var(--shaded-bg-color);
+  border: 2px solid var(--border-color);
 }
 
 /* Two columns */
