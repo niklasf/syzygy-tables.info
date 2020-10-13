@@ -10,11 +10,9 @@ Running
 
 Build JavaScript and CSS files using Gulp. Requires node.js and npm:
 
-    npm add --global gulp-cli
     npm install
-    gulp
 
-Install dependencies with Python (>= 3.6) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
+Install dependencies with Python (>= 3.7) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
 
     PIPENV_VENV_IN_PROJECT=1 pipenv install
 
@@ -34,7 +32,7 @@ Hacking
 -------
 
 Have a look at `server.py` for server side code. The client side code is in
-`src/client.js`. Run `gulp js` or `gulp css` to build, `gulp` for both.
+`src/client.js`. Run `npm run prepare` to rebuild.
 
 License
 -------
