@@ -136,7 +136,7 @@ a:hover, a:visited {
 
 li {
   margin-left: -1.5em;
-  margin-top: 0.5em;
+  margin-top: 0.6em;
 }
 
 table {
@@ -150,7 +150,7 @@ thead {
   border-bottom: 4px solid var(--border-color);
 }
 td, th {
-  padding: 0.2em;
+  padding: 0.4em 0.2em;
   text-align: center;
 }
 
