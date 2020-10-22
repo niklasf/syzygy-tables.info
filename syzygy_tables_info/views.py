@@ -17,7 +17,7 @@
 
 import os
 
-from tinyhtml import Frag, html, h, raw
+from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional
 
 
@@ -25,7 +25,7 @@ def asset_url(path: str) -> str:
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
-def layout(*, development: bool = True, left: Optional[Frag] = None, right: Optional[Frag] = None, head: Optional[Frag] = None, scripts: Optional[Frag] = None) -> Frag:
+def layout(*, title: str, development: bool, left: Optional[Frag] = None, right: Optional[Frag] = None, head: Optional[Frag] = None, scripts: Optional[Frag] = None) -> Frag:
     return html(lang="en")(
         raw("<!-- https://github.com/niklasf/syzygy-tables.info -->"),
         h("head")(
@@ -33,7 +33,7 @@ def layout(*, development: bool = True, left: Optional[Frag] = None, right: Opti
             h("link", rel="preload", href="/static/fonts/fontello.woff2", as_="font", type="font/woff2", crossorigin=True),
             h("link", rel="stylesheet", href=asset_url("css/style.min.css")),
             head,
-            h("title")("Syzygy endgame tablebases"),
+            h("title")(title, "– Syzygy endgame tablebases"),
             h("meta", name="viewport", content="width=device-width,initial-scale=1.0,user-scalable=yes"),
             h("meta", name="keywords", content="Syzygy,chess,endgame,tablebase"),
             h("meta", name="author", content="Niklas Fiekas"),
@@ -69,5 +69,101 @@ def layout(*, development: bool = True, left: Optional[Frag] = None, right: Opti
                 ),
             ),
             scripts,
+        ),
+    )
+
+
+def legal(*, development: bool = True) -> Frag:
+    return layout(
+        development=development,
+        title="Legal",
+        left=frag(
+            h("h1")("Legal"),
+            h("p")("The tablebase lookup is provided on a best-effort basis, without guarantees of correctness or availability. Feedback or questions are welcome."),
+            h("p")("There are standard server logs kept no longer than 48 hours."),
+            h("nav")(
+                h("div", klass="reload")(
+                    h("a", klass="btn btn-default", href="/")("Back to board"),
+                ),
+            ),
+        ),
+        right=frag(
+            h("section", id="contact")(
+                h("h2")("Contact"),
+                h("p")(
+                    h("a", href="mailto:niklas.fiekas@backscattering.de")("niklas.fiekas@backscattering.de"), " ",
+                    "(", h("a", href="https://pgp.mit.edu/pks/lookup?op=get&search=0x2ECA66C65B255138")("pgp"), ")",
+                ),
+            ),
+            h("section", id="imprint")(
+                h("h2")("Imprint"),
+                h("p")(
+                    "Niklas Fiekas",
+                    h("br"), "Tannenhöhe 16",
+                    h("br"), "38678 Clausthal-Zellerfeld",
+                    h("br"), "Germany",
+                ),
+            ),
+            h("section", id="thanks")(
+                h("h2")("Software licenses"),
+                h("p")(
+                    "The ",
+                    h("a", href="https://github.com/niklasf/syzygy-tables.info")("code for the website itself"),
+                    " is ",
+                    h("a", href="https://github.com/niklasf/syzygy-tables.info/blob/master/LICENSE")("licensed under the AGPL-3.0+"),
+                    ".",
+                ),
+                h("table", id="jslicense-labels1")(
+                    h("thead")(
+                        h("tr")(
+                            h("th")("Script"),
+                            h("th")("License"),
+                            h("th")("Source"),
+                        ),
+                    ),
+                    h("tbody")(
+                        h("tr")(
+                            h("td")(
+                                h("a", href=asset_url("js/client.min.js"))("client.min.js"),
+                            ),
+                            h("td")(
+                                h("a", href="https://www.gnu.org/licenses/agpl-3.0.en.html")("AGPL-3.0+"),
+                            ),
+                            h("td")(
+                                h("a", href="https://github.com/niklasf/syzygy-tables.info/blob/master/src/client.ts")("client.ts"),
+                            ),
+                        ),
+                    ),
+                ),
+                h("p")("It also uses the following software/artwork:"),
+                h("ul")(
+                    h("li")(
+                        h("a", href="https://github.com/ornicar/chessground")("chessground"),
+                        " (GPL-3.0+)",
+                    ),
+                    h("li")(
+                        h("a", href="https://github.com/niklasf/chessops")("chessops"),
+                        " (GPL-3.0+)",
+                    ),
+                    h("li")(
+                        h("a", href="https://github.com/niklasf/python-chess")("python-chess"),
+                        " (GPL-3.0+)",
+                    ),
+                    h("li")(
+                        h("a", href="http://aiohttp.readthedocs.org/en/stable/")("aiohttp"),
+                        " (Apache License 2.0)",
+                    ),
+                    h("li")(
+                        "Selected icons from ",
+                        h("a", href="https://fontawesome.com/")("Font Awesome"),
+                        " (SIL)",
+                    ),
+                    h("li")(
+                        "A few styles from ",
+                        h("a", href="https://getbootstrap.com/")("Bootstrap"),
+                        " (MIT)",
+                    ),
+                ),
+            ),
         ),
     )

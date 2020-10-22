@@ -474,8 +474,9 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 @routes.get("/legal")
 async def legal(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    template = request.app["jinja"].get_template("legal.html")
-    return aiohttp.web.Response(text=template.render(), content_type="text/html")
+    return aiohttp.web.Response(
+            text=syzygy_tables_info.views.legal(development=request.app["jinja"].globals["development"]).render(),
+            content_type="text/html")
 
 @routes.get("/metrics")
 async def metrics(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -675,11 +676,6 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     template = request.app["jinja"].get_template("endgames.html")
     return aiohttp.web.Response(text=template.render(render), content_type="text/html")
-
-
-@routes.get("/new")
-async def new(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    return aiohttp.web.Response(text=syzygy_tables_info.views.layout().render(), content_type="text/html")
 
 
 def make_app(config):
