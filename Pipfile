@@ -11,4 +11,4 @@ aiohttp = "~=3.6.3"
 brotlipy = "~=0.7.0"
 
 [scripts]
-server = "python server.py"
+server = "python -m syzygy_tables_info"

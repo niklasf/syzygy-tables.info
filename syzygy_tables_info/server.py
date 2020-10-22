@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 # This file is part of the syzygy-tables.info tablebase probing website.
 # Copyright (C) 2015-2020 Niklas Fiekas <niklas.fiekas@backscattering.de>
 #
@@ -16,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 import aiohttp.web
 
@@ -65,11 +63,11 @@ def kib(num):
 def static(path, content_type=None):
     def handler(request):
         headers = { "Content-Type": content_type } if content_type else None
-        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), path), headers=headers)
+        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), "..", path), headers=headers)
     return handler
 
 def asset_url(path):
-    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", path)))
+    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
 def with_turn(board, turn):
@@ -728,8 +726,8 @@ def main(argv):
 
     config = configparser.ConfigParser()
     config.read([
-        os.path.join(os.path.dirname(__file__), "config.default.ini"),
-        os.path.join(os.path.dirname(__file__), "config.ini"),
+        os.path.join(os.path.dirname(__file__), "..", "config.default.ini"),
+        os.path.join(os.path.dirname(__file__), "..", "config.ini"),
     ] + argv)
 
     bind = config.get("server", "bind")
@@ -740,7 +738,3 @@ def main(argv):
     print("* Server name: ", config.get("server", "name"))
     print("* Base url: ", config.get("server", "base_url"))
     aiohttp.web.run_app(app, host=bind, port=port, access_log=None)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])

@@ -23,16 +23,17 @@ Then start the server on port 5000.
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables.
 
-API / Backend
--------------
+API
+---
 
 This website is based on a [public API](https://github.com/niklasf/lila-tablebase) hosted by [lichess.org](https://tablebase.lichess.ovh).
 
 Hacking
 -------
 
-Have a look at `server.py` for server side code. The client side code is in
-`src/client.js`. Run `npm run prepare` to rebuild.
+Have a look at `syzygy_tables_info` for server side code.
+
+The client side code is in `src/client.js`. Run `npm run prepare` to rebuild.
 
 License
 -------
