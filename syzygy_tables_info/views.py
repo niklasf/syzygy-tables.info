@@ -73,6 +73,14 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
     )
 
 
+def back_to_board() -> Frag:
+    return h("nav")(
+        h("div", klass="reload")(
+            h("a", klass="btn btn-default", href="/")("Back to board"),
+        ),
+    )
+
+
 def legal(*, development: bool = True) -> Frag:
     return layout(
         development=development,
@@ -81,11 +89,7 @@ def legal(*, development: bool = True) -> Frag:
             h("h1")("Legal"),
             h("p")("The tablebase lookup is provided on a best-effort basis, without guarantees of correctness or availability. Feedback or questions are welcome."),
             h("p")("There are standard server logs kept no longer than 48 hours."),
-            h("nav")(
-                h("div", klass="reload")(
-                    h("a", klass="btn btn-default", href="/")("Back to board"),
-                ),
-            ),
+            back_to_board(),
         ),
         right=frag(
             h("section", id="contact")(
@@ -163,6 +167,98 @@ def legal(*, development: bool = True) -> Frag:
                         h("a", href="https://getbootstrap.com/")("Bootstrap"),
                         " (MIT)",
                     ),
+                ),
+            ),
+        ),
+    )
+
+
+def metrics(*, development: bool) -> Frag:
+    wdl50 = frag("WDL", h("sub")(50))
+    dtz50_pp = frag("DTZ", h("sub")(50), "′′")
+    n = h("var")("n")
+    example1 = "1kb5/8/1KN5/3N4/8/8/8/8 b - -"
+    example2 = "8/8/2N5/8/3k4/7N/p2K4/8 b - -"
+
+    def example_board(epd: str, check: str) -> Frag:
+        board_fen = epd.split(" ")[0]
+        return h("a", href=f"/?fen={epd.replace(' ', '_')}_0_1")(
+            h("img", width=300, height=300, alt=epd, src=f"https://backscattering.de/web-boardimage/board.svg?fen={board_fen}&check={check}"),
+        )
+
+    def example_link(epd: str) -> Frag:
+        return h("a", href=f"/?fen={epd.replace(' ', '_')}_0_1")(epd)
+
+    return layout(
+        development=development,
+        title="Metrics",
+        left=frag(
+            h("h1")("Metrics"),
+            h("p")("Information stored in Syzygy tablebases"),
+            back_to_board(),
+        ),
+        right=frag(
+            h("section", id="wdl")(
+                h("h2")(wdl50),
+                h("p")(
+                    "5-valued ",
+                    h("em")("Win/Draw/Loss"),
+                    " information can be used to decide which positions to aim for.",
+                ),
+                h("div", klass="list-group stats")(
+                    h("div", klass="list-group-item white-win")("Win (+2)"),
+                    h("div", klass="list-group-item white-win frustrated")("Win prevented by 50-move rule (+1)"),
+                    h("div", klass="list-group-item draws")("Drawn (0)"),
+                    h("div", klass="list-group-item black-win frustrated")("Loss saved by 50-move rule (-1)"),
+                    h("div", klass="list-group-item black-win")("Loss (-2)"),
+                ),
+            ),
+            h("section", id="dtz")(
+                h("h2")(dtz50_pp, " with rounding"),
+                h("p")(
+                    "Once a tablebase position has been reached, the ",
+                    h("em")("Distance To Zeroing"), " ",
+                    "(of the fifty-move counter by a capture or pawn move) ",
+                    "can be used to reliably make progress in favorable positions and stall ",
+                    "in unfavorable positions.",
+                ),
+                h("p")("The precise meanings are as follows:"),
+                h("p")(
+                    "A DTZ value ", n, " with 100 ≥ ", n, " ≥ 1 means the position is winning, ",
+                    "and a zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves.",
+                ),
+                example_board(example1, "b8"),
+                h("p")(
+                    "For an example of this ambiguity, see how the DTZ repeats after the only-move Ka8 in ",
+                    example_link(example1), ". ",
+                    "This is due to the fact that some Syzygy tables store rounded moves ",
+                    "instead of half-moves, to save space. This implies some primary tablebase lines ",
+                    "may waste up to 1 ply. Rounding is never used for endgame phases where it would ",
+                    "change the game theoretical outcome (", wdl50, ").",
+                ),
+                h("p")(
+                    "Users need to be careful in positions ",
+                    "that are nearly drawn under ",
+                    "the 50-move rule! Carelessly wasting 1 more ply ",
+                    "by not following the tablebase recommendation, for a total of 2 wasted plies, ",
+                    "may change the outcome of the game.",
+                ),
+                h("p")(
+                    "A DTZ value ", n, " > 100 means the position is winning, but drawn under the 50-move rule. ",
+                    "A zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves, ",
+                    "or in ", n, " - 100 or ", n, " + 1 - 100 half-moves ",
+                    "if a later phase is responsible for the draw.",
+                ),
+                example_board("8/8/2N5/8/3k4/7N/p2K4/8 b - -", "d4"),
+                h("p")(
+                    "For example, in ", example_link(example2), " ",
+                    "black promotes the pawn in 7 ply, but the DTZ is 107, ",
+                    "indicating that white can hold a draw under the 50-move rule ",
+                    "in a later phase of the endgame.",
+                ),
+                h("p")(
+                    "An in-depth discussion of rounding can be found in ",
+                    h("a", href="http://www.talkchess.com/forum3/viewtopic.php?f=7&t=58488#p651293")("this thread"), ".",
                 ),
             ),
         ),
