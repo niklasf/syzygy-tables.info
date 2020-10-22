@@ -33,7 +33,7 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
             h("link", rel="preload", href="/static/fonts/fontello.woff2", as_="font", type="font/woff2", crossorigin=True),
             h("link", rel="stylesheet", href=asset_url("css/style.min.css")),
             head,
-            h("title")(title, "– Syzygy endgame tablebases"),
+            h("title")(title, " – Syzygy endgame tablebases"),
             h("meta", name="viewport", content="width=device-width,initial-scale=1.0,user-scalable=yes"),
             h("meta", name="keywords", content="Syzygy,chess,endgame,tablebase"),
             h("meta", name="author", content="Niklas Fiekas"),
@@ -154,8 +154,12 @@ def legal(*, development: bool = True) -> Frag:
                         " (GPL-3.0+)",
                     ),
                     h("li")(
+                        h("a", href="https://github.com/niklasf/python-tinyhtml")("tinyhtml"),
+                        " (MIT/Apache-2.0)",
+                    ),
+                    h("li")(
                         h("a", href="http://aiohttp.readthedocs.org/en/stable/")("aiohttp"),
-                        " (Apache License 2.0)",
+                        " (Apache-2.0)",
                     ),
                     h("li")(
                         "Selected icons from ",
