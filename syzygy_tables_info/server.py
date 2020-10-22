@@ -36,6 +36,8 @@ import math
 import sys
 import textwrap
 
+import syzygy_tables_info.views
+
 from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional
 
 
@@ -57,9 +59,6 @@ def static(path: str, content_type: Optional[str] = None) -> Any:
         headers = { "Content-Type": content_type } if content_type else None
         return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), "..", path), headers=headers)
     return handler
-
-def asset_url(path: str) -> str:
-    return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
 def with_turn(board: chess.Board, turn: chess.Color) -> chess.Board:
@@ -678,6 +677,11 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(text=template.render(render), content_type="text/html")
 
 
+@routes.get("/new")
+async def new(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    return aiohttp.web.Response(text=syzygy_tables_info.views.layout().render(), content_type="text/html")
+
+
 def make_app(config):
     app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
     app["config"] = config
@@ -693,7 +697,7 @@ def make_app(config):
     app["jinja"].globals["DEFAULT_FEN"] = DEFAULT_FEN
     app["jinja"].globals["STARTING_FEN"] = chess.STARTING_FEN
     app["jinja"].globals["development"] = config.getboolean("server", "development")
-    app["jinja"].globals["asset_url"] = asset_url
+    app["jinja"].globals["asset_url"] = syzygy_tables_info.views.asset_url
     app["jinja"].globals["kib"] = kib
 
     # Load stats.
