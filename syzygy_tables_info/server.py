@@ -36,13 +36,15 @@ import math
 import sys
 import textwrap
 
+from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional
+
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-def kib(num):
+def kib(num: float) -> str:
     for unit in ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"]:
         if abs(num) < 1024:
             return "%3.1f %s" % (num, unit)
@@ -50,34 +52,37 @@ def kib(num):
     return "%.1f %s" % (num, "Yi")
 
 
-def static(path, content_type=None):
-    def handler(request):
+def static(path: str, content_type: Optional[str] = None) -> Any:
+    def handler(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
         headers = { "Content-Type": content_type } if content_type else None
         return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), "..", path), headers=headers)
     return handler
 
-def asset_url(path):
+def asset_url(path: str) -> str:
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
-def with_turn(board, turn):
+def with_turn(board: chess.Board, turn: chess.Color) -> chess.Board:
     board = board.copy(stack=False)
     board.turn = turn
     return board
 
 
 @aiohttp.web.middleware
-async def trust_x_forwarded_for(request, handler):
+async def trust_x_forwarded_for(
+    request: aiohttp.web.Request,
+    handler: Callable[[aiohttp.web.Request], Awaitable[aiohttp.web.StreamResponse]]
+) -> aiohttp.web.StreamResponse:
     if request.remote == "127.0.0.1":
         request = request.clone(remote=request.headers.get("X-Forwarded-For", "127.0.0.1"))
     return await handler(request)
 
-def backend_session(request):
+def backend_session(request: aiohttp.web.Request) -> aiohttp.ClientSession:
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote})
 
 
-def prepare_stats(request, material, fen, active_dtz):
-    render = {}
+def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int]) -> Optional[Dict[str, Any]]:
+    render: Dict[str, Any] = {}
 
     # Get stats and side.
     stats = request.app["stats"].get(material)
@@ -160,7 +165,7 @@ def prepare_stats(request, material, fen, active_dtz):
     return render
 
 
-def longest_fen(stats, endgame):
+def longest_fen(stats: Dict[str, Any], endgame: str) -> Optional[str]:
     if endgame == "KNvK":
         return "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1"
     elif endgame == "KBvK":
@@ -172,14 +177,14 @@ def longest_fen(stats, endgame):
         return None
 
     try:
-        longest = max(stats["longest"], key=lambda e: e["ply"])
+        longest: Dict[str, Any] = max(stats["longest"], key=lambda e: e["ply"])
     except ValueError:
         return None
     else:
         return longest["epd"] + " 0 1"
 
 
-def sort_key(endgame):
+def sort_key(endgame: str) -> Any:
     w, b = endgame.split("v", 1)
     return len(endgame), len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
 
@@ -187,12 +192,12 @@ def sort_key(endgame):
 routes = aiohttp.web.RouteTableDef()
 
 @routes.get("/syzygy-vs-syzygy/{material}.pgn")
-async def syzygy_vs_syzygy_pgn(request):
+async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
     # Parse FEN.
     try:
         board = chess.Board(request.query["fen"].replace("_", " "))
         board.halfmove_clock = 0
-        board.fullmoves = 1
+        board.fullmove_number = 1
     except KeyError:
         raise aiohttp.web.HTTPBadRequest(reason="fen required")
     except ValueError:
@@ -227,7 +232,7 @@ async def syzygy_vs_syzygy_pgn(request):
     async with backend_session(request) as session:
         async with session.get(request.app["config"].get("server", "backend") + "/mainline", params={"fen": board.fen()}) as res:
             if res.status == 404:
-                result = {
+                result: Dict[str, Any] = {
                     "dtz": None,
                     "mainline": [],
                 }
@@ -244,7 +249,7 @@ async def syzygy_vs_syzygy_pgn(request):
 
     # Follow the DTZ mainline.
     dtz = result["dtz"]
-    node = game
+    node: chess.pgn.GameNode = game
     for move_info in result["mainline"]:
         move = board.push_uci(move_info["uci"])
         node = node.add_variation(move)
@@ -277,14 +282,14 @@ async def syzygy_vs_syzygy_pgn(request):
     return response
 
 @routes.get("/")
-async def index(request):
+async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render = {}
 
     # Setup a board from the given valid FEN or fall back to the default FEN.
     try:
         board = chess.Board(request.query.get("fen", DEFAULT_FEN).replace("_", " "))
         board.halfmove_clock = 0
-        board.fullmoves = 1
+        board.fullmove_number = 1
     except ValueError:
         board = chess.Board(DEFAULT_FEN)
 
@@ -469,17 +474,17 @@ async def index(request):
     return aiohttp.web.Response(text=template.render(render), content_type="text/html")
 
 @routes.get("/legal")
-def legal(request):
+async def legal(request: aiohttp.web.Request) -> aiohttp.web.Response:
     template = request.app["jinja"].get_template("legal.html")
     return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/metrics")
-def metrics(request):
+async def metrics(request: aiohttp.web.Request) -> aiohttp.web.Response:
     template = request.app["jinja"].get_template("metrics.html")
     return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/robots.txt")
-def robots(request):
+async def robots(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(text=textwrap.dedent("""\
         User-agent: SemrushBot
         User-agent: SemrushBot-SA
@@ -493,7 +498,7 @@ def robots(request):
         """))
 
 @routes.get("/sitemap.txt")
-def sitemap(request):
+async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
     entries = [
         "endgames",
         "stats",
@@ -507,12 +512,12 @@ def sitemap(request):
     return aiohttp.web.Response(text=content)
 
 @routes.get("/stats")
-def stats_doc(request):
+async def stats_doc(request: aiohttp.web.Request) -> aiohttp.web.Response:
     template = request.app["jinja"].get_template("stats.html")
     return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/stats/{material}.json")
-def stats_json(request):
+async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
     table = request.match_info["material"]
     if len(table) > 7 + 1 or not chess.syzygy.TABLENAME_REGEX.match(table):
         raise aiohttp.web.HTTPNotFound()
@@ -530,7 +535,7 @@ def stats_json(request):
 
 @routes.get("/graph.dot")
 @routes.get("/graph/{material}.dot")
-def graph_dot(request):
+async def graph_dot(request: aiohttp.web.Request) -> aiohttp.web.Response:
     root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
     if not all(chess.syzygy.is_tablename(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
@@ -560,7 +565,7 @@ def graph_dot(request):
 
 @routes.get("/download.txt")
 @routes.get("/download/{material}.txt")
-def download_txt(request):
+async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
     root = request.match_info.get("material", "KPPPPPvK,KPPPPvKP,KPPPvKPP").split(",")
     if not all(chess.syzygy.is_tablename(r) for r in root):
         raise aiohttp.web.HTTPNotFound()
@@ -646,8 +651,8 @@ def download_txt(request):
     return aiohttp.web.Response(text="\n".join(result))
 
 @routes.get("/endgames")
-def endgames(request):
-    def subgroup(endgames, num_pieces, num_pawns):
+async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    def subgroup(endgames: List[str], num_pieces: int, num_pawns: int) -> Iterable[str]:
         return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
 
     endgames = list(chess.syzygy.tablenames(piece_count=7))
@@ -711,7 +716,7 @@ def make_app(config):
     return app
 
 
-def main(argv):
+def main(argv: List[str]) -> None:
     logging.basicConfig(level=logging.DEBUG)
 
     config = configparser.ConfigParser()
