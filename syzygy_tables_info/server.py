@@ -36,16 +36,6 @@ import math
 import sys
 import textwrap
 
-try:
-    import htmlmin
-
-    html_minify = functools.partial(htmlmin.minify, remove_optional_attribute_quotes=False)
-except ImportError:
-    warnings.warn("Not using HTML minification, htmlmin not imported.")
-
-    def html_minify(html):
-        return html
-
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
@@ -476,17 +466,17 @@ async def index(request):
     else:
         template = request.app["jinja"].get_template("index.html")
 
-    return aiohttp.web.Response(text=html_minify(template.render(render)), content_type="text/html")
+    return aiohttp.web.Response(text=template.render(render), content_type="text/html")
 
 @routes.get("/legal")
 def legal(request):
     template = request.app["jinja"].get_template("legal.html")
-    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
+    return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/metrics")
 def metrics(request):
     template = request.app["jinja"].get_template("metrics.html")
-    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
+    return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/robots.txt")
 def robots(request):
@@ -519,7 +509,7 @@ def sitemap(request):
 @routes.get("/stats")
 def stats_doc(request):
     template = request.app["jinja"].get_template("stats.html")
-    return aiohttp.web.Response(text=html_minify(template.render()), content_type="text/html")
+    return aiohttp.web.Response(text=template.render(), content_type="text/html")
 
 @routes.get("/stats/{material}.json")
 def stats_json(request):
@@ -680,7 +670,7 @@ def endgames(request):
     }
 
     template = request.app["jinja"].get_template("endgames.html")
-    return aiohttp.web.Response(text=html_minify(template.render(render)), content_type="text/html")
+    return aiohttp.web.Response(text=template.render(render), content_type="text/html")
 
 
 def make_app(config):
