@@ -4,10 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-Jinja2 = "~=2.11.2"
-python-chess = "~=1.1.0"
 aiohttp = "~=3.6.3"
 brotlipy = "~=0.7.0"
+Jinja2 = "~=2.11.2"
+python-chess = "~=1.1.0"
+tinyhtml = "~=1.0.0b1"
+
+[pipenv]
+allow_prereleases = true
 
 [scripts]
 server = "python -m syzygy_tables_info"

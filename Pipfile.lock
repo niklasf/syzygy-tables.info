@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a7f59b75fb5e2811e268554e40aeb9ff5f8f2b7fbaff3af87ad3802b59a5ab94"
+            "sha256": "60631d225f64e70558b0db962f17f1577fb66da6e82a35899b71b300383d8ec2"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -134,13 +134,6 @@
             ],
             "version": "==3.0.4"
         },
-        "htmlmin": {
-            "hashes": [
-                "sha256:50c1ef4630374a5d723900096a961cff426dff46b48f34d194a81bbe14eca178"
-            ],
-            "index": "pypi",
-            "version": "==0.1.12"
-        },
         "idna": {
             "hashes": [
                 "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6",
@@ -234,6 +227,14 @@
             ],
             "index": "pypi",
             "version": "==1.1.0"
+        },
+        "tinyhtml": {
+            "hashes": [
+                "sha256:e8f686e91f1e1df81c534bcd3574a4669eda869ca3a249a41b356a58de0d8043",
+                "sha256:fb9205e5e632e8bb3e81a34e3380c30f39c22cb9ef9aa487031546465b50eaf1"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0b1"
         },
         "yarl": {
             "hashes": [
