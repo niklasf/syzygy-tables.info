@@ -514,8 +514,9 @@ async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 @routes.get("/stats")
 async def stats_doc(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    template = request.app["jinja"].get_template("stats.html")
-    return aiohttp.web.Response(text=template.render(), content_type="text/html")
+    return aiohttp.web.Response(
+        text=syzygy_tables_info.views.stats(development=request.app["jinja"].globals["development"]).render(),
+        content_type="text/html")
 
 @routes.get("/stats/{material}.json")
 async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
