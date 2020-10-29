@@ -46,12 +46,7 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-def kib(num: float) -> str:
-    for unit in ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"]:
-        if abs(num) < 1024:
-            return "%3.1f %s" % (num, unit)
-        num /= 1024
-    return "%.1f %s" % (num, "Yi")
+kib = syzygy_tables_info.views.kib
 
 
 def static(path: str, content_type: Optional[str] = None) -> Any:
@@ -654,30 +649,9 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 @routes.get("/endgames")
 async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    def subgroup(endgames: List[str], num_pieces: int, num_pawns: int) -> Iterable[str]:
-        return filter(lambda t: len(t) - 1 == num_pieces and t.count("P") == num_pawns, endgames)
-
-    endgames = list(chess.syzygy.tablenames(piece_count=7))
-    endgames.sort(key=sort_key)
-
-    render = {
-        "groups": [{
-            "num_pieces": num_pieces,
-            "split_pawns": num_pieces >= 5,
-            "subgroups": [{
-                "num_pawns": num_pawns,
-                "endgames": [{
-                    "material": endgame,
-                    "has_stats": endgame in request.app["stats"],
-                    "longest_fen": longest_fen(request.app["stats"], endgame),
-                    "maximal": endgame in ["KRvK", "KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"],
-                } for endgame in subgroup(endgames, num_pieces, num_pawns)],
-            } for num_pawns in range(0, num_pieces - 2 + 1)],
-        } for num_pieces in range(3, 7 + 1)],
-    }
-
-    template = request.app["jinja"].get_template("endgames.html")
-    return aiohttp.web.Response(text=template.render(render), content_type="text/html")
+    return aiohttp.web.Response(
+        text=syzygy_tables_info.views.endgames(development=request.app["jinja"].globals["development"]).render(),
+        content_type="text/html")
 
 
 def make_app(config):

@@ -26,6 +26,14 @@ def asset_url(path: str) -> str:
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
+def kib(num: float) -> str:
+    for unit in ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"]:
+        if abs(num) < 1024:
+            return "%3.1f %s" % (num, unit)
+        num /= 1024
+    return "%.1f %s" % (num, "Yi")
+
+
 def layout(*, title: str, development: bool, left: Optional[Frag] = None, right: Optional[Frag] = None, head: Optional[Frag] = None, scripts: Optional[Frag] = None) -> Frag:
     return html(lang="en")(
         raw("<!-- https://github.com/niklasf/syzygy-tables.info -->"),
@@ -372,5 +380,23 @@ def stats(*, development: bool) -> Frag:
                     )),
                 ),
             ),
+        ),
+    )
+
+
+def endgames(*, development: bool) -> Frag:
+    return layout(
+        development=development,
+        title="Endgames",
+        left=frag(
+            h("h1")("Endgames"),
+            h("p")("These are the longest endgames (maximum DTZ) for each material configuration."),
+            h("p")(
+                h("a", href="/endgames.pgn")(
+                    h("span", klass="icon icon-download")(), " endgames.pgn",
+                ),
+                " (", kib(4396), ")",
+            ),
+            back_to_board(),
         ),
     )
