@@ -186,9 +186,11 @@ def legal(*, development: bool = True) -> Frag:
     )
 
 
+wdl50 = frag("WDL", h("sub")(50))
+dtz50_pp = frag("DTZ", h("sub")(50), "′′")
+
+
 def metrics(*, development: bool) -> Frag:
-    wdl50 = frag("WDL", h("sub")(50))
-    dtz50_pp = frag("DTZ", h("sub")(50), "′′")
     n = h("var")("n")
     example1 = "1kb5/8/1KN5/3N4/8/8/8/8 b - -"
     example2 = "8/8/2N5/8/3k4/7N/p2K4/8 b - -"
@@ -390,7 +392,11 @@ def endgames(*, development: bool) -> Frag:
         title="Endgames",
         left=frag(
             h("h1")("Endgames"),
-            h("p")("These are the longest endgames (maximum DTZ) for each material configuration."),
+            h("p")(
+                "These are the longest endgames (maximum ",
+                h("a", href="/stats")(dtz50_pp),
+                ") for each material configuration."
+            ),
             h("p")(
                 h("a", href="/endgames.pgn")(
                     h("span", klass="icon icon-download")(), " endgames.pgn",
