@@ -372,7 +372,7 @@ def stats(*, development: bool) -> Frag:
                                 "2": 2959977091
                               }
                             },
-                            "b": { // black to move
+                            "black": { // black to move
                               // ...
                             },
                           }
