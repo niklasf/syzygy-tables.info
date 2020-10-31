@@ -18,6 +18,8 @@
 import os
 import textwrap
 
+import syzygy_tables_info.stats
+
 from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional
 
@@ -408,8 +410,13 @@ def endgames(*, development: bool) -> Frag:
         right=frag(
             h("section", id=f"{piece_count}-pieces")(
                 h("h2")(piece_count, " pieces"),
-                h("ul")(
-                ) for material in ,
+                h("ul", klass="endgames")(
+                    h("li")(
+                        h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material, stats).replace(' ', '_')}")(
+                            material
+                        )
+                    ) for material, stats in syzygy_tables_info.stats.STATS.items() if len(material) == piece_count + 1
+                ),
             ) for piece_count in range(3, 7 + 1)
         ),
     )
