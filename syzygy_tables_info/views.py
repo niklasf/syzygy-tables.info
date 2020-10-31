@@ -405,4 +405,11 @@ def endgames(*, development: bool) -> Frag:
             ),
             back_to_board(),
         ),
+        right=frag(
+            h("section", id=f"{piece_count}-pieces")(
+                h("h2")(piece_count, " pieces"),
+                h("ul")(
+                ) for material in ,
+            ) for piece_count in range(3, 7 + 1)
+        ),
     )
