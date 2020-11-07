@@ -654,6 +654,13 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
         content_type="text/html")
 
 
+@routes.get("/wip")
+async def wip(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    return aiohttp.web.Response(
+        text=syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], material="KvK").render(),
+        content_type="text/html")
+
+
 def make_app(config):
     app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
     app["config"] = config

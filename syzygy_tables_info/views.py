@@ -84,6 +84,29 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
     )
 
 
+def index(*, development: bool = True, material: str) -> Frag:
+    thumbnail_url = "XXX"
+    return layout(
+        development=development,
+        title=material,
+        head=frag(
+            h("meta", name="description", content="User interface and public API for probing Syzygy endgame tablebases"),
+            h("meta", property="og:image", content=thumbnail_url),
+            h("meta", property="twitter:image", content=thumbnail_url),
+        ),
+        left=frag(
+            h("h1")("Syzygy endgame tablebases"),
+            h("nav")(
+                h("div", id="side-to-move-toolbar")(
+                    h("div", id="side-to-move", klass="btn-group", role="group", aria_label="Side to move")(
+                        h("a", id="btn-white", klass="btn btn-default", href="...")(),
+                    ),
+                ),
+            ),
+        ),
+    )
+
+
 def back_to_board() -> Frag:
     return h("nav")(
         h("div", klass="reload")(
