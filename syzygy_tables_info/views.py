@@ -20,8 +20,9 @@ import textwrap
 
 import syzygy_tables_info.stats
 
+from syzygy_tables_info.model import Render, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
-from typing import Optional
+from typing import Optional, Literal
 
 
 def asset_url(path: str) -> str:
@@ -88,27 +89,93 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
     )
 
 
-def index(*, development: bool = True, material: str) -> Frag:
-    thumbnail_url = "XXX"
+def index(*, development: bool = True, render: Render) -> Frag:
+    def spare(color: Literal["white", "black"]) -> Frag:
+        return h("div", klass=["spare", "bottom" if color == "white" else "top"])(
+            frag(
+                h("piece", klass=[color, role], data_color=color, data_role=role)(),
+                " ",
+            ) for role in ["pawn", "knight", "bishop", "rook", "queen", "king"]
+        )
+
     return layout(
         development=development,
-        title=material,
+        title=render.material,
         head=frag(
             h("meta", name="description", content="User interface and public API for probing Syzygy endgame tablebases"),
-            h("meta", property="og:image", content=thumbnail_url),
-            h("meta", property="twitter:image", content=thumbnail_url),
+            h("meta", property="og:image", content=render.thumbnail_url),
+            h("meta", property="twitter:image", content=render.thumbnail_url),
         ),
         left=frag(
             h("h1")("Syzygy endgame tablebases"),
             h("nav")(
                 h("div", id="side-to-move-toolbar")(
                     h("div", id="side-to-move", klass="btn-group", role="group", aria_label="Side to move")(
-                        h("a", id="btn-white", klass="btn btn-default", href="...")(),
+                        h("a", klass={
+                            "btn": True,
+                            "btn-default": True,
+                            "active": render.turn == "white",
+                        }, id="btn-white", href=fen_url(render.white_fen))("White to move"),
+                        h("a", klass={
+                            "btn": True,
+                            "btn-default": True,
+                            "active": render.turn == "black",
+                        }, id="btn-black", href=fen_url(render.white_fen))("Black to move"),
+                    ),
+                    " ",
+                    h("div", klass="btn-group")(
+                        h("a", id="btn-edit", klass="btn btn-default", title="Edit mode: Do not switch sides when playing moves")(
+                            h("span", klass="icon icon-lock-open")(),
+                        ),
+                    ),
+                ),
+                spare("black"),
+                h("div", id="board", data_fen="XXX")(
+                    h("noscript")("JavaScript required for interactive board view."),
+                ),
+                spare("white"),
+                h("div", id="board-toolbar", role="toolbar")(
+                    h("div", klass="btn-group")(
+                        h("a", id="btn-flip-board", type_="button", klass="btn btn-default", title="Flip board")(
+                            h("span", klass="icon icon-rotate")(),
+                        ),
+                    ),
+                    " ",
+                    h("div", klass="btn-group")(
+                        h("a", id="btn-clear-board", href=fen_url(render.clear_fen), klass="btn btn-default", title="Clear board")(
+                            h("span", klass="icon icon-eraser")(),
+                        ),
+                    ),
+                    " ",
+                    h("div", klass="btn-group")(
+                        h("a", id="btn-swap-colors", href=fen_url(render.swapped_fen), klass="btn btn-default", title="Swap colors")(
+                            h("span", klass="icon icon-black-white")(),
+                        ),
+                        h("a", id="btn-mirror-horizontal", href=fen_url(render.horizontal_fen), klass="btn btn-default", title="Mirror horizontally")(
+                            h("span", klass="icon icon-horizontal")(),
+                        ),
+                        h("a", id="btn-mirror-vertical", href=fen_url(render.vertical_fen), klass="btn btn-default", title="Mirror vertically")(
+                            h("span", klass="icon icon-vertical")(),
+                        ),
+                    ),
+                ),
+                h("form", id="form-set-fen", action="/")(
+                    h("div", klass="input-group")(
+                        h("input", id="fen", name="fen", value=render.fen_input, klass="form-control", aria_label="FEN", placeholder=DEFAULT_FEN),
+                        h("span", klass="input-group-btn")(
+                            h("input", type="submit", klass="btn btn-default", value="Set FEN"),
+                        ),
                     ),
                 ),
             ),
         ),
+        right=xhr_probe(),
+        scripts=h("script", src=asset_url("js/client.min.js"), async_=True, defer=True)(),
     )
+
+
+def xhr_probe() -> Frag:
+    return frag()
 
 
 def back_to_board() -> Frag:

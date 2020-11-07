@@ -38,6 +38,7 @@ import textwrap
 
 import syzygy_tables_info.views
 
+from syzygy_tables_info.model import Render
 from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional
 
 
@@ -657,7 +658,19 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
 @routes.get("/wip")
 async def wip(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], material="KvK").render(),
+        text=syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=Render(
+            white_fen="",
+            black_fen="",
+            material="KvK",
+            turn="white",
+            swapped_fen="",
+            clear_fen="",
+            fen_input="",
+            horizontal_fen="",
+            vertical_fen="",
+            fen="",
+            thumbnail_url="",
+        )).render(),
         content_type="text/html")
 
 
