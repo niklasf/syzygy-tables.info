@@ -389,6 +389,11 @@ def stats(*, development: bool) -> Frag:
 
 
 def endgames(*, development: bool) -> Frag:
+    def item(material: str) -> Frag:
+        return h("li")(
+            h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material).replace(' ', '_')}")(material),
+        )
+
     return layout(
         development=development,
         title="Endgames",
@@ -411,12 +416,15 @@ def endgames(*, development: bool) -> Frag:
             h("section", id=f"{piece_count}-pieces")(
                 h("h2")(piece_count, " pieces"),
                 h("ul", klass="endgames")(
-                    h("li")(
-                        h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material, stats).replace(' ', '_')}")(
-                            material
-                        )
-                    ) for material, stats in syzygy_tables_info.stats.STATS.items() if len(material) == piece_count + 1
-                ),
+                    item(material) for material in syzygy_tables_info.stats.STATS if len(material) == piece_count + 1
+                ) if piece_count < 5 else (
+                    frag(
+                        h("h3")("No pawns" if pawns == 0 else ("1 pawn" if pawns == 1 else f"{pawns} pawns")),
+                        h("ul", klass="endgames")(
+                            item(material) for material in syzygy_tables_info.stats.STATS if len(material) == piece_count + 1 and material.count("P") == pawns
+                        ),
+                    ) for pawns in range(0, piece_count - 2 + 1)
+                )
             ) for piece_count in range(3, 7 + 1)
         ),
     )

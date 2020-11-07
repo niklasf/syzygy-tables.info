@@ -56,12 +56,13 @@ class LongEndgame(TypedDict):
     wdl: int
 
 
-def longest_fen(material: str, stats: EndgameStats) -> str:
+def longest_fen(material: str) -> str:
     if material == "KNvK":
         return "4k3/8/8/8/8/8/8/1N2K3 w - - 0_1"
     elif material == "KBvK":
         return "4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"
     else:
+        stats = STATS[material]
         longest = max(stats["longest"], key=lambda e: e["ply"])
         return longest["epd"] + " 0 1"
 
