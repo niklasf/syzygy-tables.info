@@ -28,6 +28,10 @@ def asset_url(path: str) -> str:
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
 
+def fen_url(fen: str) -> str:
+    return f"/?fen={fen.replace(' ', '_')}"
+
+
 def kib(num: float) -> str:
     for unit in ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB"]:
         if abs(num) < 1024:
@@ -416,7 +420,7 @@ def endgames(*, development: bool) -> Frag:
         return h("li", klass={
             "maximal": syzygy_tables_info.stats.is_maximal(material),
         })(
-            h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material).replace(' ', '_')}")(
+            h("a", href=fen_url(syzygy_tables_info.stats.longest_fen(material)))(
                 h("strong")(material) if syzygy_tables_info.stats.is_maximal(material) else material,
             ),
         )
