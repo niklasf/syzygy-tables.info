@@ -390,8 +390,12 @@ def stats(*, development: bool) -> Frag:
 
 def endgames(*, development: bool) -> Frag:
     def item(material: str) -> Frag:
-        return h("li")(
-            h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material).replace(' ', '_')}")(material),
+        return h("li", klass={
+            "maximal": syzygy_tables_info.stats.is_maximal(material),
+        })(
+            h("a", href=f"/?fen={syzygy_tables_info.stats.longest_fen(material).replace(' ', '_')}")(
+                h("strong")(material) if syzygy_tables_info.stats.is_maximal(material) else material,
+            ),
         )
 
     return layout(

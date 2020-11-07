@@ -67,5 +67,9 @@ def longest_fen(material: str) -> str:
         return longest["epd"] + " 0 1"
 
 
+def is_maximal(material: str) -> bool:
+    return material in ["KRvK", " KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"]
+
+
 with open(os.path.join(os.path.dirname(__file__), "..", "stats.json")) as f:
     STATS: Dict[str, EndgameStats] = json.load(f)
