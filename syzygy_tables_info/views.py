@@ -20,7 +20,7 @@ import textwrap
 
 import syzygy_tables_info.stats
 
-from syzygy_tables_info.model import Render, RenderMove, DEFAULT_FEN
+from syzygy_tables_info.model import Render, RenderMove, STARTING_FEN, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional, Literal
 
@@ -187,22 +187,22 @@ def xhr_probe(render: Render) -> Frag:
             f"{render.winning_side}-win" if render.winning_side else None,
             "frustrated" if render.frustrated else None,
         ])(render.status),
-        h("div", id="winning", klass=f"list-group {turn}-turn")(
+        h("div", id="winning", klass=f"list-group {render.turn}-turn")(
             move(m) for m in render.winning_moves
         ),
-        h("div", id="cursed", klass=f"list-group {turn}-turn")(
+        h("div", id="cursed", klass=f"list-group {render.turn}-turn")(
             move(m) for m in render.cursed_moves
         ),
         h("div", id="drawing", klass="list-group")(
             move(m) for m in render.drawing_moves
         ),
         h("div", id="unknown", klass="list-group")(
-            move(m) for m in render.unkown_moves
+            move(m) for m in render.unknown_moves
         ),
-        h("div", id="blessed", klass="list-group")(
+        h("div", id="blessed", klass=f"list-group {render.turn}-turn")(
             move(m) for m in render.blessed_moves
         ),
-        h("div", id="losing", klass="list-group")(
+        h("div", id="losing", klass=f"list-group {render.turn}-turn")(
             move(m) for m in render.losing_moves
         ),
         h("div", id="info")(
@@ -211,8 +211,29 @@ def xhr_probe(render: Render) -> Frag:
             ) if render.illegal else h("p")(
                 h("strong")("The game is drawn"),
                 " because with the remaining material no sequence of legal moves can lead to checkmate."
-            ) if render.unkown_moves else frag()
+            ) if render.insufficient_material else frag(
+                h("p")(
+                    h("a", href="https://en.wikipedia.org/wiki/Solving_chess")("Chess is not yet solved."),
+                ) if render.fen == STARTING_FEN else None,
+                h("p")("Syzygy tables only provide information for positions with up to 7 pieces and no castling rights."),
+            ) if render.unknown_moves else h("p")(
+                h("strong")("This is a blessed loss."),
+                " Mate can be forced, but a draw can be achieved under the fifty-move rule.",
+            ) if render.blessed_loss else h("p")(
+                h("strong")("This is a cursed win."),
+                " Mate can be forced, but a draw can be achieved under the fifty-move rule.",
+            ) if render.cursed_win else None,
         ),
+        frag(
+            h("a", klass="meta-link", href=f"/syzygy-vs-syzygy/{render.material}.pgn?fen={fen.replace(' ', '_')}", title="Download DTZ mainline")(
+                h("span", klass="icon icon-download", aria_hidden="true")(),
+                f" {render.material}.pgn",
+            ),
+            h("a", klass="meta-link", href=f"https://lichess.org/analysis/standard/{fen.replace(' ', '_')}#explorer")(
+                h("span", klass="icon icon-external", aria_hidden="true")(),
+                " lichess.org",
+            ),
+        ) if not render.illegal else None,
     )
 
 
