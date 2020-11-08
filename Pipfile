@@ -8,10 +8,7 @@ aiohttp = "~=3.6.3"
 brotlipy = "~=0.7.0"
 Jinja2 = "~=2.11.2"
 chess = "~=1.2.2"
-tinyhtml = "~=1.0.0b1"
-
-[pipenv]
-allow_prereleases = true
+tinyhtml = "~=1.0.0"
 
 [scripts]
 server = "python -m syzygy_tables_info"

@@ -20,7 +20,7 @@ import textwrap
 
 import syzygy_tables_info.stats
 
-from syzygy_tables_info.model import Render, DEFAULT_FEN
+from syzygy_tables_info.model import Render, RenderMove, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional, Literal
 
@@ -169,13 +169,51 @@ def index(*, development: bool = True, render: Render) -> Frag:
                 ),
             ),
         ),
-        right=xhr_probe(),
+        right=xhr_probe(render),
         scripts=h("script", src=asset_url("js/client.min.js"), async_=True, defer=True)(),
     )
 
 
-def xhr_probe() -> Frag:
-    return frag()
+def xhr_probe(render: Render) -> Frag:
+    def move(m: RenderMove) -> Frag:
+        return h("a", klass="list-group-item", href=fen_url(m.fen), data_uci=m.uci)(
+            m.san,
+            h("span", klass="badge")(f"DTM {m.dtm}") if m.dtm else None,
+            h("span", klass="badge")(m.badge),
+        )
+
+    return h("section")(
+        h("h2", id="status", klass=[
+            f"{render.winning_side}-win" if render.winning_side else None,
+            "frustrated" if render.frustrated else None,
+        ])(render.status),
+        h("div", id="winning", klass=f"list-group {turn}-turn")(
+            move(m) for m in render.winning_moves
+        ),
+        h("div", id="cursed", klass=f"list-group {turn}-turn")(
+            move(m) for m in render.cursed_moves
+        ),
+        h("div", id="drawing", klass="list-group")(
+            move(m) for m in render.drawing_moves
+        ),
+        h("div", id="unknown", klass="list-group")(
+            move(m) for m in render.unkown_moves
+        ),
+        h("div", id="blessed", klass="list-group")(
+            move(m) for m in render.blessed_moves
+        ),
+        h("div", id="losing", klass="list-group")(
+            move(m) for m in render.losing_moves
+        ),
+        h("div", id="info")(
+            h("p")(
+                "The given position is not a legal chess position."
+            ) if render.illegal else h("p")(
+                h("strong")("The game is drawn"),
+                " because with the remaining material no sequence of legal moves can lead to checkmate."
+            ) if render.unkown_moves else frag()
+        ),
+    )
 
 
 def back_to_board() -> Frag:

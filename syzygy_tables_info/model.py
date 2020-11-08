@@ -16,7 +16,7 @@
 
 import dataclasses
 
-from typing import Literal
+from typing import List, Literal, Optional
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -37,3 +37,23 @@ class Render:
     horizontal_fen: str
     vertical_fen: str
     fen_input: str
+
+    status: str
+    winning_side: Optional[Literal["white", "black"]]
+    frustrated: bool
+    winning_moves: List[RenderMove]
+    cursed_moves: List[RenderMove]
+    drawing_moves: List[RenderMove]
+    unknown_moves: List[RenderMove]
+    blessed_moves: List[RenderMove]
+    losing_moves: List[RenderMove]
+    illegal: bool
+
+
+@dataclasses.dataclass
+class RenderMove:
+    san: str
+    uci: str
+    fen: str
+    dtm: Optional[int]
+    badge: str
