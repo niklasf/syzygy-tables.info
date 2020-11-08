@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-aiohttp = "~=3.6.3"
+aiohttp = "~=3.7.2"
 brotlipy = "~=0.7.0"
 Jinja2 = "~=2.11.2"
 chess = "~=1.2.2"
