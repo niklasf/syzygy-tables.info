@@ -55,6 +55,7 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
             h("meta", name="author", content="Niklas Fiekas"),
             h("link", rel="author", title="Legal", href="/legal"),
             h("link", rel="icon", href="/static/favicon.32.png", type="image/png", sizes="32x32"),
+            h("link", rel="icon", href="/static/favicon.64.png", type="image/png", sizes="64x64"),
             h("link", rel="icon", href="/static/favicon.96.png", type="image/png", sizes="96x96"),
             h("link", rel="sitemap", href="/sitemap.txt", type="text/plain"),
         ),
