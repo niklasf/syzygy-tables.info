@@ -110,7 +110,9 @@ def index(*, development: bool = True, render: Render) -> Frag:
             h("meta", property="twitter:image", content=render["thumbnail_url"]),
         ),
         left=frag(
-            h("h1")("Syzygy endgame tablebases"),
+            h("h1", klass="main")(
+                h("a", href="/")("Syzygy endgame tablebases"),
+            ),
             h("nav")(
                 h("div", id="side-to-move-toolbar")(
                     h("div", id="side-to-move", klass="btn-group", role="group", aria_label="Side to move")(
@@ -123,7 +125,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                             "btn": True,
                             "btn-default": True,
                             "active": render["turn"] == "black",
-                        }, id="btn-black", href=fen_url(render["white_fen"]))("Black to move"),
+                        }, id="btn-black", href=fen_url(render["black_fen"]))("Black to move"),
                     ),
                     " ",
                     h("div", klass="btn-group")(
@@ -133,7 +135,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                     ),
                 ),
                 spare("black"),
-                h("div", id="board", data_fen="XXX")(
+                h("div", id="board", data_fen=render["fen"])(
                     h("noscript")("JavaScript required for interactive board view."),
                 ),
                 spare("white"),

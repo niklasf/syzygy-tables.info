@@ -451,11 +451,11 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         } for dep in chess.syzygy.dependencies(material)]
 
     if "xhr" in request.query:
-        #html = syzygy_tables_info.views.xhr_probe(render=render).render()
-        html = request.app["jinja"].get_template("xhr-probe.html").render(render)
+        html = syzygy_tables_info.views.xhr_probe(render=render).render()
+        #html = request.app["jinja"].get_template("xhr-probe.html").render(render)
     else:
-        #html = syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=render).render()
-        html = request.app["jinja"].get_template("index.html").render(render)
+        html = syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=render).render()
+        #html = request.app["jinja"].get_template("index.html").render(render)
 
     return aiohttp.web.Response(text=html, content_type="text/html")
 
@@ -643,24 +643,6 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
 async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
         text=syzygy_tables_info.views.endgames(development=request.app["jinja"].globals["development"]).render(),
-        content_type="text/html")
-
-@routes.get("/wip")
-async def wip(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    return aiohttp.web.Response(
-        text=syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=Render(
-            white_fen="",
-            black_fen="",
-            material="KvK",
-            turn="white",
-            swapped_fen="",
-            clear_fen="",
-            fen_input="",
-            horizontal_fen="",
-            vertical_fen="",
-            fen="",
-            thumbnail_url="",
-        )).render(),
         content_type="text/html")
 
 
