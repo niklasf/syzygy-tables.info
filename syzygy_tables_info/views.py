@@ -526,7 +526,7 @@ def legal(*, development: bool = True) -> Frag:
         left=frag(
             h("h1")("Legal"),
             h("p")("The tablebase lookup is provided on a best-effort basis, without guarantees of correctness or availability. Feedback or questions are welcome."),
-            h("p")("There are standard server logs kept no longer than 48 hours."),
+            h("p")("Records no personal information other than standard server logs. The logs are kept no longer than 48 hours."),
             back_to_board(),
         ),
         right=frag(
