@@ -454,13 +454,18 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                 f"Histogram: {stats['material_side']} {stats['verb']} vs. {stats['material_other']} ",
                 raw("(log&nbsp;scale)"),
             ),
-            (
+            h("div", klass="histogram")(
                 (
-                    h("div", style=f"width:{row['width']}%;", klass={
-                        "hist": True,
-                        "active": row["active"],
-                    }, title=f"{row['num']:,} unique positions with {stats['material_side']} {stats['verb']} in {row['ply']} (DTZ)")(
-                    ) if not row["empty"] else h("div", klass="hist-empty", title=f"{row['empty']} empty rows skipped")()
+                    h(
+                        "div",
+                        klass="empty",
+                        title=f"{row['empty']} empty rows skipped",
+                    )() if row["empty"] else h(
+                        "div",
+                        style=f"width:{row['width']}%;",
+                        klass="active" if row["active"] else None,
+                        title=f"{row['num']:,} unique positions with {stats['material_side']} {stats['verb']} in {row['ply']} (DTZ)"
+                    )()
                 ) for row in stats["histogram"]
             ),
         ) if stats["histogram"] else None,

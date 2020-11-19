@@ -453,17 +453,17 @@ input[type=text] {
   color: var(--draw-color);
 }
 
-.hist {
+.histogram > div {
   height: 8px;
   background: var(--shaded-bg-color);
   border: 1px solid var(--border-color);
   margin-bottom: 2px;
 }
-.hist.active {
+.histogram > div.active {
   background: var(--grave-border-color);
   border: 1px solid var(--grave-border-color);
 }
-.hist-empty {
+.histogram > div.empty {
   color: var(--grave-border-color);
 }
 
