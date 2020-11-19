@@ -124,7 +124,7 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     render["verb"] = "winning" if side_winning else "losing"
 
     win_hist = stats["histogram"][side]["win"] if side_winning else stats["histogram"][side]["loss"]
-    loss_hist = stats["histogram"][other]["loss"] if side_winning else stats["histogram"][side]["win"]
+    loss_hist = stats["histogram"][other]["loss"] if side_winning else stats["histogram"][other]["win"]
     hist = [a + b for a, b in itertools.zip_longest(win_hist, loss_hist, fillvalue=0)]
     if not any(hist):
         return render
@@ -273,8 +273,12 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["fen"] = fen = board.fen()
     render["white_fen"] = with_turn(board, chess.WHITE).fen()
     render["black_fen"] = with_turn(board, chess.BLACK).fen()
-    #XXX render["board_fen"] = board.board_fen()
-    #XXX render["check_square"] = chess.SQUARE_NAMES[board.king(board.turn)] if board.is_check() else None
+
+    # Thumbail.
+    render["thumbnail_url"] = f"https://backscattering.de/web-boardimage/board.png?fen={board.board_fen()}"
+    king = board.king(board.turn)
+    if king is not None and board.is_check():
+        render["thumbnail_url"] += "&check=" + chess.SQUARE_NAMES[king]
 
     # Mirrored and color swapped FENs for the toolbar.
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
@@ -286,11 +290,15 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     # Material key for the page title.
     render["material"] = material = chess.syzygy.calc_key(board)
-    #XXX render["normalized_material"] = chess.syzygy.normalize_tablename(material)
-    #XXX render["piece_count"] = chess.popcount(board.occupied)
+    render["normalized_material"] = chess.syzygy.normalize_tablename(material)
 
     # Moves are going to be grouped by WDL.
     grouped_moves: Dict[Optional[int], List[RenderMove]] = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
+
+    # Defaults.
+    render["winning_side"] = None
+    render["illegal"] = False
+    render["insufficient_material"] = False
 
     dtz = None
     active_dtz = None
@@ -443,11 +451,13 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         } for dep in chess.syzygy.dependencies(material)]
 
     if "xhr" in request.query:
-        template = request.app["jinja"].get_template("xhr-probe.html")
+        #html = syzygy_tables_info.views.xhr_probe(render=render).render()
+        html = request.app["jinja"].get_template("xhr-probe.html").render(render)
     else:
-        template = request.app["jinja"].get_template("index.html")
+        #html = syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=render).render()
+        html = request.app["jinja"].get_template("index.html").render(render)
 
-    return aiohttp.web.Response(text=template.render(render), content_type="text/html")
+    return aiohttp.web.Response(text=html, content_type="text/html")
 
 @routes.get("/legal")
 async def legal(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -634,7 +644,6 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
         text=syzygy_tables_info.views.endgames(development=request.app["jinja"].globals["development"]).render(),
         content_type="text/html")
-
 
 @routes.get("/wip")
 async def wip(request: aiohttp.web.Request) -> aiohttp.web.Response:

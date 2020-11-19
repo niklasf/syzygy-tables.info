@@ -82,6 +82,7 @@ class RenderStats(TypedDict, total=False):
 
 class Render(TypedDict, total=False):
     material: str
+    normalized_material: str
     thumbnail_url: str
     turn: Literal["white", "black"]
     fen: str
