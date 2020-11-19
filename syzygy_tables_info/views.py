@@ -166,7 +166,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                 ),
                 h("form", id="form-set-fen", action="/")(
                     h("div", klass="input-group")(
-                        h("input", id="fen", name="fen", value=render["fen_input"], klass="form-control", aria_label="FEN", placeholder=DEFAULT_FEN),
+                        h("input", id="fen", name="fen", type="text", value=render["fen_input"], klass="form-control", aria_label="FEN", placeholder=DEFAULT_FEN),
                         h("span", klass="input-group-btn")(
                             h("input", type="submit", klass="btn btn-default", value="Set FEN"),
                         ),
@@ -243,6 +243,7 @@ def xhr_probe(render: Render) -> Frag:
                 h("span", klass="icon icon-download", aria_hidden="true")(),
                 f" {render['material']}.pgn",
             ),
+            " ",
             h("a", klass="meta-link", href=f"https://lichess.org/analysis/standard/{render['fen'].replace(' ', '_')}#explorer")(
                 h("span", klass="icon icon-external", aria_hidden="true")(),
                 " lichess.org",
@@ -293,7 +294,7 @@ def xhr_probe(render: Render) -> Frag:
                     "The tables provide ",
                     h("a", href="/metrics")(wdl50, " and ", dtz50_pp, " information"),
                     ". ",
-                    "Forcing captures or pawn moves while keeping a win in hand",
+                    "Forcing captures or pawn moves while keeping a win in hand ",
                     "ensures that progress is being made.",
                 ),
                 h("p")(
@@ -489,7 +490,7 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                 "Draws:",
                 h("br"),
                 f"{stats['draws']:,} ({stats['draws_pct']}%)"
-            ) if stats["white"] else None,
+            ) if stats["draws"] else None,
             h("div", klass="list-group-item black-win frustrated", title="Unique positions with frustrated black wins")(
                 "Frustrated black wins:",
                 h("br"),
@@ -499,7 +500,7 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                 "Black wins:",
                 h("br"),
                 f"{stats['black']:,} ({stats['black_pct']}%)"
-            ) if stats["white"] else None,
+            ) if stats["black"] else None,
         ),
 
         h("a", href=f"/stats/{render['material']}.json", title=f"Machine readable endgame statistics for {render['material']}")(
