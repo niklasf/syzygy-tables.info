@@ -300,6 +300,8 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["illegal"] = False
     render["insufficient_material"] = False
     render["frustrated"] = False
+    render["blessed_loss"] = False
+    render["cursed_win"] = False
 
     dtz = None
     active_dtz = None
