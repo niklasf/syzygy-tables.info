@@ -36,8 +36,8 @@ import textwrap
 
 import syzygy_tables_info.views
 
-from syzygy_tables_info.model import Render, RenderMove, RenderStats
-from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional, Literal, Optional
+from syzygy_tables_info.model import Render, RenderMove, RenderStats, ColorName
+from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional, Optional
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -71,7 +71,7 @@ async def trust_x_forwarded_for(
     return await handler(request)
 
 def backend_session(request: aiohttp.web.Request) -> aiohttp.ClientSession:
-    return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote})
+    return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote} if request.remote else {})
 
 
 def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int]) -> Optional[RenderStats]:
@@ -79,8 +79,8 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
 
     # Get stats and side.
     stats = syzygy_tables_info.stats.STATS.get(material)
-    side: Literal["white", "black"] = "white"
-    other: Literal["white", "black"] = "black"
+    side: ColorName = "white"
+    other: ColorName = "black"
     if stats is None:
         stats = syzygy_tables_info.stats.STATS.get(chess.syzygy.normalize_tablename(material))
         side = "black"

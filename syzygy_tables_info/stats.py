@@ -18,43 +18,59 @@ from __future__ import annotations
 
 import json
 import os.path
+import typing
 
-from typing import Dict, TypedDict, List
-
-
-class EndgameStats(TypedDict):
-    rtbw: TableStats
-    rtbz: TableStats
-    longest: List[LongEndgame]
-    histogram: Histograms
+from typing import Dict, List
 
 
-class TableStats(TypedDict):
-    bytes: int
-    tbcheck: str
-    md5: str
-    sha1: str
-    sha256: str
-    sha512: str
-    b2: str
-    ipfs: str
+try:
+    class EndgameStats(typing.TypedDict):
+        rtbw: TableStats
+        rtbz: TableStats
+        longest: List[LongEndgame]
+        histogram: Histograms
+except AttributeError:
+    EndgameStats = dict  # type: ignore
 
 
-class Histograms(TypedDict):
-    white: Histogram
-    black: Histogram
+try:
+    class TableStats(typing.TypedDict):
+        bytes: int
+        tbcheck: str
+        md5: str
+        sha1: str
+        sha256: str
+        sha512: str
+        b2: str
+        ipfs: str
+except AttributeError:
+    TableStats = dict  # type: ignore
 
 
-class Histogram(TypedDict):
-    win: List[int]
-    loss: List[int]
-    wdl: Dict[str, int]
+try:
+    class Histograms(typing.TypedDict):
+        white: Histogram
+        black: Histogram
+except AttributeError:
+    Histograms = dict  # type: ignore
 
 
-class LongEndgame(TypedDict):
-    epd: str
-    ply: int
-    wdl: int
+try:
+    class Histogram(typing.TypedDict):
+        win: List[int]
+        loss: List[int]
+        wdl: Dict[str, int]
+except AttributeError:
+    Histogram = dict  # type: ignore
+
+
+try:
+    class LongEndgame(typing.TypedDict):
+        epd: str
+        ply: int
+        wdl: int
+except AttributeError:
+    LongEndgame = dict  # type: ignore
 
 
 def longest_fen(material: str) -> str:

@@ -22,9 +22,9 @@ import chess
 
 import syzygy_tables_info.stats
 
-from syzygy_tables_info.model import Render, RenderMove, RenderStats, DEFAULT_FEN
+from syzygy_tables_info.model import ColorName, Render, RenderMove, RenderStats, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
-from typing import Optional, Literal
+from typing import Optional
 
 
 def asset_url(path: str) -> str:
@@ -93,7 +93,7 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
 
 
 def index(*, development: bool = True, render: Render) -> Frag:
-    def spare(color: Literal["white", "black"]) -> Frag:
+    def spare(color: ColorName) -> Frag:
         return h("div", klass=["spare", "bottom" if color == "white" else "top"])(
             frag(
                 h("piece", klass=[color, role], data_color=color, data_role=role)(),
