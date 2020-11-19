@@ -306,6 +306,35 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
             ),
         ) if stats["longest"] else None,
 
+        h("h3")(f"{render['material']} statistics (unique positions)"),
+        h("div", klass="list-group stats")(
+            h("div", klass="list-group-item white-win", title="Unique positions with white wins")(
+                "White wins:",
+                h("br"),
+                f"{stats['white']:,} ({stats['white_pct']}%)"
+            ) if stats["white"] else None,
+            h("div", klass="list-group-item white-win frustrated", title="Unique positions with frustrated white wins")(
+                "Frustrated white wins:",
+                h("br"),
+                f"{stats['cursed']:,} ({stats['cursed_pct']}%)"
+            ) if stats["cursed"] else None,
+            h("div", klass="list-group-item draws", title="Unique drawn positions")(
+                "Draws:",
+                h("br"),
+                f"{stats['draws']:,} ({stats['draws_pct']}%)"
+            ) if stats["white"] else None,
+            h("div", klass="list-group-item black-win frustrated", title="Unique positions with frustrated black wins")(
+                "Frustrated black wins:",
+                h("br"),
+                f"{stats['blessed']:,} ({stats['blessed_pct']}%)"
+            ) if stats["blessed"] else None,
+            h("div", klass="list-group-item black-win", title="Unique positions with black wins")(
+                "Black wins:",
+                h("br"),
+                f"{stats['black']:,} ({stats['black_pct']}%)"
+            ) if stats["white"] else None,
+        ),
+
         h("a", href=f"/stats/{render['material']}.json", title=f"Machine readable endgame statistics for {render['material']}")(
             h("span", klass="icon icon-stats", aria_hidden="true")(),
             f" {render['material']}.json ",
