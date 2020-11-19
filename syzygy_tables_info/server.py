@@ -17,8 +17,6 @@
 
 import aiohttp.web
 
-import jinja2
-
 import chess
 import chess.pgn
 import chess.syzygy
@@ -454,23 +452,21 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     if "xhr" in request.query:
         html = syzygy_tables_info.views.xhr_probe(render=render).render()
-        #html = request.app["jinja"].get_template("xhr-probe.html").render(render)
     else:
-        html = syzygy_tables_info.views.index(development=request.app["jinja"].globals["development"], render=render).render()
-        #html = request.app["jinja"].get_template("index.html").render(render)
+        html = syzygy_tables_info.views.index(development=request.app["development"], render=render).render()
 
     return aiohttp.web.Response(text=html, content_type="text/html")
 
 @routes.get("/legal")
 async def legal(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.legal(development=request.app["jinja"].globals["development"]).render(),
+        text=syzygy_tables_info.views.legal(development=request.app["development"]).render(),
         content_type="text/html")
 
 @routes.get("/metrics")
 async def metrics(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.metrics(development=request.app["jinja"].globals["development"]).render(),
+        text=syzygy_tables_info.views.metrics(development=request.app["development"]).render(),
         content_type="text/html")
 
 @routes.get("/robots.txt")
@@ -504,7 +500,7 @@ async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
 @routes.get("/stats")
 async def stats_doc(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.stats(development=request.app["jinja"].globals["development"]).render(),
+        text=syzygy_tables_info.views.stats(development=request.app["development"]).render(),
         content_type="text/html")
 
 @routes.get("/stats/{material}.json")
@@ -644,27 +640,18 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
 @routes.get("/endgames")
 async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.endgames(development=request.app["jinja"].globals["development"]).render(),
+        text=syzygy_tables_info.views.endgames(development=request.app["development"]).render(),
         content_type="text/html")
 
 
 def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
     app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
     app["config"] = config
+    app["development"] = config.getboolean("server", "development")
 
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")
     assert config.get("server", "base_url").endswith("/")
-
-    # Configure templating.
-    app["jinja"] = jinja2.Environment(
-        loader=jinja2.FileSystemLoader("templates"),
-        autoescape=jinja2.select_autoescape(["html"]))
-    app["jinja"].globals["DEFAULT_FEN"] = DEFAULT_FEN
-    app["jinja"].globals["STARTING_FEN"] = chess.STARTING_FEN
-    app["jinja"].globals["development"] = config.getboolean("server", "development")
-    app["jinja"].globals["asset_url"] = syzygy_tables_info.views.asset_url
-    app["jinja"].globals["kib"] = kib
 
     # Setup routes.
     app.router.add_routes(routes)
