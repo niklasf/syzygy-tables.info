@@ -468,7 +468,7 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                     )()
                 ) for row in stats["histogram"]
             ),
-        ) if stats["histogram"] else None,
+        ) if stats.get("histogram") else None,
 
         frag(
             h("h3")(f"Longest {render['material']} phases"),
