@@ -20,7 +20,7 @@ import textwrap
 
 import syzygy_tables_info.stats
 
-from syzygy_tables_info.model import Render, RenderMove, STARTING_FEN, DEFAULT_FEN
+from syzygy_tables_info.model import Render, RenderMove, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional, Literal
 
@@ -215,7 +215,7 @@ def xhr_probe(render: Render) -> Frag:
             ) if render.insufficient_material else frag(
                 h("p")(
                     h("a", href="https://en.wikipedia.org/wiki/Solving_chess")("Chess is not yet solved."),
-                ) if render.fen == STARTING_FEN else None,
+                ) if render.fen == chess.STARTING_FEN else None,
                 h("p")("Syzygy tables only provide information for positions with up to 7 pieces and no castling rights."),
             ) if render.unknown_moves else h("p")(
                 h("strong")("This is a blessed loss."),

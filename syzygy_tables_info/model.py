@@ -25,6 +25,15 @@ EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
 @dataclasses.dataclass
+class RenderMove:
+    san: str
+    uci: str
+    fen: str
+    dtm: Optional[int]
+    badge: str
+
+
+@dataclasses.dataclass
 class Render:
     material: str
     thumbnail_url: str
@@ -48,12 +57,3 @@ class Render:
     blessed_moves: List[RenderMove]
     losing_moves: List[RenderMove]
     illegal: bool
-
-
-@dataclasses.dataclass
-class RenderMove:
-    san: str
-    uci: str
-    fen: str
-    dtm: Optional[int]
-    badge: str

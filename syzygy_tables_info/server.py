@@ -80,11 +80,11 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     render: Dict[str, Any] = {}
 
     # Get stats and side.
-    stats = request.app["stats"].get(material)
+    stats = syzygy_tables_info.stats.STATS.get(material)
     side = "white"
     other = "black"
     if stats is None:
-        stats = request.app["stats"].get(chess.syzygy.normalize_tablename(material))
+        stats = syzygy_tables_info.stats.STATS.get(chess.syzygy.normalize_tablename(material))
         side = "black"
         other = "white"
     if stats is None:
@@ -158,25 +158,6 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
         })
 
     return render
-
-
-def longest_fen(stats: Dict[str, Any], endgame: str) -> Optional[str]:
-    if endgame == "KNvK":
-        return "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1"
-    elif endgame == "KBvK":
-        return "4k3/8/8/8/8/8/8/2B1K3 w - - 0 1"
-
-    try:
-        stats = stats[endgame]
-    except KeyError:
-        return None
-
-    try:
-        longest: Dict[str, Any] = max(stats["longest"], key=lambda e: e["ply"])
-    except ValueError:
-        return None
-    else:
-        return longest["epd"] + " 0 1"
 
 
 def sort_key(endgame: str) -> Any:
@@ -458,7 +439,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     if render["is_table"]:
         render["deps"] = [{
             "material": dep,
-            "longest_fen": longest_fen(request.app["stats"], dep),
+            "longest_fen": syzygy_tables_info.stats.longest_fen(dep),
         } for dep in chess.syzygy.dependencies(material)]
 
     if "xhr" in request.query:
@@ -525,7 +506,7 @@ async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
         raise aiohttp.web.HTTPMovedPermanently(location="/stats/{}.json".format(normalized))
 
     try:
-        stats = request.app["stats"][table]
+        stats = syzygy_tables_info.stats.STATS[table]
     except KeyError:
         raise aiohttp.web.HTTPNotFound()
     else:
@@ -691,10 +672,6 @@ def make_app(config):
     app["jinja"].globals["development"] = config.getboolean("server", "development")
     app["jinja"].globals["asset_url"] = syzygy_tables_info.views.asset_url
     app["jinja"].globals["kib"] = kib
-
-    # Load stats.
-    with open("stats.json") as f:
-        app["stats"] = json.load(f)
 
     # Setup routes.
     app.router.add_routes(routes)
