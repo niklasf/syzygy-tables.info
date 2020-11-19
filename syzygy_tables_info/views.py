@@ -22,7 +22,7 @@ import chess
 
 import syzygy_tables_info.stats
 
-from syzygy_tables_info.model import Render, RenderMove, DEFAULT_FEN
+from syzygy_tables_info.model import Render, RenderMove, RenderStats, DEFAULT_FEN
 from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional, Literal
 
@@ -187,6 +187,8 @@ def xhr_probe(render: Render) -> Frag:
             h("span", klass="badge")(m["badge"]),
         )
 
+    stats = render["stats"]
+
     return h("section")(
         # Status.
         h("h2", id="status", klass=[
@@ -245,7 +247,8 @@ def xhr_probe(render: Render) -> Frag:
             ),
         ) if not render["illegal"] else None,
 
-        # TODO: Stats.
+        # Stats.
+        section_stats(stats) if stats else None,
 
         # Dependencies.
         h("section", id="dependencies")(
@@ -273,6 +276,26 @@ def xhr_probe(render: Render) -> Frag:
         ) if render["is_table"] else None,
 
         # TODO: Homepage.
+    )
+
+
+def section_stats(stats: RenderStats) -> Frag:
+    return h("section", id="stats")(
+        frag(
+            h("h3")(
+                f"Histogram: {stats['material_side']} {stats['verb']} vs. {stats['material_other']} ",
+                raw("(log&nbsp;scale)"),
+            ),
+            (
+                (
+                    h("div", style=f"width:{row['width']}%;", klass={
+                        "hist": True,
+                        "active": row["active"],
+                    }, title=f"{row['num']:,} unique positions with {stats['material_side']} {stats['verb']} in {row['ply']} (DTZ)")(
+                    ) if not row["empty"] else h("div", klass="hist-empty", title=f"{row['empty']} empty rows skipped")()
+                ) for row in stats["histogram"]
+            ),
+        ) if stats["histogram"] else None,
     )
 
 

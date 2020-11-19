@@ -146,6 +146,7 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
                     "ply": ply - empty + i,
                     "num": 0,
                     "width": 0,
+                    "empty": 0,
                 })
         empty = 0
 
@@ -155,6 +156,7 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
             "num": num,
             "width": int(round((math.log(num) if num else 0) * 100 / maximum, 1)),
             "active": active_dtz is not None and (abs(active_dtz) == ply or bool(rounding and active_dtz and abs(active_dtz) + 1 == ply)),
+            "empty": 0,
         })
 
     return render
