@@ -16,7 +16,7 @@
 
 import dataclasses
 
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, TypedDict
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -25,7 +25,7 @@ EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
 @dataclasses.dataclass
-class RenderMove:
+class RenderMove(TypedDict):
     san: str
     uci: str
     fen: str
@@ -34,7 +34,7 @@ class RenderMove:
 
 
 @dataclasses.dataclass
-class Render:
+class Render(TypedDict):
     material: str
     thumbnail_url: str
     turn: Literal["white", "black"]
@@ -57,3 +57,6 @@ class Render:
     blessed_moves: List[RenderMove]
     losing_moves: List[RenderMove]
     illegal: bool
+    insufficient_material: bool
+    blessed_loss: bool
+    cursed_win: bool

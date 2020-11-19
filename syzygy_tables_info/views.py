@@ -18,6 +18,8 @@
 import os
 import textwrap
 
+import chess
+
 import syzygy_tables_info.stats
 
 from syzygy_tables_info.model import Render, RenderMove, DEFAULT_FEN
@@ -177,64 +179,64 @@ def index(*, development: bool = True, render: Render) -> Frag:
 
 def xhr_probe(render: Render) -> Frag:
     def move(m: RenderMove) -> Frag:
-        return h("a", klass="list-group-item", href=fen_url(m.fen), data_uci=m.uci)(
-            m.san,
-            h("span", klass="badge")(f"DTM {m.dtm}") if m.dtm else None,
-            h("span", klass="badge")(m.badge),
+        return h("a", klass="list-group-item", href=fen_url(m["fen"]), data_uci=m["uci"])(
+            m["san"],
+            h("span", klass="badge")(f"DTM {m['dtm']}") if m["dtm"] else None,
+            h("span", klass="badge")(m["badge"]),
         )
 
     return h("section")(
         h("h2", id="status", klass=[
-            f"{render.winning_side}-win" if render.winning_side else None,
-            "frustrated" if render.frustrated else None,
-        ])(render.status),
-        h("div", id="winning", klass=f"list-group {render.turn}-turn")(
-            move(m) for m in render.winning_moves
+            f"{render['winning_side']}-win" if render["winning_side"] else None,
+            "frustrated" if render["frustrated"] else None,
+        ])(render["status"]),
+        h("div", id="winning", klass=f"list-group {render['turn']}-turn")(
+            move(m) for m in render["winning_moves"]
         ),
-        h("div", id="cursed", klass=f"list-group {render.turn}-turn")(
-            move(m) for m in render.cursed_moves
+        h("div", id="cursed", klass=f"list-group {render['turn']}-turn")(
+            move(m) for m in render["cursed_moves"]
         ),
         h("div", id="drawing", klass="list-group")(
-            move(m) for m in render.drawing_moves
+            move(m) for m in render["drawing_moves"]
         ),
         h("div", id="unknown", klass="list-group")(
-            move(m) for m in render.unknown_moves
+            move(m) for m in render["unknown_moves"]
         ),
-        h("div", id="blessed", klass=f"list-group {render.turn}-turn")(
-            move(m) for m in render.blessed_moves
+        h("div", id="blessed", klass=f"list-group {render['turn']}-turn")(
+            move(m) for m in render["blessed_moves"]
         ),
-        h("div", id="losing", klass=f"list-group {render.turn}-turn")(
-            move(m) for m in render.losing_moves
+        h("div", id="losing", klass=f"list-group {render['turn']}-turn")(
+            move(m) for m in render["losing_moves"]
         ),
         h("div", id="info")(
             h("p")(
                 "The given position is not a legal chess position."
-            ) if render.illegal else h("p")(
+            ) if render["illegal"] else h("p")(
                 h("strong")("The game is drawn"),
                 " because with the remaining material no sequence of legal moves can lead to checkmate."
-            ) if render.insufficient_material else frag(
+            ) if render["insufficient_material"] else frag(
                 h("p")(
                     h("a", href="https://en.wikipedia.org/wiki/Solving_chess")("Chess is not yet solved."),
-                ) if render.fen == chess.STARTING_FEN else None,
+                ) if render["fen"] == chess.STARTING_FEN else None,
                 h("p")("Syzygy tables only provide information for positions with up to 7 pieces and no castling rights."),
-            ) if render.unknown_moves else h("p")(
+            ) if render["unknown_moves"] else h("p")(
                 h("strong")("This is a blessed loss."),
                 " Mate can be forced, but a draw can be achieved under the fifty-move rule.",
-            ) if render.blessed_loss else h("p")(
+            ) if render["blessed_loss"] else h("p")(
                 h("strong")("This is a cursed win."),
                 " Mate can be forced, but a draw can be achieved under the fifty-move rule.",
-            ) if render.cursed_win else None,
+            ) if render["cursed_win"] else None,
         ),
         frag(
-            h("a", klass="meta-link", href=f"/syzygy-vs-syzygy/{render.material}.pgn?fen={fen.replace(' ', '_')}", title="Download DTZ mainline")(
+            h("a", klass="meta-link", href=f"/syzygy-vs-syzygy/{render['material']}.pgn?fen={render['fen'].replace(' ', '_')}", title="Download DTZ mainline")(
                 h("span", klass="icon icon-download", aria_hidden="true")(),
-                f" {render.material}.pgn",
+                f" {render['material']}.pgn",
             ),
-            h("a", klass="meta-link", href=f"https://lichess.org/analysis/standard/{fen.replace(' ', '_')}#explorer")(
+            h("a", klass="meta-link", href=f"https://lichess.org/analysis/standard/{render['fen'].replace(' ', '_')}#explorer")(
                 h("span", klass="icon icon-external", aria_hidden="true")(),
                 " lichess.org",
             ),
-        ) if not render.illegal else None,
+        ) if not render["illegal"] else None,
     )
 
 
