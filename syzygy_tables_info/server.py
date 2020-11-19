@@ -144,6 +144,7 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
                     "ply": ply - empty + i,
                     "num": 0,
                     "width": 0,
+                    "active": False,
                     "empty": 0,
                 })
         empty = 0
