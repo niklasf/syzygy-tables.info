@@ -48,6 +48,7 @@ class Histograms(TypedDict):
 class Histogram(TypedDict):
     win: List[int]
     loss: List[int]
+    wdl: Dict[str, int]
 
 
 class LongEndgame(TypedDict):

@@ -24,7 +24,6 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-@dataclasses.dataclass
 class RenderMove(TypedDict):
     san: str
     uci: str
@@ -32,9 +31,56 @@ class RenderMove(TypedDict):
     dtm: Optional[int]
     badge: str
 
+    dtz: int
+    zeroing: bool
+    capture: bool
+    checkmate: bool
+    insufficient_material: bool
+    stalemate: bool
 
-@dataclasses.dataclass
-class Render(TypedDict):
+
+class RenderDep(TypedDict):
+    material: str
+    longest_fen: str
+
+
+class RenderStatsLongest(TypedDict):
+    label: str
+    fen: str
+
+
+class RenderStatsHist(TypedDict, total=False):
+    empty: int
+
+    ply: int
+    num: int
+    width: int
+    active: bool
+
+
+class RenderStats(TypedDict, total=False):
+    material_side: str
+    material_other: str
+
+    white: int
+    cursed: int
+    draws: int
+    blessed: int
+    black: int
+
+    white_pct: float
+    cursed_pct: float
+    draws_pct: float
+    blessed_pct: float
+    black_pct: float
+
+    longest: List[RenderStatsLongest]
+    verb: Literal["winning", "losing"]
+
+    histogram: List[RenderStatsHist]
+
+
+class Render(TypedDict, total=False):
     material: str
     thumbnail_url: str
     turn: Literal["white", "black"]
@@ -60,3 +106,6 @@ class Render(TypedDict):
     insufficient_material: bool
     blessed_loss: bool
     cursed_win: bool
+    is_table: bool
+    deps: List[RenderDep]
+    stats: Optional[RenderStats]

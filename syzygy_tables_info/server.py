@@ -38,8 +38,8 @@ import textwrap
 
 import syzygy_tables_info.views
 
-from syzygy_tables_info.model import Render
-from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional
+from syzygy_tables_info.model import Render, RenderMove, RenderStats
+from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional, Literal, Optional
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -76,13 +76,13 @@ def backend_session(request: aiohttp.web.Request) -> aiohttp.ClientSession:
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote})
 
 
-def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int]) -> Optional[Dict[str, Any]]:
-    render: Dict[str, Any] = {}
+def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int]) -> Optional[RenderStats]:
+    render: RenderStats = {}
 
     # Get stats and side.
     stats = syzygy_tables_info.stats.STATS.get(material)
-    side = "white"
-    other = "black"
+    side: Literal["white", "black"] = "white"
+    other: Literal["white", "black"] = "black"
     if stats is None:
         stats = syzygy_tables_info.stats.STATS.get(chess.syzygy.normalize_tablename(material))
         side = "black"
@@ -106,8 +106,8 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
         return None
 
     for key in outcomes:
-        render[key] = outcomes[key]
-        render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)
+        render[key] = outcomes[key]  # type: ignore
+        render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)  # type: ignore
 
     # Longest endgames.
     render["longest"] = [{
@@ -123,8 +123,8 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     side_winning = (" w" in fen) == (active_dtz is not None and active_dtz > 0)
     render["verb"] = "winning" if side_winning else "losing"
 
-    win_hist = stats["histogram"][side]["win" if side_winning else "loss"]
-    loss_hist = stats["histogram"][other]["loss" if side_winning else "win"]
+    win_hist = stats["histogram"][side]["win"] if side_winning else stats["histogram"][side]["loss"]
+    loss_hist = stats["histogram"][other]["loss"] if side_winning else stats["histogram"][side]["win"]
     hist = [a + b for a, b in itertools.zip_longest(win_hist, loss_hist, fillvalue=0)]
     if not any(hist):
         return render
@@ -153,8 +153,8 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
         render["histogram"].append({
             "ply": ply,
             "num": num,
-            "width": round((math.log(num) if num else 0) * 100 / maximum, 1),
-            "active": active_dtz is not None and (abs(active_dtz) == ply or (rounding and active_dtz and abs(active_dtz) + 1 == ply)),
+            "width": int(round((math.log(num) if num else 0) * 100 / maximum, 1)),
+            "active": active_dtz is not None and (abs(active_dtz) == ply or bool(rounding and active_dtz and abs(active_dtz) + 1 == ply)),
         })
 
     return render
@@ -259,7 +259,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
 
 @routes.get("/")
 async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    render = {}
+    render: Render = {}
 
     # Setup a board from the given valid FEN or fall back to the default FEN.
     try:
@@ -273,8 +273,8 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["fen"] = fen = board.fen()
     render["white_fen"] = with_turn(board, chess.WHITE).fen()
     render["black_fen"] = with_turn(board, chess.BLACK).fen()
-    render["board_fen"] = board.board_fen()
-    render["check_square"] = chess.SQUARE_NAMES[board.king(board.turn)] if board.is_check() else None
+    #XXX render["board_fen"] = board.board_fen()
+    #XXX render["check_square"] = chess.SQUARE_NAMES[board.king(board.turn)] if board.is_check() else None
 
     # Mirrored and color swapped FENs for the toolbar.
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
@@ -286,11 +286,11 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     # Material key for the page title.
     render["material"] = material = chess.syzygy.calc_key(board)
-    render["normalized_material"] = chess.syzygy.normalize_tablename(material)
-    render["piece_count"] = chess.popcount(board.occupied)
+    #XXX render["normalized_material"] = chess.syzygy.normalize_tablename(material)
+    #XXX render["piece_count"] = chess.popcount(board.occupied)
 
     # Moves are going to be grouped by WDL.
-    grouped_moves = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
+    grouped_moves: Dict[Optional[int], List[RenderMove]] = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
 
     dtz = None
     active_dtz = None
@@ -655,7 +655,7 @@ async def wip(request: aiohttp.web.Request) -> aiohttp.web.Response:
         content_type="text/html")
 
 
-def make_app(config):
+def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
     app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
     app["config"] = config
 

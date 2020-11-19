@@ -103,11 +103,11 @@ def index(*, development: bool = True, render: Render) -> Frag:
 
     return layout(
         development=development,
-        title=render.material,
+        title=render["material"],
         head=frag(
             h("meta", name="description", content="User interface and public API for probing Syzygy endgame tablebases"),
-            h("meta", property="og:image", content=render.thumbnail_url),
-            h("meta", property="twitter:image", content=render.thumbnail_url),
+            h("meta", property="og:image", content=render["thumbnail_url"]),
+            h("meta", property="twitter:image", content=render["thumbnail_url"]),
         ),
         left=frag(
             h("h1")("Syzygy endgame tablebases"),
@@ -117,13 +117,13 @@ def index(*, development: bool = True, render: Render) -> Frag:
                         h("a", klass={
                             "btn": True,
                             "btn-default": True,
-                            "active": render.turn == "white",
-                        }, id="btn-white", href=fen_url(render.white_fen))("White to move"),
+                            "active": render["turn"] == "white",
+                        }, id="btn-white", href=fen_url(render["white_fen"]))("White to move"),
                         h("a", klass={
                             "btn": True,
                             "btn-default": True,
-                            "active": render.turn == "black",
-                        }, id="btn-black", href=fen_url(render.white_fen))("Black to move"),
+                            "active": render["turn"] == "black",
+                        }, id="btn-black", href=fen_url(render["white_fen"]))("Black to move"),
                     ),
                     " ",
                     h("div", klass="btn-group")(
@@ -145,26 +145,26 @@ def index(*, development: bool = True, render: Render) -> Frag:
                     ),
                     " ",
                     h("div", klass="btn-group")(
-                        h("a", id="btn-clear-board", href=fen_url(render.clear_fen), klass="btn btn-default", title="Clear board")(
+                        h("a", id="btn-clear-board", href=fen_url(render["clear_fen"]), klass="btn btn-default", title="Clear board")(
                             h("span", klass="icon icon-eraser")(),
                         ),
                     ),
                     " ",
                     h("div", klass="btn-group")(
-                        h("a", id="btn-swap-colors", href=fen_url(render.swapped_fen), klass="btn btn-default", title="Swap colors")(
+                        h("a", id="btn-swap-colors", href=fen_url(render["swapped_fen"]), klass="btn btn-default", title="Swap colors")(
                             h("span", klass="icon icon-black-white")(),
                         ),
-                        h("a", id="btn-mirror-horizontal", href=fen_url(render.horizontal_fen), klass="btn btn-default", title="Mirror horizontally")(
+                        h("a", id="btn-mirror-horizontal", href=fen_url(render["horizontal_fen"]), klass="btn btn-default", title="Mirror horizontally")(
                             h("span", klass="icon icon-horizontal")(),
                         ),
-                        h("a", id="btn-mirror-vertical", href=fen_url(render.vertical_fen), klass="btn btn-default", title="Mirror vertically")(
+                        h("a", id="btn-mirror-vertical", href=fen_url(render["vertical_fen"]), klass="btn btn-default", title="Mirror vertically")(
                             h("span", klass="icon icon-vertical")(),
                         ),
                     ),
                 ),
                 h("form", id="form-set-fen", action="/")(
                     h("div", klass="input-group")(
-                        h("input", id="fen", name="fen", value=render.fen_input, klass="form-control", aria_label="FEN", placeholder=DEFAULT_FEN),
+                        h("input", id="fen", name="fen", value=render["fen_input"], klass="form-control", aria_label="FEN", placeholder=DEFAULT_FEN),
                         h("span", klass="input-group-btn")(
                             h("input", type="submit", klass="btn btn-default", value="Set FEN"),
                         ),
