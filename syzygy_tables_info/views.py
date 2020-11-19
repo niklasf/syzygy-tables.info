@@ -101,8 +101,6 @@ def index(*, development: bool = True, render: Render) -> Frag:
             ) for role in ["pawn", "knight", "bishop", "rook", "queen", "king"]
         )
 
-    middot = raw(" &middot ")
-
     return layout(
         development=development,
         title=render["material"],
@@ -188,6 +186,8 @@ def xhr_probe(render: Render) -> Frag:
             h("span", klass="badge")(f"DTM {m['dtm']}") if m["dtm"] else None,
             h("span", klass="badge")(m["badge"]),
         )
+
+    middot = raw(" &middot ")
 
     stats = render["stats"]
 
@@ -280,6 +280,148 @@ def xhr_probe(render: Render) -> Frag:
         # Homepage.
         frag(
             h("section", id="syzygy")(
+                h("h2")("Syzygy tablebases"),
+
+                h("h3")("About"),
+                h("p")(
+                    "Syzygy tablebases allow perfect play with up to 7 pieces, ",
+                    "both with and without the fifty-move drawing rule, ",
+                    "i.e., they allow winning all won ",
+                    "positions and bringing all drawn positions over the fifty-move line.",
+                ),
+                h("p")(
+                    "The tables provide ",
+                    h("a", href="/metrics")(wdl50, " and ", dtz50_pp, " information"),
+                    ". ",
+                    "Forcing captures or pawn moves while keeping a win in hand",
+                    "ensures that progress is being made.",
+                ),
+                h("p")(
+                    "DTZ optimal play is not always the shortest way to mate ",
+                    "(", h("abbr", title="depth-to-mate")("DTM"), ") ",
+                    "and can even look unintuitive: ",
+                    "For example sometimes pieces can be sacrificed to reset the fifty-move ",
+                    "counter as soon as possible. However, unlike DTM it achieves the best ",
+                    "possible result even with the fifty-move rule.",
+                ),
+                h("p")(
+                    "6-piece tables were ",
+                    h("a", href="http://www.talkchess.com/forum3/viewtopic.php?t=47681")("released"),
+                    " by Ronald de Man in April 2013, including ",
+                    h("a", href="https://github.com/syzygy1/tb")("probing code and the generator"),
+                    ".",
+                ),
+                h("p")(
+                    "From May to August 2018 Bojun Guo ",
+                    h("a", href="http://www.talkchess.com/forum/viewtopic.php?start=0&t=66797&topic_view=flat")("generated"),
+                    " 7-piece tables. ",
+                    "The 7-piece tablebase contains 423,836,835,667,331 ",
+                    h("a", href="https://kirill-kryukov.com/chess/nulp/results.html")("unique legal positions"),
+                    " in about 18 Terabytes.",
+                ),
+
+                h("h3")("Selected positions"),
+                h("ul")(
+                    h("li")(
+                        h("a", href="/endgames")("Longest endgames"), ": ",
+                        h("a", href="/?fen=8/8/8/8/8/8/2Rk4/1K6_b_-_-_0_1")("3"), ", ",
+                        h("a", href="/?fen=8/8/8/6B1/8/8/4k3/1K5N_b_-_-_0_1")("4"), ", ",
+                        h("a", href="/?fen=K7/N7/k7/8/3p4/8/N7/8_w_-_-_0_1")("5"), ", ",
+                        h("a", href="/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6_w_-_-_0_1")("6"), ", ",
+                        h("a", href="/?fen=QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-_0_1")("7 pieces"),
+                    ),
+                    h("li")(
+                        h("a", href="/?fen=8/6B1/8/8/B7/8/K1pk4/8_b_-_-_0_1")("Black escapes to a blessed loss with an underpromotion"),
+                    ),
+                    h("li")(
+                        h("a", href="/?fen=k7/2QR4/8/8/8/4N3/2r4Q/1K6_b_-_-_0_1")("Black rook chasing king to force stalemate, without avail"),
+                    ),
+                    h("li")(
+                        h("a", href="/?fen=6B1/3B4/5R2/6q1/P7/1k6/8/3K4_b_-_-_0_1")("656 half-moves before the winning side can safely move a pawn"),
+                    ),
+                ),
+            ),
+            h("section", id="download")(
+                h("h2")("Download"),
+                h("p")(
+                    "If you want to use tablebases in a chess engine you certainly need a local copy."
+                ),
+                h("p")(
+                    "Most of the time (during search) only WDL tables are used. ",
+                    "Keep these on SSD storage if you can. ",
+                    "DTZ tables are generally only used to finish the final phase of the game (\"at the root\").",
+                ),
+                h("table")(
+                    h("thead")(
+                        h("tr")(
+                            h("th")("Pieces"),
+                            h("th")("WDL"),
+                            h("th")("DTZ"),
+                            h("th")("Total"),
+                        ),
+                    ),
+                    h("tbody")(
+                        h("tr")(
+                            h("td")("3-5"),
+                            h("td")(kib(387124)),
+                            h("td")(kib(574384)),
+                            h("td")(kib(961508)),
+                        ),
+                        h("tr")(
+                            h("td")("6"),
+                            h("td")(kib(71127940)),
+                            h("td")(kib(85344200)),
+                            h("td")(kib(156472140)),
+                        ),
+                        h("tr")(
+                            h("td")("7"),
+                            h("td")(kib(9098389892)),
+                            h("td")(kib(8859535148)),
+                            h("td")(kib(17957925040)),
+                        ),
+                    ),
+                ),
+                h("p")(
+                    h("a", href="https://github.com/syzygy1/tb")("Generating"),
+                    " the tablebases requires considerable computational resources. ",
+                    "It is more efficient to download them from a mirror:",
+                ),
+                h("table")(
+                    h("thead")(
+                        h("tr")(
+                            h("th")("Host"),
+                            h("th")("Info"),
+                            h("th")("#"),
+                            h("th")("List"),
+                        ),
+                    ),
+                    h("tbody")(
+                        h("tr")(
+                            h("td")(h("a", href="http://tablebase.sesse.net/")("tablebase.sesse.net")),
+                            h("td")("http, EU"),
+                            h("td")("7"),
+                            h("td")(h("a", href="/download.txt?source=sesse&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
+                        ),
+                        h("tr")(
+                            h("td")(h("a", href="https://tablebase.lichess.ovh/tables/")("tablebase.lichess.ovh")),
+                            h("td")("http, https, EU"),
+                            h("td")("7"),
+                            h("td")(h("a", href="/download.txt?source=lichess&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
+                        ),
+                        h("tr")(
+                            h("td")(h("a", href="https://ipfs.syzygy-tables.info/")("ipfs.syzygy-tables.info")),
+                            h("td")("ipfs, Cloudflare"),
+                            h("td")("7"),
+                            h("td")(h("a", href="/download.txt?source=ipfs&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
+                        ),
+                        h("tr")(
+                            h("td")(h("a", href="http://oics.olympuschess.com/")("oics.olympuschess.com")),
+                            h("td")("BitTorrent"),
+                            h("td")("6"),
+                            h("td")(),
+                        ),
+                    ),
+                ),
                 h("h3")("Checksums"),
                 h("a", href="/checksums/bytes.tsv", title="du --bytes")("file sizes"), middot,
                 h("a", href="/checksums/tbcheck.txt", title="Internal non-cryptographic checksums")("tbcheck"), middot,
