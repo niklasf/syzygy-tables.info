@@ -264,12 +264,12 @@ def xhr_probe(render: Render) -> Frag:
             ) if render["deps"] else None,
             h("p")(
                 h("a", klass="meta-link", href=f"/download/{render['normalized_material']}.txt?source=lichess&dtz=root", title="Download list")(
-                    h("span", klass="icon icon-list", aria_hidden=True)(),
+                    h("span", klass="icon icon-list", aria_hidden="true")(),
                     f" {render['normalized_material']}.txt",
                 ),
                 " ",
                 h("a", klass="meta-link", href=f"/graph/{render['normalized_material']}.dot", title="Dependency graph")(
-                    h("span", klass="icon icon-graph", aria_hidden=True)(),
+                    h("span", klass="icon icon-graph", aria_hidden="true")(),
                     f" {render['normalized_material']}.dot",
                 ),
             ),
@@ -296,6 +296,7 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                 ) for row in stats["histogram"]
             ),
         ) if stats["histogram"] else None,
+
         frag(
             h("h3")(f"Longest {render['material']} phases"),
             h("ul")(
@@ -304,6 +305,12 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                 ) for longest in stats["longest"]
             ),
         ) if stats["longest"] else None,
+
+        h("a", href=f"/stats/{render['material']}.json", title=f"Machine readable endgame statistics for {render['material']}")(
+            h("span", klass="icon icon-stats", aria_hidden="true")(),
+            f" {render['material']}.json ",
+            h("a", href="/stats")("(?)"),
+        ),
     )
 
 
