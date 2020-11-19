@@ -275,7 +275,21 @@ def xhr_probe(render: Render) -> Frag:
             ),
         ) if render["is_table"] else None,
 
-        # TODO: Homepage.
+        # Homepage.
+        frag(
+            h("section", id="syzygy")(
+            ),
+            h("section", id="contact")(
+                h("h2")("Contact"),
+                h("p")(
+                    "Feedback ",
+                    h("a", href="/legal#contact")("via mail"),
+                    ", bug reports and ",
+                    h("a", href="https://github.com/niklasf/syzygy-tables.info")("pull requests"),
+                    " are welcome."
+                ),
+            ),
+        ) if render["fen"] == DEFAULT_FEN else None,
     )
 
 
