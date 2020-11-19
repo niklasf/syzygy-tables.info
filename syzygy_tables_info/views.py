@@ -248,7 +248,7 @@ def xhr_probe(render: Render) -> Frag:
         ) if not render["illegal"] else None,
 
         # Stats.
-        section_stats(stats) if stats else None,
+        section_stats(render, stats) if stats else None,
 
         # Dependencies.
         h("section", id="dependencies")(
@@ -279,7 +279,7 @@ def xhr_probe(render: Render) -> Frag:
     )
 
 
-def section_stats(stats: RenderStats) -> Frag:
+def section_stats(render: Render, stats: RenderStats) -> Frag:
     return h("section", id="stats")(
         frag(
             h("h3")(
@@ -296,6 +296,14 @@ def section_stats(stats: RenderStats) -> Frag:
                 ) for row in stats["histogram"]
             ),
         ) if stats["histogram"] else None,
+        frag(
+            h("h3")(f"Longest {render['material']} phases"),
+            h("ul")(
+                h("li")(
+                    h("a", href=fen_url(longest["fen"]))(longest["label"]),
+                ) for longest in stats["longest"]
+            ),
+        ) if stats["longest"] else None,
     )
 
 
