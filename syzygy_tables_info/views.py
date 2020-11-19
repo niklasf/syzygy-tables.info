@@ -181,7 +181,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
 
 def xhr_probe(render: Render) -> Frag:
     def move(m: RenderMove) -> Frag:
-        return h("a", klass="list-group-item", href=fen_url(m["fen"]), data_uci=m["uci"])(
+        return h("a", klass="li", href=fen_url(m["fen"]), data_uci=m["uci"])(
             m["san"],
             h("span", klass="badge")(f"DTM {m['dtm']}") if m["dtm"] else None,
             h("span", klass="badge")(m["badge"]),
@@ -481,27 +481,27 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
 
         h("h3")(f"{render['material']} statistics (unique positions)"),
         h("div", klass="list-group stats")(
-            h("div", klass="list-group-item white-win", title="Unique positions with white wins")(
+            h("div", klass="li white-win", title="Unique positions with white wins")(
                 "White wins:",
                 h("br"),
                 f"{stats['white']:,} ({stats['white_pct']}%)"
             ) if stats["white"] else None,
-            h("div", klass="list-group-item white-win frustrated", title="Unique positions with frustrated white wins")(
+            h("div", klass="li white-win frustrated", title="Unique positions with frustrated white wins")(
                 "Frustrated white wins:",
                 h("br"),
                 f"{stats['cursed']:,} ({stats['cursed_pct']}%)"
             ) if stats["cursed"] else None,
-            h("div", klass="list-group-item draws", title="Unique drawn positions")(
+            h("div", klass="li draws", title="Unique drawn positions")(
                 "Draws:",
                 h("br"),
                 f"{stats['draws']:,} ({stats['draws_pct']}%)"
             ) if stats["draws"] else None,
-            h("div", klass="list-group-item black-win frustrated", title="Unique positions with frustrated black wins")(
+            h("div", klass="li black-win frustrated", title="Unique positions with frustrated black wins")(
                 "Frustrated black wins:",
                 h("br"),
                 f"{stats['blessed']:,} ({stats['blessed_pct']}%)"
             ) if stats["blessed"] else None,
-            h("div", klass="list-group-item black-win", title="Unique positions with black wins")(
+            h("div", klass="li black-win", title="Unique positions with black wins")(
                 "Black wins:",
                 h("br"),
                 f"{stats['black']:,} ({stats['black_pct']}%)"
@@ -655,11 +655,11 @@ def metrics(*, development: bool) -> Frag:
                     " information can be used to decide which positions to aim for.",
                 ),
                 h("div", klass="list-group stats")(
-                    h("div", klass="list-group-item white-win")("Win (+2)"),
-                    h("div", klass="list-group-item white-win frustrated")("Win prevented by 50-move rule (+1)"),
-                    h("div", klass="list-group-item draws")("Drawn (0)"),
-                    h("div", klass="list-group-item black-win frustrated")("Loss saved by 50-move rule (-1)"),
-                    h("div", klass="list-group-item black-win")("Loss (-2)"),
+                    h("div", klass="li white-win")("Win (+2)"),
+                    h("div", klass="li white-win frustrated")("Win prevented by 50-move rule (+1)"),
+                    h("div", klass="li draws")("Drawn (0)"),
+                    h("div", klass="li black-win frustrated")("Loss saved by 50-move rule (-1)"),
+                    h("div", klass="li black-win")("Loss (-2)"),
                 ),
             ),
             h("section", id="dtz")(

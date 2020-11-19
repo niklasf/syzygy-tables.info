@@ -383,7 +383,7 @@ class TablebaseView {
 
   private bindMoveLinks() {
     const boardView = this.boardView;
-    for (const el of document.querySelectorAll('a.list-group-item')) {
+    for (const el of document.querySelectorAll('a.li')) {
       el.addEventListener('click', function (this: HTMLElement, event: MouseEvent) {
         event.preventDefault();
         controller.pushMove(parseUci(this.getAttribute('data-uci')!)!);
