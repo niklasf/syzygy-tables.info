@@ -101,6 +101,8 @@ def index(*, development: bool = True, render: Render) -> Frag:
             ) for role in ["pawn", "knight", "bishop", "rook", "queen", "king"]
         )
 
+    middot = raw(" &middot ")
+
     return layout(
         development=development,
         title=render["material"],
@@ -257,7 +259,7 @@ def xhr_probe(render: Render) -> Frag:
                 h("p")(f"To probe all {render['normalized_material']} positions, these tables and their transitive dependencies are also required:"),
                 h("p")(
                     frag(
-                        raw(" &middot; ") if i > 0 else None,
+                        middot if i > 0 else None,
                         h("a", href=fen_url(dep["longest_fen"]))(dep["material"]),
                     ) for i, dep in enumerate(render["deps"])
                 )
@@ -278,6 +280,15 @@ def xhr_probe(render: Render) -> Frag:
         # Homepage.
         frag(
             h("section", id="syzygy")(
+                h("h3")("Checksums"),
+                h("a", href="/checksums/bytes.tsv", title="du --bytes")("file sizes"), middot,
+                h("a", href="/checksums/tbcheck.txt", title="Internal non-cryptographic checksums")("tbcheck"), middot,
+                h("a", href="/checksums/MD5SUM")("md5"), middot,
+                h("a", href="/checksums/SHA1SUM")("sha1"), middot,
+                h("a", href="/checksums/SHA256SUM")("sha256"), middot,
+                h("a", href="/checksums/SHA512SUM")("sha512"), middot,
+                h("a", href="/checksums/B2SUM")("blake2"), middot,
+                h("a", href="/checksums/PackManifest", title="PackManifest")("ipfs"),
             ),
             h("section", id="contact")(
                 h("h2")("Contact"),
