@@ -188,10 +188,13 @@ def xhr_probe(render: Render) -> Frag:
         )
 
     return h("section")(
+        # Status.
         h("h2", id="status", klass=[
             f"{render['winning_side']}-win" if render["winning_side"] else None,
             "frustrated" if render["frustrated"] else None,
         ])(render["status"]),
+
+        # Move lists.
         h("div", id="winning", klass=f"list-group {render['turn']}-turn")(
             move(m) for m in render["winning_moves"]
         ),
@@ -210,6 +213,8 @@ def xhr_probe(render: Render) -> Frag:
         h("div", id="losing", klass=f"list-group {render['turn']}-turn")(
             move(m) for m in render["losing_moves"]
         ),
+
+        # Info.
         h("div", id="info")(
             h("p")(
                 "The given position is not a legal chess position."
@@ -239,6 +244,35 @@ def xhr_probe(render: Render) -> Frag:
                 " lichess.org",
             ),
         ) if not render["illegal"] else None,
+
+        # TODO: Stats.
+
+        # Dependencies.
+        h("section", id="dependencies")(
+            h("h3")(f"{render['material']} dependencies"),
+            frag(
+                h("p")(f"To probe all {render['normalized_material']} positions, these tables and their transitive dependencies are also required:"),
+                h("p")(
+                    frag(
+                        raw(" &middot; ") if i > 0 else None,
+                        h("a", href=fen_url(dep["longest_fen"]))(dep["material"]),
+                    ) for i, dep in enumerate(render["deps"])
+                )
+            ) if render["deps"] else None,
+            h("p")(
+                h("a", klass="meta-link", href=f"/download/{render['normalized_material']}.txt?source=lichess&dtz=root", title="Download list")(
+                    h("span", klass="icon icon-list", aria_hidden=True)(),
+                    f" {render['normalized_material']}.txt",
+                ),
+                " ",
+                h("a", klass="meta-link", href=f"/graph/{render['normalized_material']}.dot", title="Dependency graph")(
+                    h("span", klass="icon icon-graph", aria_hidden=True)(),
+                    f" {render['normalized_material']}.dot",
+                ),
+            ),
+        ) if render["is_table"] else None,
+
+        # TODO: Homepage.
     )
 
 
