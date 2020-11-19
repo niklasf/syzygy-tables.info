@@ -460,7 +460,7 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
                         "div",
                         klass="empty",
                         title=f"{row['empty']} empty rows skipped",
-                    )() if row["empty"] else h(
+                    )("⋮") if row["empty"] else h(
                         "div",
                         style=f"width:{row['width']}%;",
                         klass="active" if row["active"] else None,

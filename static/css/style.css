@@ -453,7 +453,7 @@ input[type=text] {
   color: var(--draw-color);
 }
 
-.histogram > div {
+.histogram > div:not(.empty) {
   height: 8px;
   background: var(--shaded-bg-color);
   border: 1px solid var(--border-color);
