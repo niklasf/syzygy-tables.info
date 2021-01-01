@@ -41,7 +41,7 @@
   "dependencies": {
     "@badrap/result": "^0.2.6",
     "chessground": "^7.9.3",
-    "chessops": "^0.7.3"
+    "chessops": "^0.8.1"
   },
   "scripts": {
     "prepare": "gulp",
