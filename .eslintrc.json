@@ -14,12 +14,8 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "indent": ["warn", 2],
     "linebreak-style": ["error", "unix"],
-    "quotes": ["warn", "single"],
-    "semi": ["warn", "always"],
     "eqeqeq": ["error", "smart"],
-    "@typescript-eslint/semi": "warn",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],

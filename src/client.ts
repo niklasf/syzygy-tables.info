@@ -19,7 +19,7 @@
 import { Chessground } from 'chessground';
 import { Api as CgApi } from 'chessground/api';
 
-import { Result} from '@badrap/result';
+import { Result } from '@badrap/result';
 
 import { Color, Role, Move, SquareName } from 'chessops/types';
 import { parseSquare, parseUci } from 'chessops/util';
@@ -30,9 +30,7 @@ import { FenError, InvalidFen, makeFen, makeBoardFen, makePocket, parseFen, pars
 import { transformSetup, flipVertical, flipHorizontal } from 'chessops/transform';
 import { chessgroundDests, chessgroundMove } from 'chessops/compat';
 
-
 const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
-
 
 class Controller {
   private events: Record<string, Array<(...args: any) => void> | undefined> = {};
@@ -48,9 +46,12 @@ class Controller {
 
     window.addEventListener('popstate', event => {
       const fen = event.state?.fen || new URLSearchParams(location.search).get('fen');
-      const setup = (fen ? Result.ok(fen) : Result.err(new FenError(InvalidFen.Fen))).chain(
-        fen => parseFen(fen.replace(/_/g, ' '))
-      ).unwrap(setup => setup, _ => parseFen(DEFAULT_FEN).unwrap());
+      const setup = (fen ? Result.ok(fen) : Result.err(new FenError(InvalidFen.Fen)))
+        .chain(fen => parseFen(fen.replace(/_/g, ' ')))
+        .unwrap(
+          setup => setup,
+          _ => parseFen(DEFAULT_FEN).unwrap()
+        );
       this.setPosition(setup, event.state?.lastMove);
     });
   }
@@ -60,7 +61,7 @@ class Controller {
   }
 
   trigger(event: string, ...args: any) {
-    for (const cb of (this.events[event] || [])) cb.apply(this, args);
+    for (const cb of this.events[event] || []) cb.apply(this, args);
   }
 
   toggleFlipped() {
@@ -76,20 +77,27 @@ class Controller {
   push(setup: Setup, lastMove?: Move) {
     if (this.setPosition(setup, lastMove) && 'pushState' in history) {
       const fen = makeFen(this.setup);
-      history.pushState({
-        fen,
-        lastMove,
-      }, '', '/?fen=' + fen.replace(/\s/g, '_'));
+      history.pushState(
+        {
+          fen,
+          lastMove,
+        },
+        '',
+        '/?fen=' + fen.replace(/\s/g, '_')
+      );
     }
   }
 
   pushMove(move: Move) {
-    return Chess.fromSetup(this.setup).unwrap(pos => {
-      if (!pos.isLegal(move)) return false;
-      pos.play(move);
-      this.push(pos.toSetup(), move);
-      return true;
-    }, _ => false);
+    return Chess.fromSetup(this.setup).unwrap(
+      pos => {
+        if (!pos.isLegal(move)) return false;
+        pos.play(move);
+        this.push(pos.toSetup(), move);
+        return true;
+      },
+      _ => false
+    );
   }
 
   private setPosition(setup: Setup, lastMove?: Move) {
@@ -105,14 +113,13 @@ class Controller {
   }
 }
 
-
 class BoardView {
   private ground: CgApi;
 
   constructor(private controller: Controller) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    const ground = this.ground = Chessground(document.getElementById('board')!, {
+    const ground = (this.ground = Chessground(document.getElementById('board')!, {
       fen: makeBoardFen(controller.setup.board),
       autoCastle: false,
       movable: {
@@ -132,10 +139,11 @@ class BoardView {
       events: {
         move: (orig, dest) => {
           // If the change is a legal move, play it.
-          if (!controller.editMode) controller.pushMove({
-            from: parseSquare(orig)!,
-            to: parseSquare(dest)!,
-          });
+          if (!controller.editMode)
+            controller.pushMove({
+              from: parseSquare(orig)!,
+              to: parseSquare(dest)!,
+            });
         },
         dropNewPiece: (piece, key) => {
           // Move the existing king, even when dropping a new one.
@@ -155,18 +163,26 @@ class BoardView {
           });
         },
       },
-    });
+    }));
 
     for (const el of document.querySelectorAll('.spare piece')) {
       for (const eventName of ['touchstart', 'mousedown']) {
-        el.addEventListener(eventName, e => {
-          e.preventDefault();
-          const target = e.target as HTMLElement;
-          ground.dragNewPiece({
-            color: target.getAttribute('data-color') as Color,
-            role: target.getAttribute('data-role') as Role,
-          }, e, true);
-        }, {passive: false});
+        el.addEventListener(
+          eventName,
+          e => {
+            e.preventDefault();
+            const target = e.target as HTMLElement;
+            ground.dragNewPiece(
+              {
+                color: target.getAttribute('data-color') as Color,
+                role: target.getAttribute('data-role') as Role,
+              },
+              e,
+              true
+            );
+          },
+          { passive: false }
+        );
       }
     }
 
@@ -200,7 +216,10 @@ class BoardView {
       lastMove: this.controller.lastMove && chessgroundMove(this.controller.lastMove),
       fen: makeBoardFen(setup.board),
       turnColor: setup.turn,
-      check: pos.unwrap(p => p.isCheck() && p.turn, _ => false),
+      check: pos.unwrap(
+        p => p.isCheck() && p.turn,
+        _ => false
+      ),
       movable: {
         dests: pos.unwrap(chessgroundDests, _ => undefined),
       },
@@ -227,14 +246,15 @@ class BoardView {
   }
 
   setHovering(uci: string) {
-    this.ground.setAutoShapes([{
-      orig: uci.substr(0, 2) as SquareName,
-      dest: uci.substr(2, 2) as SquareName,
-      brush: 'green',
-    }]);
+    this.ground.setAutoShapes([
+      {
+        orig: uci.substr(0, 2) as SquareName,
+        dest: uci.substr(2, 2) as SquareName,
+        brush: 'green',
+      },
+    ]);
   }
 }
-
 
 class SideToMoveView {
   constructor(controller: Controller) {
@@ -264,7 +284,6 @@ class SideToMoveView {
   }
 }
 
-
 class FenInputView {
   constructor(controller: Controller) {
     function relaxedParseFen(fen: string) {
@@ -274,7 +293,12 @@ class FenInputView {
 
     const input = document.getElementById('fen') as HTMLInputElement;
     input.oninput = input.onchange = () => {
-      input.setCustomValidity(relaxedParseFen(input.value).unwrap(_ => '', _ => 'Invalid FEN'));
+      input.setCustomValidity(
+        relaxedParseFen(input.value).unwrap(
+          _ => '',
+          _ => 'Invalid FEN'
+        )
+      );
     };
 
     document.getElementById('form-set-fen')!.addEventListener('submit', event => {
@@ -292,11 +316,12 @@ class FenInputView {
   }
 }
 
-
 class ToolBarView {
   constructor(controller: Controller) {
     document.getElementById('btn-flip-board')!.addEventListener('click', () => controller.toggleFlipped());
-    controller.bind('flipped', (flipped: boolean) => document.getElementById('btn-flip-board')!.classList.toggle('active', flipped));
+    controller.bind('flipped', (flipped: boolean) =>
+      document.getElementById('btn-flip-board')!.classList.toggle('active', flipped)
+    );
 
     document.getElementById('btn-clear-board')!.addEventListener('click', event => {
       event.preventDefault();
@@ -346,7 +371,6 @@ class ToolBarView {
   }
 }
 
-
 class TablebaseView {
   abortController: AbortController | null = null;
 
@@ -366,18 +390,24 @@ class TablebaseView {
       url.searchParams.set('xhr', 'probe');
 
       fetch(url.href, {
-        signal: this.abortController.signal
-      }).then(res => {
-        if (res.ok) return res.text();
-        else throw res;
-      }).then(html => {
-        content.innerHTML = html;
-        this.bindMoveLinks();
-      }).catch(err => {
-        content.innerHTML = `<section><h2 id="status">Network error ${err.status || 0}</h2><div id="info">${err.statusText || ''}</div></section>`;
-      }).finally(() => {
-        this.abortController = null;
-      });
+        signal: this.abortController.signal,
+      })
+        .then(res => {
+          if (res.ok) return res.text();
+          else throw res;
+        })
+        .then(html => {
+          content.innerHTML = html;
+          this.bindMoveLinks();
+        })
+        .catch(err => {
+          content.innerHTML = `<section><h2 id="status">Network error ${err.status || 0}</h2><div id="info">${
+            err.statusText || ''
+          }</div></section>`;
+        })
+        .finally(() => {
+          this.abortController = null;
+        });
     });
   }
 
@@ -389,14 +419,13 @@ class TablebaseView {
         controller.pushMove(parseUci(this.getAttribute('data-uci')!)!);
         boardView.unsetHovering();
       });
-      el.addEventListener('mouseover', function(this: HTMLElement) {
+      el.addEventListener('mouseover', function (this: HTMLElement) {
         boardView.setHovering(this.getAttribute('data-uci')!);
       });
       el.addEventListener('mouseleave', () => boardView.unsetHovering());
     }
   }
 }
-
 
 class DocumentTitle {
   constructor(controller: Controller) {
@@ -407,7 +436,6 @@ class DocumentTitle {
     });
   }
 }
-
 
 const controller = new Controller(document.getElementById('board')!.getAttribute('data-fen')!);
 
