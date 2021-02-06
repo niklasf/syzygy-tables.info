@@ -47,6 +47,7 @@
   "scripts": {
     "prepare": "gulp",
     "lint": "eslint src/*.ts",
-    "format": "prettier --write src static/css/cburnett.css static/css/chessground.css static/css/style.css"
+    "format": "prettier --write .",
+    "check-format": "prettier --check ."
   }
 }

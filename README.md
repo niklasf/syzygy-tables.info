@@ -1,12 +1,10 @@
-[syzygy-tables.info](https://syzygy-tables.info)
-================================================
+# [syzygy-tables.info](https://syzygy-tables.info)
 
 User interface and public API for probing Syzygy endgame tablebases.
 
 [![Screenshot of the longest winning 6-piece endgame](/screenshot.png)](https://syzygy-tables.info/?fen=6N1/5KR1/2n5/8/8/8/2n5/1k6%20w%20-%20-%200%201)
 
-Running
--------
+## Running
 
 Build JavaScript and CSS files using Gulp. Requires node.js and npm:
 
@@ -23,20 +21,17 @@ Then start the server on port 5000.
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables.
 
-API
----
+## API
 
 This website is based on a [public API](https://github.com/niklasf/lila-tablebase) hosted by [lichess.org](https://tablebase.lichess.ovh).
 
-Hacking
--------
+## Hacking
 
 Have a look at `syzygy_tables_info` for server side code.
 
 The client side code is in `src/client.js`. Run `npm run prepare` to rebuild.
 
-License
--------
+## License
 
 This project is licensed under the AGPL-3.0+.
 

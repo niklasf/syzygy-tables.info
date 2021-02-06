@@ -7,42 +7,51 @@ const commonjs = require('@rollup/plugin-commonjs');
 const typescript = require('@rollup/plugin-typescript');
 const terser = require('rollup-plugin-terser').terser;
 
-const css = [
-  'static/css/chessground.css',
-  'static/css/cburnett.css',
-  'static/css/style.css',
-];
+const css = ['static/css/chessground.css', 'static/css/cburnett.css', 'static/css/style.css'];
 
-gulp.task('css', () => gulp.src(css)
-  .pipe(cleanCss({
-    level: {
-      1: {
-        specialComments: 0,
-      },
-    },
-  }, details => console.log(`${details.name}: ${details.stats.originalSize} -> ${details.stats.minifiedSize}`)))
-  .pipe(concat('style.min.css'))
-  .pipe(gulp.dest('static/css'))
+gulp.task('css', () =>
+  gulp
+    .src(css)
+    .pipe(
+      cleanCss(
+        {
+          level: {
+            1: {
+              specialComments: 0,
+            },
+          },
+        },
+        details => console.log(`${details.name}: ${details.stats.originalSize} -> ${details.stats.minifiedSize}`)
+      )
+    )
+    .pipe(concat('style.min.css'))
+    .pipe(gulp.dest('static/css'))
 );
 
-gulp.task('js', () => rollup.rollup({
-  input: 'src/client.ts',
-  plugins: [
-    resolve(),
-    typescript({
-      noEmitOnError: false,
-    }),
-    commonjs({
-      extensions: ['.js', '.ts'],
-    }),
-    terser({
-      safari10: true,
-    }),
-  ],
-}).then(bundle => bundle.write({
-  file: 'static/js/client.min.js',
-  format: 'iife',
-  sourcemap: true,
-})));
+gulp.task('js', () =>
+  rollup
+    .rollup({
+      input: 'src/client.ts',
+      plugins: [
+        resolve(),
+        typescript({
+          noEmitOnError: false,
+        }),
+        commonjs({
+          extensions: ['.js', '.ts'],
+        }),
+        terser({
+          safari10: true,
+        }),
+      ],
+    })
+    .then(bundle =>
+      bundle.write({
+        file: 'static/js/client.min.js',
+        format: 'iife',
+        sourcemap: true,
+      })
+    )
+);
 
 gulp.task('default', gulp.parallel('css', 'js'));

@@ -1,0 +1,6 @@
+*.min.css
+*.min.js
+*.json
+
+.mypy_cache/
+.vim/
