@@ -476,12 +476,6 @@ async def metrics(request: aiohttp.web.Request) -> aiohttp.web.Response:
 @routes.get("/robots.txt")
 async def robots(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(text=textwrap.dedent("""\
-        User-agent: SemrushBot
-        User-agent: SemrushBot-SA
-        User-agent: AhrefsBot
-        User-agent: MegaIndex.ru
-        Disallow: /
-
         User-agent: *
         Disallow: /?fen=*
         Disallow: /syzygy-vs-syzygy/
