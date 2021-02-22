@@ -483,6 +483,7 @@ async def robots(request: aiohttp.web.Request) -> aiohttp.web.Response:
         Disallow: /
 
         User-agent: *
+        Disallow: /?fen=*
         Disallow: /syzygy-vs-syzygy/
         Disallow: /endgames.pgn
         """))
@@ -491,9 +492,9 @@ async def robots(request: aiohttp.web.Request) -> aiohttp.web.Response:
 async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
     entries = [
         "endgames",
+        "metrics",
         "stats",
         "legal",
-        "/?fen=QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-_0_1",
     ]
 
     base_url = request.app["config"].get("server", "base_url")
