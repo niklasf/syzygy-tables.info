@@ -83,7 +83,8 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
                         h("a", href="/endgames")("Endgames"), ". ",
                         h("a", href="/metrics")("Metrics"), ". ",
                         h("a", href="/legal", data_jslicense=1)("Legal"), ". ",
-                        h("a", href="https://github.com/niklasf/syzygy-tables.info")("GitHub"), ".",
+                        h("a", href="https://github.com/niklasf/syzygy-tables.info")("GitHub"), ". ",
+                        h("a", href="https://github.com/sponsors/niklasf")("Donate"), "."
                     ),
                 ),
             ),
