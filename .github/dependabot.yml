@@ -1,0 +1,33 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - 7.19.0
+  - dependency-name: "@typescript-eslint/eslint-plugin"
+    versions:
+    - 4.14.1
+  - dependency-name: rollup
+    versions:
+    - 2.38.2
+  - dependency-name: "@rollup/plugin-node-resolve"
+    versions:
+    - 11.1.1
+  - dependency-name: "@rollup/plugin-typescript"
+    versions:
+    - 8.1.1
+  - dependency-name: "@typescript-eslint/parser"
+    versions:
+    - 4.14.1
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "04:00"
+  open-pull-requests-limit: 10
