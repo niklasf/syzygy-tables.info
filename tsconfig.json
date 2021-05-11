@@ -2,10 +2,10 @@
   "include": ["src/*.ts"],
   "compilerOptions": {
     "noEmitOnError": false,
-    "target": "ES2016",
-    "module": "commonjs",
+    "target": "ES2017",
+    "module": "esnext",
     "moduleResolution": "node",
-    "lib": ["ES2016", "DOM", "DOM.iterable"],
+    "lib": ["ES2017", "DOM", "DOM.iterable"],
     "alwaysStrict": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
