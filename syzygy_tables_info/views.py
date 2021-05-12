@@ -84,7 +84,7 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
                         h("a", href="/metrics")("Metrics"), ". ",
                         h("a", href="/legal", data_jslicense=1)("Legal"), ". ",
                         h("a", href="https://github.com/niklasf/syzygy-tables.info")("GitHub"), ". ",
-                        h("a", href="https://github.com/sponsors/niklasf")("Donate"), "."
+                        h("a", href="https://www.paypal.com/donate?hosted_button_id=9SRZUYV897U8Y")("Donate"), "."
                     ),
                 ),
             ),
