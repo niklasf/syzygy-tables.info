@@ -836,7 +836,7 @@ def endgames(*, development: bool) -> Frag:
             h("h1")("Endgames"),
             h("p")(
                 "These are the longest endgames (maximum ",
-                h("a", href="/stats")(dtz50_pp),
+                h("a", href="/metrics")(dtz50_pp),
                 ") for each material configuration."
             ),
             h("p")(
