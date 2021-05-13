@@ -7,7 +7,7 @@ verify_ssl = true
 aiohttp = "~=3.7.4"
 Brotli = "~=1.0.9"
 chess = "~=1.5.0"
-tinyhtml = "~=1.1.0"
+tinyhtml = "~=1.2.0"
 
 [scripts]
 server = "python -m syzygy_tables_info"
