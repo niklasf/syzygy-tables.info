@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const cleanCss = require('gulp-clean-css');
 const concat = require('gulp-concat');
-const rollup = require('rollup');
+const rollup = require('rollup').rollup;
 const resolve = require('@rollup/plugin-node-resolve').default;
 const typescript = require('@rollup/plugin-typescript');
 const terser = require('rollup-plugin-terser').terser;
@@ -28,26 +28,24 @@ gulp.task('css', () =>
 );
 
 gulp.task('js', () =>
-  rollup
-    .rollup({
-      input: 'src/client.ts',
-      plugins: [
-        resolve(),
-        typescript({
-          noEmitOnError: false,
-        }),
-        terser({
-          safari10: true,
-        }),
-      ],
+  rollup({
+    input: 'src/client.ts',
+    plugins: [
+      resolve(),
+      typescript({
+        noEmitOnError: false,
+      }),
+      terser({
+        safari10: true,
+      }),
+    ],
+  }).then(bundle =>
+    bundle.write({
+      file: 'static/js/client.min.js',
+      format: 'iife',
+      sourcemap: true,
     })
-    .then(bundle =>
-      bundle.write({
-        file: 'static/js/client.min.js',
-        format: 'iife',
-        sourcemap: true,
-      })
-    )
+  )
 );
 
 gulp.task('default', gulp.parallel('css', 'js'));
