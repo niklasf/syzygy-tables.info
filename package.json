@@ -24,25 +24,24 @@
     "url": "https://github.com/niklasf/syzygy-tables.info.git"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^19.0.0",
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.23.0",
-    "@typescript-eslint/parser": "^4.23.0",
-    "eslint": "^7.26.0",
-    "gulp": "^4.0.2",
-    "gulp-clean-css": "^4.3.0",
-    "gulp-concat": "^2.6.1",
-    "prettier": "^2.3.0",
-    "rollup": "^2.47.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "@rollup/plugin-node-resolve": "^13",
+    "@rollup/plugin-typescript": "^8",
+    "@typescript-eslint/eslint-plugin": "^4",
+    "@typescript-eslint/parser": "^4",
+    "eslint": "^7",
+    "gulp": "^4",
+    "gulp-clean-css": "^4",
+    "gulp-concat": "^2",
+    "prettier": "^2",
+    "rollup": "^2",
+    "rollup-plugin-terser": "^7",
+    "tslib": "^2",
+    "typescript": "^4"
   },
   "dependencies": {
-    "@badrap/result": "^0.2.8",
-    "chessground": "^7.11.1",
-    "chessops": "^0.9.0"
+    "@badrap/result": "^0.2",
+    "chessground": "^7",
+    "chessops": "^0.9"
   },
   "scripts": {
     "prepare": "gulp",
