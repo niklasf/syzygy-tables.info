@@ -19,10 +19,7 @@
     "name": "Niklas Fiekas",
     "email": "niklas.fiekas@backscattering.de"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/niklasf/syzygy-tables.info.git"
-  },
+  "repository": "https://github.com/niklasf/syzygy-tables.info",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13",
     "@rollup/plugin-typescript": "^8",
