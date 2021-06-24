@@ -399,7 +399,7 @@ def xhr_probe(render: Render) -> Frag:
                     ),
                     h("tbody")(
                         h("tr")(
-                            h("td")(h("a", href="http://tablebase.sesse.net/")("tablebase.sesse.net", h("sup")("1"))),
+                            h("td")(h("a", href="http://tablebase.sesse.net/")("tablebase.sesse.net")),
                             h("td")("http, EU"),
                             h("td")("7"),
                             h("td")(h("a", href="/download.txt?source=sesse&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
