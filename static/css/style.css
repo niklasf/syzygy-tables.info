@@ -118,6 +118,10 @@ h3 {
   padding-top: 2em;
 }
 
+.footnote {
+  font-size: 0.8em;
+}
+
 .white-win {
   background: var(--white-bg-color);
   color: var(--white-color);
