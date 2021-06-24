@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@badrap/result": "^0.2",
-    "chessground": "^7",
+    "chessground": "^8",
     "chessops": "^0.9"
   },
   "scripts": {

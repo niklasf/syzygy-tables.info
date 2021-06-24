@@ -1,3 +1,4 @@
+*.lock
 *.min.css
 *.min.js
 *.json
