@@ -411,7 +411,7 @@ def xhr_probe(render: Render) -> Frag:
                             h("td")(h("a", href="/download.txt?source=lichess&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
                         ),
                         h("tr")(
-                            h("td")(h("a", href="https://ipfs.syzygy-tables.info/")("ipfs.syzygy-tables.info", h("sup")("1"))),
+                            h("td")(h("a", href="https://ipfs.syzygy-tables.info/")("ipfs.syzygy-tables.info")),
                             h("td")("ipfs, Cloudflare"),
                             h("td")("7"),
                             h("td")(h("a", href="/download.txt?source=ipfs&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
