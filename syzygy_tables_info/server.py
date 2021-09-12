@@ -336,16 +336,16 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         dtz = probe["dtz"]
         active_dtz = dtz if dtz else None
 
-        render["blessed_loss"] = probe["wdl"] == -1
-        render["cursed_win"] = probe["wdl"] == 1
+        render["blessed_loss"] = probe["category"] == "blessed-loss"
+        render["cursed_win"] = probe["category"] == "cursed-win"
 
         # Set status line.
         if board.is_insufficient_material():
             render["status"] = "Draw by insufficient material"
             render["insufficient_material"] = True
-        elif probe["wdl"] is None or probe["dtz"] is None:
+        elif probe["dtz"] is None:
             render["status"] = "Position not found in tablebases"
-        elif probe["wdl"] == 0:
+        elif probe["dtz"] == 0:
             render["status"] = "Tablebase draw"
         elif probe["dtz"] > 0 and board.turn == chess.WHITE:
             render["status"] = "White is winning with DTZ %d" % (abs(probe["dtz"]), )
@@ -360,7 +360,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             render["status"] = "Black is losing with DTZ %d" % (abs(probe["dtz"]), )
             render["winning_side"] = "white"
 
-        render["frustrated"] = probe["wdl"] is not None and abs(probe["wdl"]) == 1
+        render["frustrated"] = probe["category"] in ["blessed-loss", "cursed-win"]
 
         # Label and group all legal moves.
         for move_info in probe["moves"]:
@@ -371,11 +371,6 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             move_info["capture"] = board.is_capture(move)
 
             move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
-
-            if move_info["checkmate"]:
-                move_info["wdl"] = -2
-            elif move_info["stalemate"] or move_info["insufficient_material"]:
-                move_info["wdl"] = 0
 
             if move_info["checkmate"]:
                 move_info["badge"] = "Checkmate"
@@ -394,7 +389,20 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             elif move_info["dtz"] > 0:
                 move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
 
-            grouped_moves[move_info["wdl"]].append(move_info)
+            if move_info["category"] in ["loss", "maybe-loss"]:
+                wdl = -2
+            elif move_info["category"] == "blessed-loss":
+                wdl = -1
+            elif move_info["category"] == "draw":
+                wdl = 0
+            elif move_info["category"] == "cursed-win":
+                wdl = 1
+            elif move_info["category"] in ["win", "maybe-win"]:
+                wdl = 2
+            else:
+                wdl = None
+
+            grouped_moves[wdl].append(move_info)
 
     # Sort winning moves.
     grouped_moves[-2].sort(key=lambda move: move["uci"])
@@ -404,6 +412,12 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     grouped_moves[-2].sort(key=lambda move: move["capture"], reverse=True)
     grouped_moves[-2].sort(key=lambda move: move["checkmate"], reverse=True)
     render["winning_moves"] = grouped_moves[-2]
+
+    # Sort unknown moves.
+    grouped_moves[None].sort(key=lambda move: move["uci"])
+    grouped_moves[None].sort(key=lambda move: move["zeroing"], reverse=True)
+    grouped_moves[None].sort(key=lambda move: move["capture"], reverse=True)
+    render["unknown_moves"] = grouped_moves[None]
 
     # Sort moves leading to cursed wins.
     grouped_moves[-1].sort(key=lambda move: move["uci"])
@@ -436,12 +450,6 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     grouped_moves[2].sort(key=lambda move: move["zeroing"])
     grouped_moves[1].sort(key=lambda move: move["capture"])
     render["losing_moves"] = grouped_moves[2]
-
-    # Sort unknown moves.
-    grouped_moves[None].sort(key=lambda move: move["uci"])
-    grouped_moves[None].sort(key=lambda move: move["zeroing"], reverse=True)
-    grouped_moves[None].sort(key=lambda move: move["capture"], reverse=True)
-    render["unknown_moves"] = grouped_moves[None]
 
     # Stats.
     render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)

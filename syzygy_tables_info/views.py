@@ -203,14 +203,14 @@ def xhr_probe(render: Render) -> Frag:
         h("div", id="winning", klass=f"list-group {render['turn']}-turn")(
             move(m) for m in render["winning_moves"]
         ),
+        h("div", id="unknown", klass="list-group")(
+            move(m) for m in render["unknown_moves"]
+        ),
         h("div", id="cursed", klass=f"list-group {render['turn']}-turn")(
             move(m) for m in render["cursed_moves"]
         ),
         h("div", id="drawing", klass="list-group")(
             move(m) for m in render["drawing_moves"]
-        ),
-        h("div", id="unknown", klass="list-group")(
-            move(m) for m in render["unknown_moves"]
         ),
         h("div", id="blessed", klass=f"list-group {render['turn']}-turn")(
             move(m) for m in render["blessed_moves"]
