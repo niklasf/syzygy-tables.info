@@ -85,7 +85,7 @@ def longest_fen(material: str) -> str:
 
 
 def is_maximal(material: str) -> bool:
-    return material in ["KRvK", " KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"]
+    return material in ["KRvK", "KBNvK", "KNNvKP", "KRNvKNN", "KRBNvKQN"]
 
 
 with open(os.path.join(os.path.dirname(__file__), "..", "stats.json")) as f:
