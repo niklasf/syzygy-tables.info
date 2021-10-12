@@ -84,7 +84,6 @@ def layout(*, title: str, development: bool, left: Optional[Frag] = None, right:
                         h("a", href="/metrics")("Metrics"), ". ",
                         h("a", href="/legal", data_jslicense=1)("Legal"), ". ",
                         h("a", href="https://github.com/niklasf/syzygy-tables.info")("GitHub"), ". ",
-                        h("a", href="https://www.paypal.com/donate?hosted_button_id=9SRZUYV897U8Y")("Donate"), "."
                     ),
                 ),
             ),
@@ -547,15 +546,6 @@ def legal(*, development: bool = True) -> Frag:
                 h("p")(
                     h("a", href="mailto:niklas.fiekas@backscattering.de")("niklas.fiekas@backscattering.de"), " ",
                     "(", h("a", href="https://pgp.mit.edu/pks/lookup?op=get&search=0x2ECA66C65B255138")("pgp"), ")",
-                ),
-            ),
-            h("section", id="imprint")(
-                h("h2")("Imprint"),
-                h("p")(
-                    "Niklas Fiekas",
-                    h("br"), "Tannenhöhe 16",
-                    h("br"), "38678 Clausthal-Zellerfeld",
-                    h("br"), "Germany",
                 ),
             ),
             h("section", id="thanks")(
