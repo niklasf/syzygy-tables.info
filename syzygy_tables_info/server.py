@@ -74,7 +74,7 @@ def backend_session(request: aiohttp.web.Request) -> aiohttp.ClientSession:
     return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote} if request.remote else {})
 
 
-def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int]) -> Optional[RenderStats]:
+def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int], precise_dtz: Optional[int]) -> Optional[RenderStats]:
     render: RenderStats = {}
 
     # Get stats and side.
@@ -149,7 +149,7 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
                 })
         empty = 0
 
-        rounding = request.app["config"].getboolean("server", "rounding")
+        rounding = active_dtz != precise_dtz
         render["histogram"].append({
             "ply": ply,
             "num": num,
@@ -306,6 +306,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     dtz = None
     active_dtz = None
+    precise_dtz = None
 
     if not board.is_valid():
         render["status"] = "Invalid position"
@@ -314,6 +315,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         render["status"] = "Draw by stalemate"
     elif board.is_checkmate():
         active_dtz = 0
+        precise_dtz = 0
         if board.turn == chess.WHITE:
             render["status"] = "Black won by checkmate"
             render["winning_side"] = "black"
@@ -335,6 +337,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
         dtz = probe["dtz"]
         active_dtz = dtz if dtz else None
+        precise_dtz = probe["precise_dtz"] if probe["precise_dtz"] else None
 
         render["blessed_loss"] = probe["category"] == "blessed-loss"
         render["cursed_win"] = probe["category"] == "cursed-win"
@@ -390,7 +393,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
                 move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
 
             if move_info["category"] in ["loss", "maybe-loss"]:
-                wdl = -2
+                wdl: Optional[int] = -2
             elif move_info["category"] == "blessed-loss":
                 wdl = -1
             elif move_info["category"] == "draw":
@@ -452,7 +455,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["losing_moves"] = grouped_moves[2]
 
     # Stats.
-    render["stats"] = prepare_stats(request, material, render["fen"], active_dtz)
+    render["stats"] = prepare_stats(request, material, render["fen"], active_dtz, precise_dtz)
 
     # Dependencies.
     render["is_table"] = chess.syzygy.is_tablename(material, normalized=False) and material != "KvK"
