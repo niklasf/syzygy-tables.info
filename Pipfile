@@ -13,4 +13,4 @@ tinyhtml = "~=1.2.0"
 server = "python -m syzygy_tables_info"
 
 [dev-packages]
-mypy = "~=0.910"
+mypy = "~=0.930"
