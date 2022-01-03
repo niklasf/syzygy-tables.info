@@ -89,7 +89,7 @@ class Controller {
   }
 
   pushMove(move: Move) {
-    return Chess.fromSetup(this.setup).unwrap(
+    return Chess.fromSetup(this.setup, { ignoreImpossibleCheck: true }).unwrap(
       pos => {
         if (!pos.isLegal(move)) return false;
         pos.play(move);
@@ -211,7 +211,7 @@ class BoardView {
   }
 
   private setPosition(setup: Setup) {
-    const pos = Chess.fromSetup(setup);
+    const pos = Chess.fromSetup(setup, { ignoreImpossibleCheck: true });
     this.ground.set({
       lastMove: this.controller.lastMove && chessgroundMove(this.controller.lastMove),
       fen: makeBoardFen(setup.board),

@@ -60,6 +60,9 @@ def with_turn(board: chess.Board, turn: chess.Color) -> chess.Board:
     board.turn = turn
     return board
 
+def is_valid(board: chess.Board) -> bool:
+    return board.status() & ~chess.STATUS_IMPOSSIBLE_CHECK & ~chess.STATUS_TOO_MANY_CHECKERS == chess.STATUS_VALID
+
 
 @aiohttp.web.middleware
 async def trust_x_forwarded_for(
@@ -180,7 +183,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     except ValueError:
         raise aiohttp.web.HTTPBadRequest(reason="invalid fen")
 
-    if not board.is_valid():
+    if not is_valid(board):
         raise aiohttp.web.HTTPBadRequest(reason="illegal fen")
 
     # Send HTTP headers early, to let the client know we got the request.
@@ -308,7 +311,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     active_dtz = None
     precise_dtz = None
 
-    if not board.is_valid():
+    if not is_valid(board):
         render["status"] = "Invalid position"
         render["illegal"] = True
     elif board.is_stalemate():
