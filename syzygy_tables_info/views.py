@@ -129,7 +129,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                     ),
                     " ",
                     h("div", klass="btn-group")(
-                        h("a", id="btn-edit", klass="btn btn-default", title="Edit mode: Do not switch sides when playing moves")(
+                        h("button", id="btn-edit", klass="btn btn-default", title="Edit mode: Do not switch sides when playing moves")(
                             h("span", klass="icon icon-lock-open")(),
                         ),
                     ),
@@ -141,7 +141,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                 spare("white"),
                 h("div", id="board-toolbar", role="toolbar")(
                     h("div", klass="btn-group")(
-                        h("a", id="btn-flip-board", type_="button", klass="btn btn-default", title="Flip board")(
+                        h("button", id="btn-flip-board", klass="btn btn-default", title="Flip board")(
                             h("span", klass="icon icon-rotate")(),
                         ),
                     ),
