@@ -187,7 +187,7 @@ def xhr_probe(render: Render) -> Frag:
             h("span", klass="badge")(m["badge"]),
         )
 
-    middot = raw(" &middot ")
+    middot = raw("&nbsp;&middot ")
 
     stats = render["stats"]
 
@@ -356,6 +356,7 @@ def xhr_probe(render: Render) -> Frag:
                     h("thead")(
                         h("tr")(
                             h("th")("Pieces"),
+                            h("th")("Tables"),
                             h("th")("WDL"),
                             h("th")("DTZ"),
                             h("th")("Total"),
@@ -364,18 +365,21 @@ def xhr_probe(render: Render) -> Frag:
                     h("tbody")(
                         h("tr")(
                             h("td")("3-5"),
+                            h("td")("145"),
                             h("td")(kib(387124)),
                             h("td")(kib(574384)),
                             h("td")(kib(961508)),
                         ),
                         h("tr")(
                             h("td")("6"),
+                            h("td")("365"),
                             h("td")(kib(71127940)),
                             h("td")(kib(85344200)),
                             h("td")(kib(156472140)),
                         ),
                         h("tr")(
                             h("td")("7"),
+                            h("td")("1001"),
                             h("td")(kib(9098389892)),
                             h("td")(kib(8859535148)),
                             h("td")(kib(17957925040)),
