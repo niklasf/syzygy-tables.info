@@ -392,7 +392,6 @@ def xhr_probe(render: Render) -> Frag:
                         h("tr")(
                             h("th")("Host"),
                             h("th")("Info"),
-                            h("th")("#"),
                             h("th")("List"),
                         ),
                     ),
@@ -400,34 +399,19 @@ def xhr_probe(render: Render) -> Frag:
                         h("tr")(
                             h("td")(h("a", href="http://tablebase.sesse.net/")("tablebase.sesse.net")),
                             h("td")("http, EU"),
-                            h("td")("7"),
                             h("td")(h("a", href="/download.txt?source=sesse&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
                         ),
                         h("tr")(
                             h("td")(h("a", href="https://tablebase.lichess.ovh/tables/")("tablebase.lichess.ovh")),
                             h("td")("http, https, EU"),
-                            h("td")("7"),
                             h("td")(h("a", href="/download.txt?source=lichess&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
                         ),
                         h("tr")(
                             h("td")(h("a", href="https://ipfs.syzygy-tables.info/")("ipfs.syzygy-tables.info")),
                             h("td")("ipfs, Cloudflare"),
-                            h("td")("7"),
                             h("td")(h("a", href="/download.txt?source=ipfs&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
                         ),
-                        h("tr")(
-                            h("td")(h("a", href="http://oics.olympuschess.com/")("oics.olympuschess.com", h("sup")("1"))),
-                            h("td")("BitTorrent"),
-                            h("td")("6"),
-                            h("td")(),
-                        ),
                     ),
-                ),
-                h("p", klass="footnote")(
-                    h("sup")("1"),
-                    "KRvK, KQvK, and KPvK checksums differ due to a ",
-                    h("a", href="https://github.com/syzygy1/tb/commit/f85b539edba2928c6c537fe6a7532229194271d5")("generator tweak in 2014"),
-                    ", but old tables are also correct."
                 ),
                 h("h3")("Checksums"),
                 h("a", href="/checksums/bytes.tsv", title="du --bytes")("file sizes"), middot,
