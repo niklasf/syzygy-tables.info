@@ -424,7 +424,9 @@ def xhr_probe(render: Render) -> Frag:
                 h("a", href="/checksums/sha1")("sha1"), middot,
                 h("a", href="/checksums/sha256")("sha256"), middot,
                 h("a", href="/checksums/sha512")("sha512"), middot,
-                h("a", href="/checksums/b2")("blake2"), middot,
+                h("a", href="/checksums/sha3-224")("sha3-224"), middot,
+                h("a", href="/checksums/b2")("b2"), middot,
+                h("a", href="/checksums/b3")("b3"), middot,
                 h("a", href="/checksums/PackManifest", title="PackManifest")("ipfs"),
             ),
             h("section", id="contact")(
