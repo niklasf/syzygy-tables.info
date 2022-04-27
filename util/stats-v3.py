@@ -61,7 +61,7 @@ def main():
         filename, h = line.strip().split(": ")
         internal[filename] = h
 
-    checksums = {"md5": {}, "sha1": {}, "sha256": {}, "sha512": {}, "b2": {}}
+    checksums = {"md5": {}, "sha1": {}, "sha256": {}, "sha512": {}, "sha3-224": {}, "b2": {}, "b3": {}}
     for algo in checksums:
         for line in open(f"checksums/{algo}"):
             h, filename = line.strip().split()
@@ -82,7 +82,9 @@ def main():
                 "sha1": checksums["sha1"][f"{table}.rtbw"],
                 "sha256": checksums["sha256"][f"{table}.rtbw"],
                 "sha512": checksums["sha512"][f"{table}.rtbw"],
+                "sha3-224": checksums["sha3-224"][f"{table}.rtbw"],
                 "b2": checksums["b2"][f"{table}.rtbw"],
+                "b3": checksums["b3"][f"{table}.rtbw"],
                 "ipfs": ipfs[f"{table}.rtbw"],
             },
             "rtbz": {
@@ -92,20 +94,22 @@ def main():
                 "sha1": checksums["sha1"][f"{table}.rtbz"],
                 "sha256": checksums["sha256"][f"{table}.rtbz"],
                 "sha512": checksums["sha512"][f"{table}.rtbz"],
+                "sha3-224": checksums["sha3-224"][f"{table}.rtbz"],
                 "b2": checksums["b2"][f"{table}.rtbz"],
+                "b3": checksums["b3"][f"{table}.rtbz"],
                 "ipfs": ipfs[f"{table}.rtbz"],
             },
             "longest": stats[table]["longest"],
             "histogram": {
                 "white": {
-                    "win": NoIndent(stats[table]["w"]["win_hist"]),
-                    "loss": NoIndent(stats[table]["w"]["loss_hist"]),
-                    "wdl": stats[table]["w"]["wdl"],
+                    "win": NoIndent(stats[table]["histogram"]["white"]["win"]),
+                    "loss": NoIndent(stats[table]["histogram"]["white"]["loss"]),
+                    "wdl": stats[table]["histogram"]["white"]["wdl"],
                 },
                 "black": {
-                    "win": NoIndent(stats[table]["b"]["win_hist"]),
-                    "loss": NoIndent(stats[table]["b"]["loss_hist"]),
-                    "wdl": stats[table]["b"]["wdl"],
+                    "win": NoIndent(stats[table]["histogram"]["black"]["win"]),
+                    "loss": NoIndent(stats[table]["histogram"]["black"]["loss"]),
+                    "wdl": stats[table]["histogram"]["black"]["wdl"],
                 },
             },
         }
