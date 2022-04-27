@@ -671,14 +671,22 @@ def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
     app.router.add_static("/static", "static")
     app.router.add_route("GET", "/checksums/bytes.tsv", static("checksums/bytes.tsv"))
     app.router.add_route("GET", "/checksums/tbcheck.txt", static("checksums/tbcheck.txt", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/b2", static("checksums/b2", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/md5", static("checksums/md5", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/sha1", static("checksums/sha1", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/sha256", static("checksums/sha256", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/sha512", static("checksums/sha512", content_type="text/plain"))
     app.router.add_route("GET", "/checksums/PackManifest", static("checksums/PackManifest", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/B2SUM", static("checksums/B2SUM", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/MD5SUM", static("checksums/MD5SUM", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA1SUM", static("checksums/SHA1SUM", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA256SUM", static("checksums/SHA256SUM", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA512SUM", static("checksums/SHA512SUM", content_type="text/plain"))
     app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn", content_type="application/x-chess-pgn"))
     app.router.add_route("GET", "/stats.json", static("stats.json"))
+
+    # Legacy routes.
+    app.router.add_route("GET", "/checksums/B2SUM", static("checksums/b2", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/MD5SUM", static("checksums/md5", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA1SUM", static("checksums/sha1", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA256SUM", static("checksums/sha256", content_type="text/plain"))
+    app.router.add_route("GET", "/checksums/SHA512SUM", static("checksums/sha512", content_type="text/plain"))
+
     return app
 
 
