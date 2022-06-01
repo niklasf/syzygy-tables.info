@@ -6,11 +6,12 @@ verify_ssl = true
 [packages]
 aiohttp = "~=3.8.1"
 Brotli = "~=1.0.9"
-chess = "~=1.9.0"
+chess = "~=1.9.1"
 tinyhtml = "~=1.2.0"
 
 [scripts]
 server = "python -m syzygy_tables_info"
+check = "python -m mypy --strict syzygy_tables_info"
 
 [dev-packages]
-mypy = "~=0.942"
+mypy = "~=0.960"
