@@ -613,13 +613,14 @@ dtz50_pp = frag("DTZ", h("sub")(50), "′′")
 
 def metrics(*, development: bool) -> Frag:
     n = h("var")("n")
-    example1 = "1kb5/8/1KN5/3N4/8/8/8/8 b - -"
+    example1 = "8/2B5/8/k7/8/2NK4/qR4q1/8 b - -"
     example2 = "8/8/2N5/8/3k4/7N/p2K4/8 b - -"
 
-    def example_board(epd: str, check: str) -> Frag:
+    def example_board(epd: str, *, check: Optional[str] = None) -> Frag:
         board_fen = epd.split(" ")[0]
+        check_suffix = f"&check={check}" if check else ""
         return h("a", href=f"/?fen={epd.replace(' ', '_')}_0_1")(
-            h("img", width=300, height=300, alt=epd, src=f"https://backscattering.de/web-boardimage/board.svg?fen={board_fen}&check={check}"),
+            h("img", width=300, height=300, alt=epd, src=f"https://backscattering.de/web-boardimage/board.svg?fen={board_fen}{check_suffix}"),
         )
 
     def example_link(epd: str) -> Frag:
@@ -659,15 +660,16 @@ def metrics(*, development: bool) -> Frag:
                     "in unfavorable positions.",
                 ),
                 h("p")("The precise meanings are as follows:"),
+                h("h3")("100 ≥ ", n, " ≥ 1"),
                 h("p")(
                     "A DTZ value ", n, " with 100 ≥ ", n, " ≥ 1 means the position is winning, ",
                     "and a zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves.",
                 ),
-                example_board(example1, "b8"),
+                example_board(example1, check="a5"),
                 h("p")(
-                    "For an example of this ambiguity, see how the DTZ repeats after the only-move Ka8 in ",
+                    "For an example of this ambiguity, see how the DTZ repeats after the only-move Ka6 in ",
                     example_link(example1), ". ",
-                    "This is due to the fact that some Syzygy tables store rounded moves ",
+                    "That's because some Syzygy tables store rounded moves ",
                     "instead of half-moves, to save space. This implies some primary tablebase lines ",
                     "may waste up to 1 ply. Rounding is never used for endgame phases where it would ",
                     "change the game theoretical outcome (", wdl50, ").",
@@ -680,12 +682,17 @@ def metrics(*, development: bool) -> Frag:
                     "may change the outcome of the game.",
                 ),
                 h("p")(
+                    "The tables up to 5 pieces ", h("em")("on this site"), " have been generated with ",
+                    h("a", href="https://github.com/niklasf/tb/commit/9f1056429ad379eff52e748dc2783ea750671730")("a patch to avoid rounding for 100 ≥ ", n, " ≥ 1"), "."
+                ),
+                h("h3")(n, " > 100"),
+                h("p")(
                     "A DTZ value ", n, " > 100 means the position is winning, but drawn under the 50-move rule. ",
                     "A zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves, ",
                     "or in ", n, " - 100 or ", n, " + 1 - 100 half-moves ",
                     "if a later phase is responsible for the draw.",
                 ),
-                example_board("8/8/2N5/8/3k4/7N/p2K4/8 b - -", "d4"),
+                example_board("8/8/2N5/8/3k4/7N/p2K4/8 b - -", check="d4"),
                 h("p")(
                     "For example, in ", example_link(example2), " ",
                     "black promotes the pawn in 7 ply, but the DTZ is 107, ",
