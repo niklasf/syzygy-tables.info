@@ -682,7 +682,7 @@ def metrics(*, development: bool) -> Frag:
                     "may change the outcome of the game.",
                 ),
                 h("p")(
-                    "The tables up to 5 pieces ", h("em")("on this site"), " have been generated with ",
+                    "The tables up to 6 pieces ", h("em")("on this site"), " have been generated with ",
                     h("a", href="https://github.com/niklasf/tb/commit/9f1056429ad379eff52e748dc2783ea750671730")("a patch to avoid rounding for 100 ≥ ", n, " ≥ 1"), "."
                 ),
                 h("h3")(n, " > 100"),
