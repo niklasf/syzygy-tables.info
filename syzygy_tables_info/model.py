@@ -119,6 +119,8 @@ try:
         fen_input: str
 
         status: str
+        dtz: Optional[int]
+        dtm: Optional[int]
         winning_side: Optional[ColorName]
         frustrated: bool
         winning_moves: List[RenderMove]

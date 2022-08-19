@@ -127,6 +127,7 @@ h3 {
   color: var(--black-color);
 }
 .frustrated,
+.frustrated .badge,
 #cursed .badge,
 #blessed .badge {
   box-shadow: inset 0 0 0 3px var(--draw-bg-color);
@@ -191,24 +192,28 @@ section {
   white-space: nowrap;
   margin-right: 0.5em;
 }
+.black-win .badge,
 #losing.white-turn .badge,
 #winning.black-turn .badge {
   background: var(--black-bg-color);
   color: var(--black-color);
   border: 1px solid var(--black-color);
 }
+.white-win .badge,
 #losing.black-turn .badge,
 #winning.white-turn .badge {
   background: var(--white-bg-color);
   color: var(--white-color);
   border: 1px solid var(--white-color);
 }
+.white-win.frustrated .badge,
 #cursed.white-turn .badge,
 #blessed.black-turn .badge {
   background: var(--white-bg-color);
   color: var(--white-color);
   border: 1px solid var(--draw-bg-color);
 }
+.black-win.frustrated .badge,
 #cursed.black-turn .badge,
 #blessed.white-turn .badge {
   background: var(--black-bg-color);
@@ -269,13 +274,8 @@ a.li:hover {
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-.li > .badge {
-  float: right;
-}
-.li > .badge + .badge {
-  margin-right: 5px;
-}
 .badge {
+  float: right;
   display: inline-block;
   min-width: 10px;
   padding: 3px 7px;
@@ -288,6 +288,9 @@ a.li:hover {
   text-align: center;
   background-color: var(--draw-bg-color);
   border-radius: 4px;
+}
+.badge + .badge {
+  margin-right: 5px;
 }
 
 footer > .inner {

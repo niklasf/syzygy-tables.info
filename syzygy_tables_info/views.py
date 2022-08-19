@@ -183,7 +183,9 @@ def xhr_probe(render: Render) -> Frag:
     def move(m: RenderMove) -> Frag:
         return h("a", klass="li", href=fen_url(m["fen"]), data_uci=m["uci"])(
             m["san"],
+            " ",
             h("span", klass="badge")(f"DTM {m['dtm']}") if m["dtm"] else None,
+            " ",
             h("span", klass="badge")(m["badge"]),
         )
 
@@ -196,7 +198,13 @@ def xhr_probe(render: Render) -> Frag:
         h("h2", id="status", klass=[
             f"{render['winning_side']}-win" if render["winning_side"] else None,
             "frustrated" if render["frustrated"] else None,
-        ])(render["status"]),
+        ])(
+            render["status"],
+            " ",
+            h("span", klass="badge")(f"DTM {abs(render['dtm'])}") if render["dtm"] else None,
+            " ",
+            h("span", klass="badge")(f"DTZ {abs(render['dtz'])}") if render["dtz"] else None,
+        ),
 
         # Move lists.
         h("div", id="winning", klass=f"list-group {render['turn']}-turn")(

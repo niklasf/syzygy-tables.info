@@ -306,6 +306,8 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["frustrated"] = False
     render["blessed_loss"] = False
     render["cursed_win"] = False
+    render["dtz"] = None
+    render["dtm"] = None
 
     dtz = None
     active_dtz = None
@@ -344,6 +346,8 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
         render["blessed_loss"] = probe["category"] == "blessed-loss"
         render["cursed_win"] = probe["category"] == "cursed-win"
+        render["dtz"] = probe["dtz"]
+        render["dtm"] = probe["dtm"]
 
         # Set status line.
         if board.is_insufficient_material():
@@ -354,16 +358,16 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         elif probe["dtz"] == 0:
             render["status"] = "Tablebase draw"
         elif probe["dtz"] > 0 and board.turn == chess.WHITE:
-            render["status"] = "White is winning with DTZ %d" % (abs(probe["dtz"]), )
+            render["status"] = "White is winning"
             render["winning_side"] = "white"
         elif probe["dtz"] < 0 and board.turn == chess.WHITE:
-            render["status"] = "White is losing with DTZ %d" % (abs(probe["dtz"]), )
+            render["status"] = "White is losing"
             render["winning_side"] = "black"
         elif probe["dtz"] > 0 and board.turn == chess.BLACK:
-            render["status"] = "Black is winning with DTZ %d" % (abs(probe["dtz"]), )
+            render["status"] = "Black is winning"
             render["winning_side"] = "black"
         elif probe["dtz"] < 0 and board.turn == chess.BLACK:
-            render["status"] = "Black is losing with DTZ %d" % (abs(probe["dtz"]), )
+            render["status"] = "Black is losing"
             render["winning_side"] = "white"
 
         render["frustrated"] = probe["category"] in ["blessed-loss", "cursed-win"]
