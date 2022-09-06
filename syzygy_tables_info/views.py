@@ -346,7 +346,7 @@ def xhr_probe(render: Render) -> Frag:
                         h("a", href="/?fen=k7/2QR4/8/8/8/4N3/2r4Q/1K6_b_-_-_0_1")("Black rook chasing king to force stalemate, without avail"),
                     ),
                     h("li")(
-                        h("a", href="/?fen=6B1/3B4/5R2/6q1/P7/1k6/8/3K4_b_-_-_0_1")("656 half-moves before the winning side can safely move a pawn"),
+                        h("a", href="/?fen=6B1/3B4/5R2/6q1/P7/1k6/8/3K4_b_-_-_0_1")("556 half-moves before the winning side can safely move a pawn"),
                     ),
                 ),
             ),
