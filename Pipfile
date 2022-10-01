@@ -14,4 +14,4 @@ server = "python -m syzygy_tables_info"
 check = "python -m mypy --strict syzygy_tables_info"
 
 [dev-packages]
-mypy = "~=0.971"
+mypy = "~=0.981"
