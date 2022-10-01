@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "125e4a9dc5e7fe990d94899a573fe1429d1c6ddcd5208e01eb72ef7eb985819e"
+            "sha256": "d70b578c8b6a76d018d8b91a3ff41d75eb04dcbf553eb8b1328c5c523b8da222"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -186,19 +186,19 @@
         },
         "charset-normalizer": {
             "hashes": [
-                "sha256:5189b6f22b01957427f35b6a08d9a0bc45b46d3788ef5a92e978433c7a35f8a5",
-                "sha256:575e708016ff3a5e3681541cb9d79312c416835686d054a23accb873b254f413"
+                "sha256:5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845",
+                "sha256:83e9a75d1911279afd89352c68b45348559d1fc0506b054b346651b5e7fee29f"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2.1.0"
+            "version": "==2.1.1"
         },
         "chess": {
             "hashes": [
-                "sha256:62453c6fd86ab10463ee54f829b1f13c29aa017a5404eeb7afa7f7d423f1f2a7",
-                "sha256:7d8540cbca3dc06308d5a12480d1775c9507a02723ecbf7edb2348b2cd431aaf"
+                "sha256:6a430cd4666ad6c757d62576fb3ae2112502620922fd904df1af680dfcd07692",
+                "sha256:a27c45707671d413d045ab2ee8b765c98bfb1bf7ba093a704cfed7e4f758fd58"
             ],
             "index": "pypi",
-            "version": "==1.9.2"
+            "version": "==1.9.3"
         },
         "frozenlist": {
             "hashes": [
@@ -267,11 +267,11 @@
         },
         "idna": {
             "hashes": [
-                "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
-                "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
+                "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4",
+                "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"
             ],
             "markers": "python_version >= '3.5'",
-            "version": "==3.3"
+            "version": "==3.4"
         },
         "multidict": {
             "hashes": [
