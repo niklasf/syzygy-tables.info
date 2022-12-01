@@ -4,7 +4,7 @@ const concat = require('gulp-concat');
 const rollup = require('rollup').rollup;
 const resolve = require('@rollup/plugin-node-resolve').default;
 const typescript = require('@rollup/plugin-typescript');
-const terser = require('rollup-plugin-terser').terser;
+const terser = require('@rollup/plugin-terser');
 
 const css = ['static/css/chessground.css', 'static/css/cburnett.css', 'static/css/style.css'];
 
