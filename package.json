@@ -22,8 +22,8 @@
   "repository": "https://github.com/niklasf/syzygy-tables.info",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-terser": "^0.2",
-    "@rollup/plugin-typescript": "^10",
+    "@rollup/plugin-terser": "^0.4",
+    "@rollup/plugin-typescript": "^11",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "eslint": "^8",
@@ -33,7 +33,7 @@
     "prettier": "^2",
     "rollup": "^3",
     "tslib": "^2",
-    "typescript": "^4"
+    "typescript": "^5"
   },
   "dependencies": {
     "@badrap/result": "^0.2",
