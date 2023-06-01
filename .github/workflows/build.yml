@@ -11,7 +11,7 @@ jobs:
         with:
           python-version: '3.9' # nevrast.backscattering.de
           cache: pipenv
-      - run: pipx install pipenv
+      - run: pip install pipenv
       - run: pipenv install --dev
       - run: pipenv run check
   client:
