@@ -12,6 +12,7 @@ jobs:
           python-version: '3.9' # nevrast.backscattering.de
           cache: pipenv
       - run: pip install pipenv
+      - run: pip install tomli # Workaround for mypy failing in CI
       - run: pipenv install --dev
       - run: pipenv run check
   client:
