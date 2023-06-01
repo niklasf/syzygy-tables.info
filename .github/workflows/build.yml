@@ -7,11 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pipx install pipenv
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9' # nevrast.backscattering.de
           cache: pipenv
+      - run: pipx install pipenv
       - run: pipenv install --dev
       - run: pipenv run check
   client:
