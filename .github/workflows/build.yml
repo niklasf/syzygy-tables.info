@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9.2' # nevrast.backscattering.de
+          python-version: '3.9' # nevrast.backscattering.de
           cache: pipenv
       - run: pip install pipenv
       - run: pipenv install --dev
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.12.1'
+          node-version: '18.12.1' # nevrast.backscattering.de
           cache: npm
       - run: npm ci
       - run: npm run lint
