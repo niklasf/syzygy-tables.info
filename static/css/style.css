@@ -325,7 +325,9 @@ footer > .inner {
 
 @font-face {
   font-family: 'fontello';
-  src: url('/static/fonts/fontello.woff2') format('woff2'), url('/static/fonts/fontello.woff') format('woff');
+  src:
+    url('/static/fonts/fontello.woff2') format('woff2'),
+    url('/static/fonts/fontello.woff') format('woff');
   font-display: block;
 }
 

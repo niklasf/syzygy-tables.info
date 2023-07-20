@@ -32,7 +32,7 @@ class Controller {
         .chain(fen => parseFen(fen.replace(/_/g, ' ')))
         .unwrap(
           setup => setup,
-          _ => parseFen(DEFAULT_FEN).unwrap()
+          _ => parseFen(DEFAULT_FEN).unwrap(),
         );
       this.setPosition(setup, event.state?.lastMove);
     });
@@ -65,7 +65,7 @@ class Controller {
           lastMove,
         },
         '',
-        '/?fen=' + fen.replace(/\s/g, '_')
+        '/?fen=' + fen.replace(/\s/g, '_'),
       );
     }
   }
@@ -78,7 +78,7 @@ class Controller {
         this.push(pos.toSetup(), move);
         return true;
       },
-      _ => false
+      _ => false,
     );
   }
 
@@ -160,10 +160,10 @@ class BoardView {
                 role: target.getAttribute('data-role') as Role,
               },
               e,
-              true
+              true,
             );
           },
-          { passive: false }
+          { passive: false },
         );
       }
     }
@@ -200,7 +200,7 @@ class BoardView {
       turnColor: setup.turn,
       check: pos.unwrap(
         p => p.isCheck() && p.turn,
-        _ => false
+        _ => false,
       ),
       movable: {
         dests: pos.unwrap(chessgroundDests, _ => undefined),
@@ -278,8 +278,8 @@ class FenInputView {
       input.setCustomValidity(
         relaxedParseFen(input.value).unwrap(
           _ => '',
-          _ => 'Invalid FEN'
-        )
+          _ => 'Invalid FEN',
+        ),
       );
     };
 
@@ -302,7 +302,7 @@ class ToolBarView {
   constructor(controller: Controller) {
     document.getElementById('btn-flip-board')!.addEventListener('click', () => controller.toggleFlipped());
     controller.bind('flipped', (flipped: boolean) =>
-      document.getElementById('btn-flip-board')!.classList.toggle('active', flipped)
+      document.getElementById('btn-flip-board')!.classList.toggle('active', flipped),
     );
 
     document.getElementById('btn-clear-board')!.addEventListener('click', event => {
@@ -356,7 +356,10 @@ class ToolBarView {
 class TablebaseView {
   abortController: AbortController | null = null;
 
-  constructor(controller: Controller, private boardView: BoardView) {
+  constructor(
+    controller: Controller,
+    private boardView: BoardView,
+  ) {
     this.bindMoveLinks();
 
     controller.bind('setupChanged', (setup: Setup) => {

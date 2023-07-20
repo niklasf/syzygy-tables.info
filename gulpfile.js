@@ -20,11 +20,11 @@ gulp.task('css', () =>
             },
           },
         },
-        details => console.log(`${details.name}: ${details.stats.originalSize} -> ${details.stats.minifiedSize}`)
-      )
+        details => console.log(`${details.name}: ${details.stats.originalSize} -> ${details.stats.minifiedSize}`),
+      ),
     )
     .pipe(concat('style.min.css'))
-    .pipe(gulp.dest('static/css'))
+    .pipe(gulp.dest('static/css')),
 );
 
 gulp.task('js', () =>
@@ -44,8 +44,8 @@ gulp.task('js', () =>
       file: 'static/js/client.min.js',
       format: 'iife',
       sourcemap: true,
-    })
-  )
+    }),
+  ),
 );
 
 gulp.task('default', gulp.parallel('css', 'js'));
