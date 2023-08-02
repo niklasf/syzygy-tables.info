@@ -514,9 +514,10 @@ def section_stats(render: Render, stats: RenderStats) -> Frag:
 
         h("a", href=f"/stats/{render['material']}.json", title=f"Machine readable endgame statistics for {render['material']}")(
             h("span", klass="icon icon-stats", aria_hidden="true")(),
-            f" {render['material']}.json ",
-            h("a", href="/stats")("(?)"),
+            f" {render['material']}.json"
         ),
+        " ",
+        h("a", href="/stats")("(?)"),
     )
 
 
