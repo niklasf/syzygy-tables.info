@@ -752,7 +752,9 @@ def stats(*, development: bool) -> Frag:
                             "sha1": "07a0e4...",
                             "sha256": "f3386d...",
                             "sha512": "c4bf73...",
-                            "b2": "b970e0..." // blake 2
+                            "sha3-224": "15f470...",
+                            "b2": "b970e0...", // blake 2
+                            "b3": "251497..." // blake 3
                           },
                           "rtbz": {
                             // ...
