@@ -418,11 +418,6 @@ def xhr_probe(render: Render) -> Frag:
                             h("td")("http, https, EU"),
                             h("td")(h("a", href="/download.txt?source=lichess&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
                         ),
-                        #h("tr")(
-                        #    h("td")(h("a", href="https://ipfs.syzygy-tables.info/")("ipfs.syzygy-tables.info")),
-                        #    h("td")("ipfs, Cloudflare"),
-                        #    h("td")(h("a", href="/download.txt?source=ipfs&max-pieces=7", title="List of URLs (txt)")(h("span", klass="icon icon-list")())),
-                        #),
                     ),
                 ),
                 h("h3")("Checksums"),
@@ -435,7 +430,6 @@ def xhr_probe(render: Render) -> Frag:
                 middot, h("a", href="/checksums/sha3-224")("sha3-224"),
                 middot, h("a", href="/checksums/b2")("b2"),
                 middot, h("a", href="/checksums/b3")("b3"),
-                #middot, h("a", href="/checksums/PackManifest", title="PackManifest")("ipfs"),
             ),
             h("section", id="contact")(
                 h("h2")("Contact"),
@@ -758,8 +752,7 @@ def stats(*, development: bool) -> Frag:
                             "sha1": "07a0e4...",
                             "sha256": "f3386d...",
                             "sha512": "c4bf73...",
-                            "b2": "b970e0...", // blake 2
-                            "ipfs": "QmXW4S..."
+                            "b2": "b970e0..." // blake 2
                           },
                           "rtbz": {
                             // ...

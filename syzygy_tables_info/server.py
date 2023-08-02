@@ -630,17 +630,6 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
                     result.append("{}/7-WDL/{}.rtbw".format(base, table))
                 if include_dtz:
                     result.append("{}/7-DTZ/{}.rtbz".format(base, table))
-        elif source in ["ipfs", "ipfs.syzygy-tables.info"]:
-            if len(table) <= 6:
-                # More reliably seeded.
-                base = "QmNbKYpPyXFAHFMnAxoc2i28Jf7jhShM8EEnfWUMv6u2DQ"
-            else:
-                # /ipns/ipfs.syzygy-tables.info
-                base = "QmVgcSADsoW5w19MkL2RNKNPGtaz7UhGhU62XRm6pQmzct"
-            if include_wdl:
-                result.append("/ipfs/{}/{}.rtbw".format(base, table))
-            if include_dtz:
-                result.append("/ipfs/{}/{}.rtbz".format(base, table))
         elif source in ["stem", "material"]:
             result.append(table)
         elif source in ["file", "filename"]:
@@ -682,7 +671,6 @@ def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
     app.router.add_route("GET", "/checksums/sha256", static("checksums/sha256", content_type="text/plain"))
     app.router.add_route("GET", "/checksums/sha512", static("checksums/sha512", content_type="text/plain"))
     app.router.add_route("GET", "/checksums/sha3-224", static("checksums/sha3-224", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/PackManifest", static("checksums/PackManifest", content_type="text/plain"))
     app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn", content_type="application/x-chess-pgn"))
     app.router.add_route("GET", "/stats.json", static("stats.json"))
 

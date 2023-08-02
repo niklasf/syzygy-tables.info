@@ -42,7 +42,6 @@ try:
         sha256: str
         sha512: str
         b2: str
-        ipfs: str
 except AttributeError:
     TableStats = dict  # type: ignore
 

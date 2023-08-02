@@ -46,11 +46,6 @@ def main():
     with open("stats.json") as f:
         stats = json.load(f)
 
-    ipfs = {}
-    for line in open("checksums/PackManifest"):
-        h, _, filename = line.strip().split()
-        ipfs[filename] = h
-
     sizes = {}
     for line in open("checksums/bytes.tsv"):
         b, filename = line.strip().split()
@@ -83,7 +78,6 @@ def main():
                 "sha256": checksums["sha256"][f"{table}.rtbw"],
                 "sha512": checksums["sha512"][f"{table}.rtbw"],
                 "b2": checksums["b2"][f"{table}.rtbw"],
-                "ipfs": ipfs[f"{table}.rtbw"],
             },
             "rtbz": {
                 "bytes": sizes[f"{table}.rtbz"],
@@ -93,7 +87,6 @@ def main():
                 "sha256": checksums["sha256"][f"{table}.rtbz"],
                 "sha512": checksums["sha512"][f"{table}.rtbz"],
                 "b2": checksums["b2"][f"{table}.rtbz"],
-                "ipfs": ipfs[f"{table}.rtbz"],
             },
             "longest": stats[table]["longest"],
             "histogram": {
