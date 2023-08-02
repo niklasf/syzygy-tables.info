@@ -10,7 +10,7 @@ Build JavaScript and CSS files using Gulp. Requires node.js and npm:
 
     npm install
 
-Install dependencies with Python (>= 3.7) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
+Install dependencies with Python (>= 3.8) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
 
     PIPENV_VENV_IN_PROJECT=1 pipenv install
 
@@ -35,4 +35,4 @@ The client side code is in `src/client.js`. Run `npm run prepare` to rebuild.
 
 This project is licensed under the AGPL-3.0+.
 
-<a href="https://syzygy-tables.info/legal#thanks">Thanks to all dependencies</a> and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
+<a href="https://syzygy-tables.info/legal#thanks">Thanks to the maintainers of all dependencies</a> and special thanks to Ronald de Man for [his endgame tablebases](https://github.com/syzygy1/tb)!
