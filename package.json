@@ -37,7 +37,7 @@
   "scripts": {
     "prepare": "$npm_execpath run build-js && $npm_execpath run build-css",
     "build-js": "tsc -noEmit && esbuild --bundle src/client.ts --minify --sourcemap --outfile=static/js/client.min.js --target=es2018,chrome105,edge91,firefox67,opera55,safari11",
-    "build-css": "esbuild --bundle static/css/style.css --external:\"*.woff\" --external:\"*.woff2\" --outfile=static/css/style.min.css --target=chrome105,edge91,firefox67,opera55,safari11",
+    "build-css": "esbuild --bundle static/css/style.css --minify --sourcemap --external:\"*.woff\" --external:\"*.woff2\" --outfile=static/css/style.min.css --target=chrome105,edge91,firefox67,opera55,safari11",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
