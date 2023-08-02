@@ -1,4 +1,5 @@
-/* General */
+@import "cburnett.css";
+@import "chessground.css";
 
 :root {
   --draw-bg-color: #757575;

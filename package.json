@@ -21,27 +21,23 @@
   },
   "repository": "https://github.com/niklasf/syzygy-tables.info",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15",
-    "@rollup/plugin-terser": "^0.4",
-    "@rollup/plugin-typescript": "^11",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
     "eslint": "^8",
-    "gulp": "^4",
-    "gulp-clean-css": "^4",
-    "gulp-concat": "^2",
     "prettier": "^3",
-    "rollup": "^3",
     "tslib": "^2",
     "typescript": "^5"
   },
   "dependencies": {
     "@badrap/result": "^0.2",
     "chessground": "^8",
-    "chessops": "^0.12"
+    "chessops": "^0.12",
+    "esbuild": "^0.18"
   },
   "scripts": {
-    "prepare": "gulp",
+    "prepare": "$npm_execpath run build-js && $npm_execpath run build-css",
+    "build-js": "tsc -noEmit && esbuild --bundle src/client.ts --minify --sourcemap --outfile=static/js/client.min.js --target=es2018",
+    "build-css": "esbuild --bundle static/css/style.css --external:\"*.woff\" --external:\"*.woff2\" --outfile=static/css/style.min.css --target=chrome50",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
