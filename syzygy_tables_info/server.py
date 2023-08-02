@@ -77,21 +77,21 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     material_side, _ = render["material_side"], render["material_other"] = material.split("v", 1)
 
     # Basic statistics.
-    outcomes = {
-        "white": stats["histogram"][side]["wdl"]["2"] + stats["histogram"][other]["wdl"]["-2"],
-        "cursed": stats["histogram"][side]["wdl"]["1"] + stats["histogram"][other]["wdl"]["-1"],
-        "draws": stats["histogram"][side]["wdl"]["0"] + stats["histogram"][other]["wdl"]["0"],
-        "blessed": stats["histogram"][side]["wdl"]["-1"] + stats["histogram"][other]["wdl"]["1"],
-        "black": stats["histogram"][side]["wdl"]["-2"] + stats["histogram"][other]["wdl"]["2"],
-    }
+    render["white"] = stats["histogram"][side]["wdl"]["2"] + stats["histogram"][other]["wdl"]["-2"]
+    render["cursed"] = stats["histogram"][side]["wdl"]["1"] + stats["histogram"][other]["wdl"]["-1"]
+    render["draws"] = stats["histogram"][side]["wdl"]["0"] + stats["histogram"][other]["wdl"]["0"]
+    render["blessed"] = stats["histogram"][side]["wdl"]["-1"] + stats["histogram"][other]["wdl"]["1"]
+    render["black"] = stats["histogram"][side]["wdl"]["-2"] + stats["histogram"][other]["wdl"]["2"]
 
-    total = sum(outcomes.values())
+    total = render["white"] + render["cursed"] + render["draws"] + render["blessed"] + render["black"]
     if not total:
         return None
 
-    for key in outcomes:
-        render[key] = outcomes[key]  # type: ignore
-        render[key + "_pct"] = round(outcomes[key] * 100 / total, 1)  # type: ignore
+    render["white_pct"] = round(render["white"] * 100 / total, 1)
+    render["cursed_pct"] = round(render["cursed"] * 100 / total, 1)
+    render["draws_pct"] = round(render["draws"] * 100 / total, 1)
+    render["blessed_pct"] = round(render["blessed"] * 100 / total, 1)
+    render["black_pct"] = round(render["black"] * 100 / total, 1)
 
     # Longest endgames.
     render["longest"] = [{
