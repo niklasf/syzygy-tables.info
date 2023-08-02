@@ -1,7 +1,6 @@
 import dataclasses
-import typing
 
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, TypedDict
 
 
 ColorName = Literal["white", "black"]
@@ -12,7 +11,7 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-class RenderMove(typing.TypedDict):
+class RenderMove(TypedDict):
     san: str
     uci: str
     fen: str
@@ -27,17 +26,17 @@ class RenderMove(typing.TypedDict):
     stalemate: bool
 
 
-class RenderDep(typing.TypedDict):
+class RenderDep(TypedDict):
     material: str
     longest_fen: str
 
 
-class RenderStatsLongest(typing.TypedDict):
+class RenderStatsLongest(TypedDict):
     label: str
     fen: str
 
 
-class RenderStatsHist(typing.TypedDict, total=False):
+class RenderStatsHist(TypedDict, total=False):
     empty: int
 
     ply: int
@@ -46,7 +45,7 @@ class RenderStatsHist(typing.TypedDict, total=False):
     active: bool
 
 
-class RenderStats(typing.TypedDict, total=False):
+class RenderStats(TypedDict, total=False):
     material_side: str
     material_other: str
 
@@ -68,7 +67,7 @@ class RenderStats(typing.TypedDict, total=False):
     histogram: List[RenderStatsHist]
 
 
-class Render(typing.TypedDict, total=False):
+class Render(TypedDict, total=False):
     material: str
     normalized_material: str
     thumbnail_url: str

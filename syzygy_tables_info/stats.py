@@ -1,38 +1,40 @@
 import json
 import os.path
-import typing
 
-from typing import Dict, List
-
-
-class TableStats(typing.TypedDict):
-    bytes: int
-    tbcheck: str
-    md5: str
-    sha1: str
-    sha256: str
-    sha512: str
-    b2: str
+from typing import Dict, List, TypedDict
 
 
-class LongEndgame(typing.TypedDict):
+TableStats = TypedDict("TableStats", {
+    "bytes": int,
+    "tbcheck": str,
+    "md5": str,
+    "sha1": str,
+    "sha256": str,
+    "sha512": str,
+    "sha3-224": str,
+    "b2": str,
+    "b3": str,
+})
+
+
+class LongEndgame(TypedDict):
     epd: str
     ply: int
     wdl: int
 
 
-class Histogram(typing.TypedDict):
+class Histogram(TypedDict):
     win: List[int]
     loss: List[int]
     wdl: Dict[str, int]
 
 
-class Histograms(typing.TypedDict):
+class Histograms(TypedDict):
     white: Histogram
     black: Histogram
 
 
-class EndgameStats(typing.TypedDict):
+class EndgameStats(TypedDict):
     rtbw: TableStats
     rtbz: TableStats
     longest: List[LongEndgame]
