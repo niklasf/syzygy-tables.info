@@ -189,7 +189,7 @@ def xhr_probe(render: Render) -> Frag:
             h("span", klass="badge")(m["badge"]),
         )
 
-    middot = raw("&nbsp;&middot ")
+    middot = raw("&nbsp;&middot; ")
 
     stats = render["stats"]
 
