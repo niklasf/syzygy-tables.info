@@ -104,6 +104,7 @@ class BoardView {
     const ground = (this.ground = Chessground(document.getElementById('board')!, {
       fen: makeBoardFen(controller.setup.board),
       autoCastle: false,
+      trustAllEvents: true,
       movable: {
         free: true,
         color: 'both',
@@ -117,6 +118,9 @@ class BoardView {
       },
       animation: {
         enabled: !reducedMotion.matches,
+      },
+      drawable: {
+        defaultSnapToValidMove: false,
       },
       events: {
         move: (orig, dest) => {
