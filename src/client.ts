@@ -234,8 +234,8 @@ class BoardView {
   setHovering(uci: string) {
     this.ground.setAutoShapes([
       {
-        orig: uci.substr(0, 2) as SquareName,
-        dest: uci.substr(2, 2) as SquareName,
+        orig: uci.substring(0, 2) as SquareName,
+        dest: uci.substring(2, 4) as SquareName,
         brush: 'green',
       },
     ]);
