@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@badrap/result": "^0.2",
-    "chessground": "^8",
+    "chessground": "^9",
     "chessops": "^0.12",
     "esbuild": "^0.19"
   },

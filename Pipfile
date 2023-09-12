@@ -5,7 +5,7 @@ verify_ssl = true
 
 [packages]
 aiohttp = "~=3.8.5"
-Brotli = "~=1.0.9"
+Brotli = "~=1.1.0"
 chess = "~=1.10.0"
 tinyhtml = "~=1.2.0"
 
