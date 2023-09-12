@@ -726,75 +726,76 @@ def stats(*, development: bool) -> Frag:
             h("section", id="example")(
                 h("h2")("Example (KRNvKNN)"),
                 h("pre")(
-                    h("code")(textwrap.dedent("""\
-                        {
-                          "rtbw": {
-                            "bytes": 290002640, // file size
-                            "tbcheck": "a320ac...", // internal checksum
-                            "md5": "6ee435...",
-                            "sha1": "07a0e4...",
-                            "sha256": "f3386d...",
-                            "sha512": "c4bf73...",
-                            "sha3-224": "15f470...",
-                            "b2": "b970e0...", // blake 2
-                            "b3": "251497..." // blake 3
-                          },
-                          "rtbz": {
-                            // ...
-                          },
-                          "longest": [
-                            // longest winning endgames for black/white
-                            // with/without 50-move rule
+                    h("code")(
+                        textwrap.dedent("""\
                             {
-                              "epd": "3n1n2/8/8/8/4R3/8/8/NK1k4 b - -",
-                              "ply": 100,
-                              "wdl": -2
-                            },
-                            {
-                              "epd": "6k1/5n2/8/8/8/5n2/1RK5/1N6 w - -",
-                              "ply": 485,
-                              "wdl": 1
-                            },
-                            {
-                              "epd": "8/8/8/8/8/8/N1nk4/RKn5 b - -",
-                              "ply": 7,
-                              "wdl": 2
-                            }
-                          ],
-                          "histogram": {
-                            "white": { // white to move
-                              "win": [
-                                0,
-                                1924310948,
-                                35087,
-                                363845772,
-                                37120,
-                                138550471,
-                                // ...
-                              ]
-                              "loss": [
-                                98698, // # of positions losing in 0
-                                144, // # of positions losing in 1
-                                3810, // # of positions losing in 2
-                                0, // 3
-                                596, // 4
-                                0, // 5
-                                58 // 6
-                              ],
-                              "wdl": { // # of positions with each wdl
-                                "-2": 0,
-                                "-1": 103306,
-                                "0": 1333429189,
-                                "1": 162344388,
-                                "2": 2959977091
-                              }
-                            },
-                            "black": { // black to move
-                              // ...
-                            },
-                          }
-                        }"""
-                    )),
+                                "rtbw": {
+                                    "bytes": 290002640, // file size
+                                    "tbcheck": "a320ac...", // internal checksum
+                                    "md5": "6ee435...",
+                                    "sha1": "07a0e4...",
+                                    "sha256": "f3386d...",
+                                    "sha512": "c4bf73...",
+                                    "sha3-224": "15f470...",
+                                    "b2": "b970e0...", // blake 2
+                                    "b3": "251497..." // blake 3
+                                },
+                                "rtbz": {
+                                    // ...
+                                },
+                                "longest": [
+                                    // longest winning endgames for black/white
+                                    // with/without 50-move rule
+                                    {
+                                    "epd": "3n1n2/8/8/8/4R3/8/8/NK1k4 b - -",
+                                    "ply": 100,
+                                    "wdl": -2
+                                    },
+                                    {
+                                    "epd": "6k1/5n2/8/8/8/5n2/1RK5/1N6 w - -",
+                                    "ply": 485,
+                                    "wdl": 1
+                                    },
+                                    {
+                                    "epd": "8/8/8/8/8/8/N1nk4/RKn5 b - -",
+                                    "ply": 7,
+                                    "wdl": 2
+                                    }
+                                ],
+                                "histogram": {
+                                    "white": { // white to move
+                                    "win": [
+                                        0,
+                                        1924310948,
+                                        35087,
+                                        363845772,
+                                        37120,
+                                        138550471,
+                                        // ...
+                                    ]
+                                    "loss": [
+                                        98698, // # of positions losing in 0
+                                        144, // # of positions losing in 1
+                                        3810, // # of positions losing in 2
+                                        0, // 3
+                                        596, // 4
+                                        0, // 5
+                                        58 // 6
+                                    ],
+                                    "wdl": { // # of positions with each wdl
+                                        "-2": 0,
+                                        "-1": 103306,
+                                        "0": 1333429189,
+                                        "1": 162344388,
+                                        "2": 2959977091
+                                    }
+                                    },
+                                    "black": { // black to move
+                                    // ...
+                                    },
+                                }
+                            }"""),
+                    ),
                 ),
             ),
         ),

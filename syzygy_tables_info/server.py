@@ -4,23 +4,18 @@ import chess
 import chess.pgn
 import chess.syzygy
 
-import asyncio
 import configparser
 import os
-import json
 import logging
-import warnings
 import datetime
-import functools
 import itertools
 import math
-import sys
 import textwrap
 
 import syzygy_tables_info.views
 
 from syzygy_tables_info.model import Render, RenderMove, RenderStats, ColorName
-from typing import Any, Awaitable, Dict, List, Callable, Iterable, Optional, Optional
+from typing import Any, Awaitable, Dict, List, Callable, Optional
 
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
@@ -33,7 +28,7 @@ kib = syzygy_tables_info.views.kib
 
 def static(path: str, content_type: Optional[str] = None) -> Any:
     def handler(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-        headers = { "Content-Type": content_type } if content_type else None
+        headers = {"Content-Type": content_type} if content_type else None
         return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), "..", path), headers=headers)
     return handler
 
@@ -257,7 +252,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         board = chess.Board(DEFAULT_FEN)
 
     # Get FENs with the current side to move, black and white to move.
-    render["fen"] = fen = board.fen()
+    render["fen"] = board.fen()
     render["white_fen"] = with_turn(board, chess.WHITE).fen()
     render["black_fen"] = with_turn(board, chess.BLACK).fen()
 
