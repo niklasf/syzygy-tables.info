@@ -26,13 +26,13 @@
     "eslint": "^8",
     "prettier": "^3",
     "tslib": "^2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "esbuild": "^0.19"
   },
   "dependencies": {
     "@badrap/result": "^0.2",
     "chessground": "^9",
-    "chessops": "^0.12",
-    "esbuild": "^0.19"
+    "chessops": "^0.12"
   },
   "scripts": {
     "prepare": "$npm_execpath run build-js && $npm_execpath run build-css",
