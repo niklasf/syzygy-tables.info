@@ -71,7 +71,7 @@ class Controller {
   }
 
   pushMove(move: Move) {
-    return Chess.fromSetup(this.setup, { ignoreImpossibleCheck: true }).unwrap(
+    return Chess.fromSetup(this.setup).unwrap(
       pos => {
         if (!pos.isLegal(move)) return false;
         pos.play(move);
@@ -197,7 +197,7 @@ class BoardView {
   }
 
   private setPosition(setup: Setup) {
-    const pos = Chess.fromSetup(setup, { ignoreImpossibleCheck: true });
+    const pos = Chess.fromSetup(setup);
     this.ground.set({
       lastMove: this.controller.lastMove && chessgroundMove(this.controller.lastMove),
       fen: makeBoardFen(setup.board),
@@ -314,7 +314,7 @@ class ToolBarView {
       controller.push({
         ...controller.setup,
         board: parseFen(DEFAULT_FEN).unwrap().board,
-        unmovedRooks: SquareSet.empty(),
+        castlingRights: SquareSet.empty(),
         epSquare: undefined,
       });
     });
@@ -330,7 +330,7 @@ class ToolBarView {
       controller.push({
         ...controller.setup,
         board,
-        unmovedRooks: SquareSet.empty(),
+        castlingRights: SquareSet.empty(),
         epSquare: undefined,
       });
     });
