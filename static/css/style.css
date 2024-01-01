@@ -136,7 +136,6 @@ h3 {
 
 a {
   color: var(--link-color);
-  text-decoration: none;
 }
 a:hover,
 a:visited {
@@ -341,6 +340,9 @@ footer > .inner {
   font-weight: normal;
   line-height: 1em;
   width: 1em;
+}
+a:has(.icon) {
+  text-decoration: none;
 }
 
 .icon-rotate:before {
