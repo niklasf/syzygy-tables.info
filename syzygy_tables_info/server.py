@@ -51,9 +51,6 @@ async def trust_x_forwarded_for(
         request = request.clone(remote=request.headers.get("X-Forwarded-For", "127.0.0.1"))
     return await handler(request)
 
-def backend_session(request: aiohttp.web.Request) -> aiohttp.ClientSession:
-    return aiohttp.ClientSession(headers={"X-Forwarded-For": request.remote} if request.remote else {})
-
 
 def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int], precise_dtz: Optional[int]) -> Optional[RenderStats]:
     render: RenderStats = {}
@@ -187,15 +184,16 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     game.headers["Annotator"] = request.app["config"].get("server", "name")
 
     # Query backend.
-    async with backend_session(request) as session:
-        async with session.get(request.app["config"].get("server", "backend") + "/mainline", params={"fen": board.fen()}) as res:
-            if res.status == 404:
-                result: Dict[str, Any] = {
-                    "dtz": None,
-                    "mainline": [],
-                }
-            else:
-                result = await res.json()
+    async with request.app["session"].get(request.app["config"].get("server", "backend") + "/mainline",
+                                          headers={"X-Forwarded-For": request.remote} if request.remote else {},
+                                          params={"fen": board.fen()}) as res:
+        if res.status == 404:
+            result: Dict[str, Any] = {
+                "dtz": None,
+                "mainline": [],
+            }
+        else:
+            result = await res.json()
 
     # Starting comment.
     if result["dtz"] == 0:
@@ -307,16 +305,17 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             render["winning_side"] = "white"
     else:
         # Query backend.
-        async with backend_session(request) as session:
-            async with session.get(request.app["config"].get("server", "backend"), params={"fen": board.fen()}) as res:
-                if res.status != 200:
-                    return aiohttp.web.Response(
-                        status=res.status,
-                        content_type=res.content_type,
-                        body=await res.read(),
-                        charset=res.charset)
+        async with request.app["session"].get(request.app["config"].get("server", "backend"),
+                                              headers={"X-Forwarded-For": request.remote} if request.remote else {},
+                                              params={"fen": board.fen()}) as res:
+            if res.status != 200:
+                return aiohttp.web.Response(
+                    status=res.status,
+                    content_type=res.content_type,
+                    body=await res.read(),
+                    charset=res.charset)
 
-                probe = await res.json()
+            probe = await res.json()
 
         dtz = probe["dtz"]
         active_dtz = dtz if dtz else None
@@ -628,8 +627,9 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
         content_type="text/html")
 
 
-def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
+async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
     app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
+    app["session"] = aiohttp.ClientSession()
     app["config"] = config
     app["development"] = config.getboolean("server", "development")
 
@@ -674,8 +674,6 @@ def main(argv: List[str]) -> None:
     bind = config.get("server", "bind")
     port = config.getint("server", "port")
 
-    app = make_app(config)
-
     print("* Server name: ", config.get("server", "name"))
     print("* Base url: ", config.get("server", "base_url"))
-    aiohttp.web.run_app(app, host=bind, port=port, access_log=None)
+    aiohttp.web.run_app(make_app(config), host=bind, port=port, access_log=None)
