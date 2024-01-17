@@ -14,7 +14,7 @@
     "url": "https://github.com/niklasf/syzygy-tables.info/issues",
     "email": "niklas.fiekas@backscattering.de"
   },
-  "license": "AGPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Niklas Fiekas",
     "email": "niklas.fiekas@backscattering.de"
