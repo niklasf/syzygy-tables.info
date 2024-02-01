@@ -27,7 +27,7 @@
     "prettier": "^3",
     "tslib": "^2",
     "typescript": "^5",
-    "esbuild": "^0.19"
+    "esbuild": "^0.20"
   },
   "dependencies": {
     "@badrap/result": "^0.2",
