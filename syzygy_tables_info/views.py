@@ -1,3 +1,4 @@
+import functools
 import os
 import textwrap
 
@@ -10,6 +11,7 @@ from tinyhtml import Frag, html, h, frag, raw
 from typing import Optional
 
 
+@functools.lru_cache
 def asset_url(path: str) -> str:
     return "/static/{}?mtime={}".format(path, os.path.getmtime(os.path.join(os.path.dirname(__file__), "..", "static", path)))
 
