@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-aiohttp = "~=3.9.1"
+aiohttp = "~=3.9.3"
 Brotli = "~=1.1.0"
 chess = "~=1.10.0"
 tinyhtml = "~=1.2.0"
@@ -14,4 +14,4 @@ server = "python -m syzygy_tables_info"
 check = "python -m mypy --strict syzygy_tables_info"
 
 [dev-packages]
-mypy = "~=1.7.1"
+mypy = "~=1.8.0"
