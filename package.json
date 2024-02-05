@@ -27,12 +27,12 @@
     "prettier": "^3",
     "tslib": "^2",
     "typescript": "^5",
-    "esbuild": "^0.19"
+    "esbuild": "^0.20"
   },
   "dependencies": {
     "@badrap/result": "^0.2",
     "chessground": "^9",
-    "chessops": "^0.13"
+    "chessops": "^0.14"
   },
   "scripts": {
     "prepare": "$npm_execpath run build-js && $npm_execpath run build-css",
