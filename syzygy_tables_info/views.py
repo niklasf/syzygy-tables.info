@@ -126,7 +126,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
                 spare("white"),
                 h("div", id="board-toolbar", role="toolbar")(
                     h("div", klass="btn-group")(
-                        h("button", id="btn-flip-board", klass="btn btn-default", title="Flip board")(
+                        h("button", id="btn-flip-board", klass="btn btn-default", title="Flip board (f)")(
                             h("span", klass="icon icon-rotate")(),
                         ),
                     ),
@@ -165,8 +165,13 @@ def index(*, development: bool = True, render: Render) -> Frag:
 
 
 def xhr_probe(render: Render) -> Frag:
+    first_move = True
+
     def move(m: RenderMove) -> Frag:
-        return h("a", klass="li", href=fen_url(m["fen"]), data_uci=m["uci"])(
+        nonlocal first_move
+        title = "Play best move (space)" if first_move else None
+        first_move = False
+        return h("a", klass="li", href=fen_url(m["fen"]), data_uci=m["uci"], title=title)(
             m["san"],
             " ",
             h("span", klass="badge")(f"DTM {m['dtm']}") if m["dtm"] else None,
