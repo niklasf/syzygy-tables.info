@@ -160,7 +160,7 @@ def index(*, development: bool = True, render: Render) -> Frag:
             ),
         ),
         right=xhr_probe(render),
-        scripts=h("script", src=asset_url("js/client.min.js"), async_=True, defer=True)(),
+        scripts=h("script", src=asset_url("js/main.min.js"), async_=True, defer=True)(),
     )
 
 
@@ -546,13 +546,13 @@ def legal(*, development: bool = True) -> Frag:
                     h("tbody")(
                         h("tr")(
                             h("td")(
-                                h("a", href=asset_url("js/client.min.js"))("client.min.js"),
+                                h("a", href=asset_url("js/main.min.js"))("main.min.js"),
                             ),
                             h("td")(
                                 h("a", href="https://www.gnu.org/licenses/agpl-3.0.en.html")("AGPL-3.0+"),
                             ),
                             h("td")(
-                                h("a", href="https://github.com/niklasf/syzygy-tables.info/blob/master/src/client.ts")("client.ts"),
+                                h("a", href="https://github.com/niklasf/syzygy-tables.info/blob/master/src/main.ts")("main.ts"),
                             ),
                         ),
                     ),

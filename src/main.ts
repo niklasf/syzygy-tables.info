@@ -12,6 +12,8 @@ import { FenError, InvalidFen, makeFen, makeBoardFen, makePocket, parseFen, pars
 import { transformSetup, flipVertical, flipHorizontal } from 'chessops/transform';
 import { chessgroundDests, chessgroundMove } from 'chessops/compat';
 
+import { Mousetrap } from './mousetrap';
+
 const DEFAULT_FEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
 
 class Controller {
@@ -435,5 +437,9 @@ new ToolBarView(controller);
 
 new DocumentTitle(controller);
 new TablebaseView(controller, boardView);
+
+new Mousetrap()
+  .bind('f', () => controller.toggleFlipped())
+  .bind('space', () => (document.querySelector('a.li') as HTMLElement | null)?.click());
 
 console.log('syzygy-tables.info is free/libre open source software! https://github.com/niklasf/syzygy-tables.info');

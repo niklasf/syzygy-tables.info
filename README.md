@@ -29,7 +29,7 @@ This website is based on a [public API](https://github.com/niklasf/lila-tablebas
 
 Have a look at `syzygy_tables_info` for server side code.
 
-The client side code is in `src/client.ts`. Run `npm run prepare` to rebuild.
+The client side code is in `src/main.ts`. Run `npm run prepare` to rebuild.
 
 ## License
 
