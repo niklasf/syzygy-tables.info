@@ -575,9 +575,9 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
             base = "https://tablebase.lichess.ovh/tables/standard"
             if len(table) <= 6:
                 if include_wdl:
-                    result.append("{}/3-4-5/{}.rtbw".format(base, table))
+                    result.append("{}/3-4-5-wdl/{}.rtbw".format(base, table))
                 if include_dtz:
-                    result.append("{}/3-4-5/{}.rtbz".format(base, table))
+                    result.append("{}/3-4-5-dtz/{}.rtbz".format(base, table))
             elif len(table) <= 7:
                 if include_wdl:
                     result.append("{}/6-wdl/{}.rtbw".format(base, table))
