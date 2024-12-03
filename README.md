@@ -10,7 +10,7 @@ Build JavaScript and CSS files. Requires node.js and npm:
 
     npm install
 
-Install dependencies with Python (>= 3.8) and [pipenv](https://pipenv.readthedocs.io/en/latest/):
+Install dependencies with Python and [pipenv](https://pipenv.readthedocs.io/en/latest/):
 
     PIPENV_VENV_IN_PROJECT=1 pipenv install
 
