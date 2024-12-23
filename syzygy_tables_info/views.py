@@ -601,13 +601,14 @@ def legal(*, development: bool = True) -> Frag:
 
 
 wdl50 = frag("WDL", h("sub")(50))
-dtz50_pp = frag("DTZ", h("sub")(50), "′′")
+dtz50 = frag("DTZ", h("sub")(50))
+dtz50_pp = frag(dtz50, "′′")
 
 
 def metrics(*, development: bool) -> Frag:
     n = h("var")("n")
-    example1 = "8/2B5/8/k7/8/2NK4/qR4q1/8 b - -"
-    example2 = "8/8/2N5/8/3k4/7N/p2K4/8 b - -"
+    example_107 = "8/8/2N5/8/3k4/7N/p2K4/8 b - -"
+    example_rounding = "8/2B5/8/k7/8/2NK4/qR4q1/8 b - -"
 
     def example_board(epd: str, *, check: Optional[str] = None) -> Frag:
         board_fen = epd.split(" ")[0]
@@ -644,18 +645,61 @@ def metrics(*, development: bool) -> Frag:
                 ),
             ),
             h("section", id="dtz")(
+                h("h2")(dtz50_pp),
+                h("p")(
+                    dtz50, " refers to the ",
+                    h("em")("Distance to Zeroing"), " under the 50-move rule: ",
+                    "The number of half-moves until the next capture, pawn move, or checkmate, ",
+                    "that keeps the optimal outcome under the 50-move rule (", wdl50, ").",
+                ),
+                h("p")(
+                    "Syzygy adjusts the raw ", dtz50, " values with a possible offset of 100 to ", dtz50_pp, ", "
+                    "which can then be min-maxed to reliably make progress in favorable positions and stall ",
+                    "in unfavorable positions.",
+                ),
+                h("h3")("100 ≥ ", dtz50_pp, " ≥ 1"),
+                h("p")(
+                    "Winning with and without regard to the 50-move rule. "
+                    "No adjustment is needed."
+                ),
+                h("h3")(dtz50_pp, " > 100"),
+                h("p")(
+                    "For positions drawn under the 50-move rule, "
+                    "the simple case is that the current endgame phase is solely responsible for the draw. ",
+                    "In this case no adjustment is needed."
+                ),
+                h("p")(
+                    "However it's also possible that one of the following endgame phases is responsible for the draw."
+                ),
+                example_board(example_107, check="d4"),
+                h("p")(
+                    "For example, in ", example_link(example_107), " ",
+                    "black promotes the pawn in 7 ply for a ", dtz50, " of 7, but white can hold a draw under the 50-move rule ",
+                    "after this zeroing move. Other positions with a ", dtz50, " of 7 may be unconditionally winning. ",
+                ),
+                h("p")(
+                    "To distinguish both cases, Syzygy with ", dtz50_pp, " adds an offset of 100 whenever one of the following endgame phases is drawn. ",
+                    "This way the number will always represent the game-theoretic value of the position: ",
+                    h("strong")("1 ≤ ", dtz50_pp, " ≤ 100 if and only if the position is unconditionally winning."),
+                ),
+                h("p")(
+                    "This is very useful in practise, but also means the original ", dtz50, " could be ",
+                    dtz50_pp, " - 100 ", h("em")("or"), " ", dtz50_pp, ".",
+                ),
+            ),
+            h("section", id="rounding")(
                 h("h2")(dtz50_pp, " with rounding"),
                 h("p")(
-                    "Once a tablebase position has been reached, the ",
-                    h("em")("Distance To Zeroing"), " ",
-                    "(of the fifty-move counter by a capture or pawn move) ",
-                    "can be used to reliably make progress in favorable positions and stall ",
-                    "in unfavorable positions.",
+                    "There is one more ambiguity in Syzygy, where ", dtz50_pp, " values can be off by 1."
                 ),
                 h("table")(
                     h("thead")(
                         h("tr")(
-                            h("th")(dtz50_pp),
+                            h("th")(
+                                dtz50_pp,
+                                h("br"),
+                                "with rounding",
+                            ),
                             h("th")(
                                 "Zeroing move or checkmate",
                                 h("br"),
@@ -678,19 +722,20 @@ def metrics(*, development: bool) -> Frag:
                         ),
                     ),
                 ),
-                h("h3")("100 ≥ ", n, " ≥ 1"),
                 h("p")(
-                    "A DTZ value ", n, " with 100 ≥ ", n, " ≥ 1 means the position is winning, ",
-                    "and a zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves.",
+                    "If a table has no endgames that are exactly on the edge of the 50-move rule, ",
+                    "then half-move precision is not needed to reliably convert it. ",
+                    "In this case Syzygy may round to full moves, to save space."
                 ),
-                example_board(example1, check="a5"),
+                example_board(example_rounding, check="a5"),
                 h("p")(
-                    "For an example of this ambiguity, see how the DTZ repeats after the only-move Ka6 in ",
-                    example_link(example1), ". ",
-                    "That's because some Syzygy tables store rounded moves ",
-                    "instead of half-moves, to save space. This implies some primary tablebase lines ",
-                    "may waste up to 1 ply. Rounding is never used for endgame phases where it would ",
-                    "change the game theoretical outcome (", wdl50, ").",
+                    "For example, see how the given ", dtz50_pp, " repeats after the only-move Ka6 in ",
+                    example_link(example_rounding), ". ",
+                ),
+                h("p")(
+                    "While rounding is never used for endgame phases where it woud ",
+                    "change the game-theoretical outcome (", wdl50, "), ",
+                    "it implies that some primary tablebase lines may waste up to 1 ply.",
                 ),
                 h("p")(
                     "Users need to be careful in positions ",
@@ -706,26 +751,6 @@ def metrics(*, development: bool) -> Frag:
                 h("p")(
                     "An in-depth discussion of rounding can be found in ",
                     h("a", href="http://www.talkchess.com/forum3/viewtopic.php?f=7&t=58488#p651293")("this thread"), ".",
-                ),
-                h("h3")(n, " > 100"),
-                h("p")(
-                    "A DTZ value ", n, " > 100 means the position is winning, but drawn under the 50-move rule. ",
-                ),
-                h("p")(
-                    "If the current endgame phase is solely responsible for the draw, ",
-                    "a zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves. ",
-                ),
-                h("p")(
-                    "It's also possible that there is a long endgame phase only or additionaly after the next pawn move or capture. ",
-                    "In this case the DTZ is padded with 100 to ensure it represents the game-theoretic value of the position. ",
-                    "So a zeroing move can be forced in ", n, " - 100 or ", n, " + 1 - 100 half-moves.",
-                ),
-                example_board("8/8/2N5/8/3k4/7N/p2K4/8 b - -", check="d4"),
-                h("p")(
-                    "For example, in ", example_link(example2), " ",
-                    "black promotes the pawn in 7 ply, but the ", dtz50_pp, " is 107, ",
-                    "indicating that white can hold a draw under the 50-move rule ",
-                    "in a later phase of the endgame.",
                 ),
             ),
         ),
