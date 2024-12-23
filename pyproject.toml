@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "syzygy-tables.info"
+package-mode = false
+description = "User interface and public API for probing Syzygy endgame tablebases"
+authors = ["Niklas Fiekas <niklas.fiekas@backscattering.de>"]
+readme = "README.md"
+
+[[tool.poetry.packages]]
+include = "syzygy_tables_info"
+
+[tool.poetry.dependencies]
+python = "^3.9.2"
+aiohttp = "^3.11.11"
+Brotli = "^1.1.0"
+chess = "^1.11.1"
+tinyhtml = "^1.2.0"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.14.0"
