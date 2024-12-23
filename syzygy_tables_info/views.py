@@ -703,23 +703,29 @@ def metrics(*, development: bool) -> Frag:
                     "The tables up to 6 pieces ", h("em")("on this site"), " have been generated with ",
                     h("a", href="https://github.com/niklasf/tb/commit/9f1056429ad379eff52e748dc2783ea750671730")("a patch to avoid rounding for 100 ≥ ", n, " ≥ 1"), "."
                 ),
+                h("p")(
+                    "An in-depth discussion of rounding can be found in ",
+                    h("a", href="http://www.talkchess.com/forum3/viewtopic.php?f=7&t=58488#p651293")("this thread"), ".",
+                ),
                 h("h3")(n, " > 100"),
                 h("p")(
                     "A DTZ value ", n, " > 100 means the position is winning, but drawn under the 50-move rule. ",
-                    "A zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves, ",
-                    "or in ", n, " - 100 or ", n, " + 1 - 100 half-moves ",
-                    "if a later phase is responsible for the draw.",
+                ),
+                h("p")(
+                    "If the current endgame phase is solely responsible for the draw, ",
+                    "a zeroing move or checkmate can be forced in ", n, " or ", n, " + 1 half-moves. ",
+                ),
+                h("p")(
+                    "It's also possible that there is a long endgame phase only or additionaly after the next pawn move or capture. ",
+                    "In this case the DTZ is padded with 100 to ensure it represents the game-theoretic value of the position. ",
+                    "So a zeroing move can be forced in ", n, " - 100 or ", n, " + 1 - 100 half-moves.",
                 ),
                 example_board("8/8/2N5/8/3k4/7N/p2K4/8 b - -", check="d4"),
                 h("p")(
                     "For example, in ", example_link(example2), " ",
-                    "black promotes the pawn in 7 ply, but the DTZ is 107, ",
+                    "black promotes the pawn in 7 ply, but the ", dtz50_pp, " is 107, ",
                     "indicating that white can hold a draw under the 50-move rule ",
                     "in a later phase of the endgame.",
-                ),
-                h("p")(
-                    "An in-depth discussion of rounding can be found in ",
-                    h("a", href="http://www.talkchess.com/forum3/viewtopic.php?f=7&t=58488#p651293")("this thread"), ".",
                 ),
             ),
         ),
