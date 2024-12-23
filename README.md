@@ -10,13 +10,13 @@ Build JavaScript and CSS files. Requires node.js and npm:
 
     npm install
 
-Install dependencies with Python and [pipenv](https://pipenv.readthedocs.io/en/latest/):
+Install Python dependencies with poetry:
 
-    PIPENV_VENV_IN_PROJECT=1 pipenv install
+    poetry install
 
 Then start the server on port 5000.
 
-    PIPENV_VENV_IN_PROJECT=1 pipenv run server
+    poetry run python -m syzygy_tables_info
 
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables.
