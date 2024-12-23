@@ -10,7 +10,7 @@ jobs:
       - run: pipx install poetry
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # nevrast.backscattering.de
+          python-version: '3.12' # nevrast.backscattering.de
           cache: poetry
       - run: poetry install
       - run: poetry run mypy --strict syzygy_tables_info
