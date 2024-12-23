@@ -652,7 +652,32 @@ def metrics(*, development: bool) -> Frag:
                     "can be used to reliably make progress in favorable positions and stall ",
                     "in unfavorable positions.",
                 ),
-                h("p")("The precise meanings are as follows:"),
+                h("table")(
+                    h("thead")(
+                        h("tr")(
+                            h("th")(dtz50_pp),
+                            h("th")(
+                                "Zeroing move or checkmate",
+                                h("br"),
+                                "in half-moves",
+                            ),
+                        ),
+                    ),
+                    h("tbody")(
+                        h("tr")(
+                            h("td")("100 ≥ ", n, " ≥ 1"),
+                            h("td")(n, " or ", n, " + 1"),
+                        ),
+                        h("tr")(
+                            h("td")(n, " > 100"),
+                            h("td")(
+                                n, " or ", n, " + 1",
+                                h("br"),
+                                n, " - 100 or ", n, " + 1 - 100",
+                            ),
+                        ),
+                    ),
+                ),
                 h("h3")("100 ≥ ", n, " ≥ 1"),
                 h("p")(
                     "A DTZ value ", n, " with 100 ≥ ", n, " ≥ 1 means the position is winning, ",
