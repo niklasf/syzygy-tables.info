@@ -12,6 +12,7 @@ include = "syzygy_tables_info"
 python = "^3.9.2"
 aiohttp = "^3.11.11"
 Brotli = "^1.1.0"
+cbor2 = "^5.6.5"
 chess = "^1.11.1"
 tinyhtml = "^1.2.0"
 

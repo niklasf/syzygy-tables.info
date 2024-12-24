@@ -1,5 +1,6 @@
 import aiohttp.web
 
+import cbor2
 import chess
 import chess.pgn
 import chess.syzygy
@@ -185,7 +186,10 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
 
     # Query backend.
     async with request.app["session"].get(request.app["config"].get("server", "backend") + "/mainline",
-                                          headers={"X-Forwarded-For": request.remote} if request.remote else {},
+                                          headers={
+                                              "Accept": "application/cbor",
+                                              "X-Forwarded-For": request.remote,
+                                          },
                                           params={"fen": board.fen()}) as res:
         if res.status == 404:
             result: Dict[str, Any] = {
@@ -193,7 +197,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
                 "mainline": [],
             }
         else:
-            result = await res.json()
+            result = cbor2.loads(await res.read())
 
     # Starting comment.
     if result["dtz"] == 0:
@@ -306,7 +310,10 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     else:
         # Query backend.
         async with request.app["session"].get(request.app["config"].get("server", "backend"),
-                                              headers={"X-Forwarded-For": request.remote} if request.remote else {},
+                                              headers={
+                                                  "Accept": "application/cbor",
+                                                  "X-Forwarded-For": request.remote
+                                              },
                                               params={"fen": board.fen()}) as res:
             if res.status != 200:
                 return aiohttp.web.Response(
@@ -315,7 +322,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
                     body=await res.read(),
                     charset=res.charset)
 
-            probe = await res.json()
+            probe = cbor2.loads(await res.read())
 
         dtz = probe["dtz"]
         active_dtz = dtz if dtz else None
