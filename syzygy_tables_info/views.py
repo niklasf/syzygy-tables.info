@@ -527,8 +527,7 @@ def legal(*, development: bool = True) -> Frag:
             h("section", id="contact")(
                 h("h2")("Contact"),
                 h("p")(
-                    h("a", href="mailto:niklas.fiekas@backscattering.de")("niklas.fiekas@backscattering.de"), " ",
-                    "(", h("a", href="https://pgp.mit.edu/pks/lookup?op=get&search=0x2ECA66C65B255138")("pgp"), ")",
+                    h("a", href="mailto:niklas.fiekas@backscattering.de")("niklas.fiekas@backscattering.de"),
                 ),
             ),
             h("section", id="thanks")(
