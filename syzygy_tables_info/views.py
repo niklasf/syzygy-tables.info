@@ -92,7 +92,6 @@ def index(*, development: bool = True, render: Render) -> Frag:
         head=frag(
             h("meta", name="description", content="User interface and public API for probing Syzygy endgame tablebases"),
             h("meta", property="og:image", content=render["thumbnail_url"]),
-            h("meta", property="twitter:image", content=render["thumbnail_url"]),
         ),
         left=frag(
             h("h1", klass="main")(
