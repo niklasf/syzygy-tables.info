@@ -662,7 +662,7 @@ def metrics(*, development: bool) -> Frag:
                 ),
                 h("h3")(dtz50_pp, " > 100"),
                 h("p")(
-                    "For positions drawn under the 50-move rule, "
+                    "For positions that are drawn because of the 50-move rule, "
                     "the simple case is that the current endgame phase is solely responsible for the draw. ",
                     "In this case no adjustment is needed."
                 ),
@@ -688,7 +688,7 @@ def metrics(*, development: bool) -> Frag:
             h("section", id="rounding")(
                 h("h2")(dtz50_pp, " with rounding"),
                 h("p")(
-                    "There is one more ambiguity in Syzygy, where ", dtz50_pp, " values can be off by 1."
+                    "To save space, there is an ambiguity in Syzygy, where ", dtz50_pp, " values can be off by 1."
                 ),
                 h("table")(
                     h("thead")(
@@ -722,8 +722,8 @@ def metrics(*, development: bool) -> Frag:
                 ),
                 h("p")(
                     "If a table has no endgames that are exactly on the edge of the 50-move rule, ",
-                    "then half-move precision is not needed to reliably convert it. ",
-                    "In this case Syzygy may round to full moves, to save space."
+                    "then half-move precision is not really needed. ",
+                    "In this case Syzygy may round to full moves."
                 ),
                 example_board(example_rounding, check="a5"),
                 h("p")(
