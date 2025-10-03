@@ -11,6 +11,7 @@ jobs:
         with:
           version-file: .tool-versions
       - run: uv sync
+      - run: uv run python --version
       - run: uv run mypy --strict syzygy_tables_info
   client:
     runs-on: ubuntu-latest
