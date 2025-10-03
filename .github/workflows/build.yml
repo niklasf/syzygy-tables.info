@@ -6,19 +6,18 @@ jobs:
   server:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: pipx install poetry
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12' # nevrast.backscattering.de
-          cache: poetry
-      - run: poetry install
-      - run: poetry run mypy --strict syzygy_tables_info
+      - run: uv sync
+      - run: uv run mypy --strict syzygy_tables_info
   client:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '20.9.0'
           cache: npm

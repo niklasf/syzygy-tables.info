@@ -10,13 +10,13 @@ Build JavaScript and CSS files. Requires node.js and npm:
 
     npm install
 
-Install Python dependencies with poetry:
+Install Python dependencies with [uv](https://docs.astral.sh/uv/):
 
-    poetry install
+    uv sync
 
 Then start the server on port 5000.
 
-    poetry run python -m syzygy_tables_info
+    uv run python -m syzygy_tables_info
 
 You can optionally copy `config.default.ini` to `config.ini` and adjust
 configuration variables.
