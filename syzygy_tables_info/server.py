@@ -30,7 +30,10 @@ kib = syzygy_tables_info.views.kib
 def static(path: str, content_type: Optional[str] = None) -> Any:
     def handler(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
         headers = {"Content-Type": content_type} if content_type else None
-        return aiohttp.web.FileResponse(os.path.join(os.path.dirname(__file__), "..", path), headers=headers)
+        return aiohttp.web.FileResponse(
+            os.path.join(os.path.dirname(__file__), "..", path), headers=headers
+        )
+
     return handler
 
 
@@ -39,21 +42,35 @@ def with_turn(board: chess.Board, turn: chess.Color) -> chess.Board:
     board.turn = turn
     return board
 
+
 def is_valid(board: chess.Board) -> bool:
-    return board.status() & ~chess.STATUS_IMPOSSIBLE_CHECK & ~chess.STATUS_TOO_MANY_CHECKERS == chess.STATUS_VALID
+    return (
+        board.status()
+        & ~chess.STATUS_IMPOSSIBLE_CHECK
+        & ~chess.STATUS_TOO_MANY_CHECKERS
+        == chess.STATUS_VALID
+    )
 
 
 @aiohttp.web.middleware
 async def trust_x_forwarded_for(
     request: aiohttp.web.Request,
-    handler: Callable[[aiohttp.web.Request], Awaitable[aiohttp.web.StreamResponse]]
+    handler: Callable[[aiohttp.web.Request], Awaitable[aiohttp.web.StreamResponse]],
 ) -> aiohttp.web.StreamResponse:
     if request.remote == "127.0.0.1":
-        request = request.clone(remote=request.headers.get("X-Forwarded-For", "127.0.0.1"))
+        request = request.clone(
+            remote=request.headers.get("X-Forwarded-For", "127.0.0.1")
+        )
     return await handler(request)
 
 
-def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_dtz: Optional[int], precise_dtz: Optional[int]) -> Optional[RenderStats]:
+def prepare_stats(
+    request: aiohttp.web.Request,
+    material: str,
+    fen: str,
+    active_dtz: Optional[int],
+    precise_dtz: Optional[int],
+) -> Optional[RenderStats]:
     render: RenderStats = {}
 
     # Get stats and side.
@@ -61,22 +78,42 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     side: ColorName = "white"
     other: ColorName = "black"
     if stats is None:
-        stats = syzygy_tables_info.stats.STATS.get(chess.syzygy.normalize_tablename(material))
+        stats = syzygy_tables_info.stats.STATS.get(
+            chess.syzygy.normalize_tablename(material)
+        )
         side = "black"
         other = "white"
     if stats is None:
         return None
 
-    material_side, _ = render["material_side"], render["material_other"] = material.split("v", 1)
+    material_side, _ = render["material_side"], render["material_other"] = (
+        material.split("v", 1)
+    )
 
     # Basic statistics.
-    render["white"] = stats["histogram"][side]["wdl"]["2"] + stats["histogram"][other]["wdl"]["-2"]
-    render["cursed"] = stats["histogram"][side]["wdl"]["1"] + stats["histogram"][other]["wdl"]["-1"]
-    render["draws"] = stats["histogram"][side]["wdl"]["0"] + stats["histogram"][other]["wdl"]["0"]
-    render["blessed"] = stats["histogram"][side]["wdl"]["-1"] + stats["histogram"][other]["wdl"]["1"]
-    render["black"] = stats["histogram"][side]["wdl"]["-2"] + stats["histogram"][other]["wdl"]["2"]
+    render["white"] = (
+        stats["histogram"][side]["wdl"]["2"] + stats["histogram"][other]["wdl"]["-2"]
+    )
+    render["cursed"] = (
+        stats["histogram"][side]["wdl"]["1"] + stats["histogram"][other]["wdl"]["-1"]
+    )
+    render["draws"] = (
+        stats["histogram"][side]["wdl"]["0"] + stats["histogram"][other]["wdl"]["0"]
+    )
+    render["blessed"] = (
+        stats["histogram"][side]["wdl"]["-1"] + stats["histogram"][other]["wdl"]["1"]
+    )
+    render["black"] = (
+        stats["histogram"][side]["wdl"]["-2"] + stats["histogram"][other]["wdl"]["2"]
+    )
 
-    total = render["white"] + render["cursed"] + render["draws"] + render["blessed"] + render["black"]
+    total = (
+        render["white"]
+        + render["cursed"]
+        + render["draws"]
+        + render["blessed"]
+        + render["black"]
+    )
     if not total:
         return None
 
@@ -87,21 +124,35 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
     render["black_pct"] = round(render["black"] * 100 / total, 1)
 
     # Longest endgames.
-    render["longest"] = [{
-        "label": "{} {} with DTZ {}{}".format(
-            material_side,
-            "winning" if (longest["wdl"] > 0) == ((" " + side[0]) in longest["epd"]) else "losing",
-            longest["ply"],
-            " (frustrated)" if abs(longest["wdl"]) == 1 else ""),
-        "fen": longest["epd"] + " 0 1",
-    } for longest in stats["longest"]]
+    render["longest"] = [
+        {
+            "label": "{} {} with DTZ {}{}".format(
+                material_side,
+                "winning"
+                if (longest["wdl"] > 0) == ((" " + side[0]) in longest["epd"])
+                else "losing",
+                longest["ply"],
+                " (frustrated)" if abs(longest["wdl"]) == 1 else "",
+            ),
+            "fen": longest["epd"] + " 0 1",
+        }
+        for longest in stats["longest"]
+    ]
 
     # Histogram.
     side_winning = (" w" in fen) == (active_dtz is not None and active_dtz > 0)
     render["verb"] = "winning" if side_winning else "losing"
 
-    win_hist = stats["histogram"][side]["win"] if side_winning else stats["histogram"][side]["loss"]
-    loss_hist = stats["histogram"][other]["loss"] if side_winning else stats["histogram"][other]["win"]
+    win_hist = (
+        stats["histogram"][side]["win"]
+        if side_winning
+        else stats["histogram"][side]["loss"]
+    )
+    loss_hist = (
+        stats["histogram"][other]["loss"]
+        if side_winning
+        else stats["histogram"][other]["win"]
+    )
     hist = [a + b for a, b in itertools.zip_longest(win_hist, loss_hist, fillvalue=0)]
     if not any(hist):
         return render
@@ -119,36 +170,53 @@ def prepare_stats(request: aiohttp.web.Request, material: str, fen: str, active_
             render["histogram"].append({"empty": empty})
         else:
             for i in range(empty):
-                render["histogram"].append({
-                    "ply": ply - empty + i,
-                    "num": 0,
-                    "width": 0,
-                    "active": False,
-                    "empty": 0,
-                })
+                render["histogram"].append(
+                    {
+                        "ply": ply - empty + i,
+                        "num": 0,
+                        "width": 0,
+                        "active": False,
+                        "empty": 0,
+                    }
+                )
         empty = 0
 
         rounding = active_dtz != precise_dtz
-        render["histogram"].append({
-            "ply": ply,
-            "num": num,
-            "width": int(round((math.log(num) if num else 0) * 100 / maximum, 1)),
-            "active": active_dtz is not None and (abs(active_dtz) == ply or bool(rounding and active_dtz and abs(active_dtz) + 1 == ply)),
-            "empty": 0,
-        })
+        render["histogram"].append(
+            {
+                "ply": ply,
+                "num": num,
+                "width": int(round((math.log(num) if num else 0) * 100 / maximum, 1)),
+                "active": active_dtz is not None
+                and (
+                    abs(active_dtz) == ply
+                    or bool(rounding and active_dtz and abs(active_dtz) + 1 == ply)
+                ),
+                "empty": 0,
+            }
+        )
 
     return render
 
 
 def sort_key(endgame: str) -> Any:
     w, b = endgame.split("v", 1)
-    return len(endgame), len(w), [-chess.syzygy.PCHR.index(p) for p in w], len(b), [-chess.syzygy.PCHR.index(p) for p in b]
+    return (
+        len(endgame),
+        len(w),
+        [-chess.syzygy.PCHR.index(p) for p in w],
+        len(b),
+        [-chess.syzygy.PCHR.index(p) for p in b],
+    )
 
 
 routes = aiohttp.web.RouteTableDef()
 
+
 @routes.get("/syzygy-vs-syzygy/{material}.pgn")
-async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
+async def syzygy_vs_syzygy_pgn(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.StreamResponse:
     # Parse FEN.
     try:
         board = chess.Board(request.query["fen"].replace("_", " "))
@@ -171,13 +239,17 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     await response.prepare(request)
 
     # Force reverse proxies like nginx to send the first chunk.
-    await response.write("[Event \"\"]\n".encode("utf-8"))
+    await response.write('[Event ""]\n'.encode("utf-8"))
 
     # Prepare PGN headers.
     game = chess.pgn.Game()
     game.setup(board)
     del game.headers["Event"]
-    game.headers["Site"] = request.app["config"].get("server", "base_url") + "?fen=" + board.fen().replace(" ", "_")
+    game.headers["Site"] = (
+        request.app["config"].get("server", "base_url")
+        + "?fen="
+        + board.fen().replace(" ", "_")
+    )
     game.headers["Date"] = datetime.datetime.now().strftime("%Y.%m.%d")
     game.headers["Round"] = "-"
     game.headers["White"] = "Syzygy"
@@ -185,12 +257,14 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     game.headers["Annotator"] = request.app["config"].get("server", "name")
 
     # Query backend.
-    async with request.app["session"].get(request.app["config"].get("server", "backend") + "/mainline",
-                                          headers={
-                                              "Accept": "application/cbor",
-                                              "X-Forwarded-For": request.remote,
-                                          },
-                                          params={"fen": board.fen()}) as res:
+    async with request.app["session"].get(
+        request.app["config"].get("server", "backend") + "/mainline",
+        headers={
+            "Accept": "application/cbor",
+            "X-Forwarded-For": request.remote,
+        },
+        params={"fen": board.fen()},
+    ) as res:
         if res.status == 404:
             result: Dict[str, Any] = {
                 "dtz": None,
@@ -203,7 +277,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     if result["dtz"] == 0:
         game.comment = "Tablebase draw"
     elif result["dtz"] is not None:
-        game.comment = "DTZ %d" % (result["dtz"], )
+        game.comment = "DTZ %d" % (result["dtz"],)
     else:
         game.comment = "Position not in tablebases"
 
@@ -226,7 +300,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     elif board.is_insufficient_material():
         node.comment = "Insufficient material"
     elif dtz is not None and dtz != 0 and result["winner"] is None:
-        node.comment = "Draw claimed at DTZ %d" % (dtz, )
+        node.comment = "Draw claimed at DTZ %d" % (dtz,)
 
     # Set result.
     if dtz is not None:
@@ -240,6 +314,7 @@ async def syzygy_vs_syzygy_pgn(request: aiohttp.web.Request) -> aiohttp.web.Stre
     # Send response.
     await response.write(str(game).encode("utf-8"))
     return response
+
 
 @routes.get("/")
 async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -259,7 +334,9 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["black_fen"] = with_turn(board, chess.BLACK).fen()
 
     # Thumbail.
-    render["thumbnail_url"] = f"https://backscattering.de/web-boardimage/board.png?fen={board.board_fen()}"
+    render["thumbnail_url"] = (
+        f"https://backscattering.de/web-boardimage/board.png?fen={board.board_fen()}"
+    )
     king = board.king(board.turn)
     if king is not None and board.is_check():
         render["thumbnail_url"] += "&check=" + chess.SQUARE_NAMES[king]
@@ -277,7 +354,14 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["normalized_material"] = chess.syzygy.normalize_tablename(material)
 
     # Moves are going to be grouped by WDL.
-    grouped_moves: Dict[Optional[int], List[RenderMove]] = {-2: [], -1: [], 0: [], 1: [], 2: [], None: []}
+    grouped_moves: Dict[Optional[int], List[RenderMove]] = {
+        -2: [],
+        -1: [],
+        0: [],
+        1: [],
+        2: [],
+        None: [],
+    }
 
     # Defaults.
     render["winning_side"] = None
@@ -431,58 +515,87 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     # Sort moves leading to a blessed loss.
     grouped_moves[1].sort(key=lambda move: move["uci"])
-    grouped_moves[1].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
-    grouped_moves[1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+    grouped_moves[1].sort(
+        key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True
+    )
+    grouped_moves[1].sort(
+        key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True
+    )
     grouped_moves[1].sort(key=lambda move: move["zeroing"])
     grouped_moves[1].sort(key=lambda move: move["capture"])
     render["blessed_moves"] = grouped_moves[1]
 
     # Sort losing moves.
     grouped_moves[2].sort(key=lambda move: move["uci"])
-    grouped_moves[2].sort(key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True)
-    grouped_moves[2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+    grouped_moves[2].sort(
+        key=lambda move: (move["dtm"] is not None, move["dtm"]), reverse=True
+    )
+    grouped_moves[2].sort(
+        key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True
+    )
     grouped_moves[2].sort(key=lambda move: move["zeroing"])
     grouped_moves[1].sort(key=lambda move: move["capture"])
     render["losing_moves"] = grouped_moves[2]
 
     # Stats.
-    render["stats"] = prepare_stats(request, material, render["fen"], active_dtz, precise_dtz)
+    render["stats"] = prepare_stats(
+        request, material, render["fen"], active_dtz, precise_dtz
+    )
 
     # Dependencies.
-    render["is_table"] = chess.syzygy.is_tablename(material, normalized=False) and material != "KvK"
+    render["is_table"] = (
+        chess.syzygy.is_tablename(material, normalized=False) and material != "KvK"
+    )
     if render["is_table"]:
-        render["deps"] = [{
-            "material": dep,
-            "longest_fen": syzygy_tables_info.stats.longest_fen(dep),
-        } for dep in chess.syzygy.dependencies(material)]
+        render["deps"] = [
+            {
+                "material": dep,
+                "longest_fen": syzygy_tables_info.stats.longest_fen(dep),
+            }
+            for dep in chess.syzygy.dependencies(material)
+        ]
 
     if "xhr" in request.query:
         html = syzygy_tables_info.views.xhr_probe(render=render).render()
     else:
-        html = syzygy_tables_info.views.index(development=request.app["development"], render=render).render()
+        html = syzygy_tables_info.views.index(
+            development=request.app["development"], render=render
+        ).render()
 
     return aiohttp.web.Response(text=html, content_type="text/html")
+
 
 @routes.get("/legal")
 async def legal(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.legal(development=request.app["development"]).render(),
-        content_type="text/html")
+        text=syzygy_tables_info.views.legal(
+            development=request.app["development"]
+        ).render(),
+        content_type="text/html",
+    )
+
 
 @routes.get("/metrics")
 async def metrics(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.metrics(development=request.app["development"]).render(),
-        content_type="text/html")
+        text=syzygy_tables_info.views.metrics(
+            development=request.app["development"]
+        ).render(),
+        content_type="text/html",
+    )
+
 
 @routes.get("/robots.txt")
 async def robots(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    return aiohttp.web.Response(text=textwrap.dedent("""\
+    return aiohttp.web.Response(
+        text=textwrap.dedent("""\
         User-agent: *
         Disallow: /?fen=*
         Disallow: /syzygy-vs-syzygy/
         Disallow: /endgames.pgn
-        """))
+        """)
+    )
+
 
 @routes.get("/sitemap.txt")
 async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -498,11 +611,16 @@ async def sitemap(request: aiohttp.web.Request) -> aiohttp.web.Response:
     content = "\n".join(base_url + entry for entry in entries)
     return aiohttp.web.Response(text=content)
 
+
 @routes.get("/stats")
 async def stats_doc(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.stats(development=request.app["development"]).render(),
-        content_type="text/html")
+        text=syzygy_tables_info.views.stats(
+            development=request.app["development"]
+        ).render(),
+        content_type="text/html",
+    )
+
 
 @routes.get("/stats/{material}.json")
 async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -512,7 +630,9 @@ async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     normalized = chess.syzygy.normalize_tablename(table)
     if table != normalized:
-        raise aiohttp.web.HTTPMovedPermanently(location="/stats/{}.json".format(normalized))
+        raise aiohttp.web.HTTPMovedPermanently(
+            location="/stats/{}.json".format(normalized)
+        )
 
     try:
         stats = syzygy_tables_info.stats.STATS[table]
@@ -520,6 +640,7 @@ async def stats_json(request: aiohttp.web.Request) -> aiohttp.web.Response:
         raise aiohttp.web.HTTPNotFound()
     else:
         return aiohttp.web.json_response(stats)
+
 
 @routes.get("/graph.dot")
 @routes.get("/graph/{material}.dot")
@@ -550,6 +671,7 @@ async def graph_dot(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
     result.append("")
     return aiohttp.web.Response(text="\n".join(result))
+
 
 @routes.get("/download.txt")
 @routes.get("/download/{material}.txt")
@@ -594,9 +716,17 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
                 suffix = "pawnful" if "P" in table else "pawnless"
                 w, b = table.split("v")
                 if include_wdl:
-                    result.append("{}/7/{}v{}_{}/{}.rtbw".format(base, len(w), len(b), suffix, table))
+                    result.append(
+                        "{}/7/{}v{}_{}/{}.rtbw".format(
+                            base, len(w), len(b), suffix, table
+                        )
+                    )
                 if include_dtz:
-                    result.append("{}/7/{}v{}_{}/{}.rtbz".format(base, len(w), len(b), suffix, table))
+                    result.append(
+                        "{}/7/{}v{}_{}/{}.rtbz".format(
+                            base, len(w), len(b), suffix, table
+                        )
+                    )
         elif source in ["sesse", "sesse.net", "tablebase.sesse.net"]:
             base = "http://tablebase.sesse.net/syzygy"
             if len(table) <= 6:
@@ -627,11 +757,15 @@ async def download_txt(request: aiohttp.web.Request) -> aiohttp.web.Response:
     result.append("")
     return aiohttp.web.Response(text="\n".join(result))
 
+
 @routes.get("/endgames")
 async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return aiohttp.web.Response(
-        text=syzygy_tables_info.views.endgames(development=request.app["development"]).render(),
-        content_type="text/html")
+        text=syzygy_tables_info.views.endgames(
+            development=request.app["development"]
+        ).render(),
+        content_type="text/html",
+    )
 
 
 async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
@@ -648,23 +782,65 @@ async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application
     app.router.add_routes(routes)
     app.router.add_static("/static", "static")
     app.router.add_route("GET", "/checksums/bytes.tsv", static("checksums/bytes.tsv"))
-    app.router.add_route("GET", "/checksums/tbcheck.txt", static("checksums/tbcheck.txt", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/b2", static("checksums/b2", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/b3", static("checksums/b3", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/md5", static("checksums/md5", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/sha1", static("checksums/sha1", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/sha256", static("checksums/sha256", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/sha512", static("checksums/sha512", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/sha3-224", static("checksums/sha3-224", content_type="text/plain"))
-    app.router.add_route("GET", "/endgames.pgn", static("stats/regular/maxdtz.pgn", content_type="application/x-chess-pgn"))
+    app.router.add_route(
+        "GET",
+        "/checksums/tbcheck.txt",
+        static("checksums/tbcheck.txt", content_type="text/plain"),
+    )
+    app.router.add_route(
+        "GET", "/checksums/b2", static("checksums/b2", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET", "/checksums/b3", static("checksums/b3", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET", "/checksums/md5", static("checksums/md5", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET", "/checksums/sha1", static("checksums/sha1", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET",
+        "/checksums/sha256",
+        static("checksums/sha256", content_type="text/plain"),
+    )
+    app.router.add_route(
+        "GET",
+        "/checksums/sha512",
+        static("checksums/sha512", content_type="text/plain"),
+    )
+    app.router.add_route(
+        "GET",
+        "/checksums/sha3-224",
+        static("checksums/sha3-224", content_type="text/plain"),
+    )
+    app.router.add_route(
+        "GET",
+        "/endgames.pgn",
+        static("stats/regular/maxdtz.pgn", content_type="application/x-chess-pgn"),
+    )
     app.router.add_route("GET", "/stats.json", static("stats.json"))
 
     # Legacy routes.
-    app.router.add_route("GET", "/checksums/B2SUM", static("checksums/b2", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/MD5SUM", static("checksums/md5", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA1SUM", static("checksums/sha1", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA256SUM", static("checksums/sha256", content_type="text/plain"))
-    app.router.add_route("GET", "/checksums/SHA512SUM", static("checksums/sha512", content_type="text/plain"))
+    app.router.add_route(
+        "GET", "/checksums/B2SUM", static("checksums/b2", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET", "/checksums/MD5SUM", static("checksums/md5", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET", "/checksums/SHA1SUM", static("checksums/sha1", content_type="text/plain")
+    )
+    app.router.add_route(
+        "GET",
+        "/checksums/SHA256SUM",
+        static("checksums/sha256", content_type="text/plain"),
+    )
+    app.router.add_route(
+        "GET",
+        "/checksums/SHA512SUM",
+        static("checksums/sha512", content_type="text/plain"),
+    )
 
     return app
 
@@ -673,10 +849,13 @@ def main(argv: List[str]) -> None:
     logging.basicConfig(level=logging.DEBUG)
 
     config = configparser.ConfigParser()
-    config.read([
-        os.path.join(os.path.dirname(__file__), "..", "config.default.ini"),
-        os.path.join(os.path.dirname(__file__), "..", "config.ini"),
-    ] + argv)
+    config.read(
+        [
+            os.path.join(os.path.dirname(__file__), "..", "config.default.ini"),
+            os.path.join(os.path.dirname(__file__), "..", "config.ini"),
+        ]
+        + argv
+    )
 
     bind = config.get("server", "bind")
     port = config.getint("server", "port")
