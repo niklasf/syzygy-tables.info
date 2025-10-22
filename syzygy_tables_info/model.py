@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, TypedDict
+from typing import List, Literal, Optional, TypedDict, NotRequired
 
 
 ColorName = Literal["white", "black"]
@@ -9,19 +9,63 @@ DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 EMPTY_FEN = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 
-class RenderMove(TypedDict):
-    san: str
-    uci: str
-    fen: str
-    dtm: Optional[int]
-    badge: str
+ApiCategory = Literal[
+    "win",
+    "unknown",
+    "syzygy-win",
+    "maybe-win",
+    "cursed-win",
+    "draw",
+    "blessed-loss",
+    "maybe-loss",
+    "syzygy-loss",
+    "loss",
+]
 
-    dtz: int
+
+class ApiMove(TypedDict):
+    uci: str
+    san: str
+    category: ApiCategory
+    dtz: NotRequired[int]
+    precise_dtz: NotRequired[int]
+    dtc: NotRequired[int]
+    dtm: NotRequired[int]
+    zeroing: NotRequired[bool]
+    conversion: NotRequired[bool]
+    checkmate: NotRequired[bool]
+    stalemate: NotRequired[bool]
+    insufficient_material: NotRequired[bool]
+
+
+class ApiResponse(TypedDict):
+    category: ApiCategory
+    dtz: NotRequired[int]
+    precise_dtz: NotRequired[int]
+    dtc: NotRequired[int]
+    dtm: NotRequired[int]
+    checkmate: NotRequired[bool]
+    stalemate: NotRequired[bool]
+    insufficient_material: NotRequired[bool]
+    moves: List[ApiMove]
+
+
+class RenderMove(TypedDict):
+    uci: str
+    san: str
+    fen: str
+    wdl: Optional[int]
+
+    checkmate: bool
+    stalemate: bool
+    insufficient_material: bool
     zeroing: bool
     capture: bool
-    checkmate: bool
-    insufficient_material: bool
-    stalemate: bool
+
+    dtz: Optional[int]
+    dtm: Optional[int]
+
+    badge: str
 
 
 class RenderDep(TypedDict):

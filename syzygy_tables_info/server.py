@@ -15,7 +15,13 @@ import textwrap
 
 import syzygy_tables_info.views
 
-from syzygy_tables_info.model import Render, RenderMove, RenderStats, ColorName
+from syzygy_tables_info.model import (
+    ApiResponse,
+    Render,
+    RenderMove,
+    RenderStats,
+    ColorName,
+)
 from typing import Any, Awaitable, Dict, List, Callable, Optional
 
 
@@ -393,48 +399,48 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             render["winning_side"] = "white"
     else:
         # Query backend.
-        async with request.app["session"].get(request.app["config"].get("server", "backend"),
-                                              headers={
-                                                  "Accept": "application/cbor",
-                                                  "X-Forwarded-For": request.remote
-                                              },
-                                              params={"fen": board.fen()}) as res:
+        async with request.app["session"].get(
+            request.app["config"].get("server", "backend"),
+            headers={"Accept": "application/cbor", "X-Forwarded-For": request.remote},
+            params={"fen": board.fen()},
+        ) as res:
             if res.status != 200:
                 return aiohttp.web.Response(
                     status=res.status,
                     content_type=res.content_type,
                     body=await res.read(),
-                    charset=res.charset)
+                    charset=res.charset,
+                )
 
-            probe = cbor2.loads(await res.read())
+            probe: ApiResponse = cbor2.loads(await res.read())
 
-        dtz = probe["dtz"]
-        active_dtz = dtz if dtz else None
-        precise_dtz = probe["precise_dtz"] if probe["precise_dtz"] else None
+        dtz = probe.get("dtz")
+        active_dtz = dtz or None
+        precise_dtz = probe.get("precise_dtz") or None
 
         render["blessed_loss"] = probe["category"] == "blessed-loss"
         render["cursed_win"] = probe["category"] == "cursed-win"
-        render["dtz"] = probe["dtz"]
-        render["dtm"] = probe["dtm"]
+        render["dtz"] = dtz
+        render["dtm"] = probe.get("dtm")
 
         # Set status line.
         if board.is_insufficient_material():
             render["status"] = "Draw by insufficient material"
             render["insufficient_material"] = True
-        elif probe["dtz"] is None:
+        elif dtz is None:
             render["status"] = "Position not found in tablebases"
-        elif probe["dtz"] == 0:
+        elif dtz == 0:
             render["status"] = "Tablebase draw"
-        elif probe["dtz"] > 0 and board.turn == chess.WHITE:
+        elif dtz > 0 and board.turn == chess.WHITE:
             render["status"] = "White is winning"
             render["winning_side"] = "white"
-        elif probe["dtz"] < 0 and board.turn == chess.WHITE:
+        elif dtz < 0 and board.turn == chess.WHITE:
             render["status"] = "White is losing"
             render["winning_side"] = "black"
-        elif probe["dtz"] > 0 and board.turn == chess.BLACK:
+        elif dtz > 0 and board.turn == chess.BLACK:
             render["status"] = "Black is winning"
             render["winning_side"] = "black"
-        elif probe["dtz"] < 0 and board.turn == chess.BLACK:
+        elif dtz < 0 and board.turn == chess.BLACK:
             render["status"] = "Black is losing"
             render["winning_side"] = "white"
 
@@ -442,30 +448,22 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
         # Label and group all legal moves.
         for move_info in probe["moves"]:
-            move = board.push_uci(move_info["uci"])
-            move_info["fen"] = board.fen()
-            board.pop()
-
-            move_info["capture"] = board.is_capture(move)
-
-            move_info["dtm"] = abs(move_info["dtm"]) if move_info["dtm"] is not None else None
-
-            if move_info["checkmate"]:
-                move_info["badge"] = "Checkmate"
-            elif move_info["stalemate"]:
-                move_info["badge"] = "Stalemate"
-            elif move_info["insufficient_material"]:
-                move_info["badge"] = "Insufficient material"
+            if move_info.get("checkmate"):
+                badge = "Checkmate"
+            elif move_info.get("stalemate"):
+                badge = "Stalemate"
+            elif move_info.get("insufficient_material"):
+                badge = "Insufficient material"
+            elif move_info.get("dtz") is None:
+                badge = "Unknown"
             elif move_info["dtz"] == 0:
-                move_info["badge"] = "Draw"
-            elif move_info["dtz"] is None:
-                move_info["badge"] = "Unknown"
-            elif move_info["zeroing"]:
-                move_info["badge"] = "Zeroing"
+                badge = "Draw"
+            elif move_info.get("zeroing"):
+                badge = "Zeroing"
             elif move_info["dtz"] < 0:
-                move_info["badge"] = "Win with DTZ %d" % (abs(move_info["dtz"]), )
-            elif move_info["dtz"] > 0:
-                move_info["badge"] = "Loss with DTZ %d" % (abs(move_info["dtz"]), )
+                badge = "Win with DTZ %d" % (abs(move_info["dtz"]),)
+            else:
+                badge = "Loss with DTZ %d" % (move_info["dtz"],)
 
             if move_info["category"] in ["loss", "maybe-loss"]:
                 wdl: Optional[int] = -2
@@ -480,12 +478,35 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             else:
                 wdl = None
 
-            grouped_moves[wdl].append(move_info)
+            dtm = abs(move_info["dtm"]) if move_info.get("dtm") is not None else None
+
+            try:
+                board.push_uci(move_info["uci"])
+                grouped_moves[wdl].append(
+                    {
+                        "uci": move_info["uci"],
+                        "san": move_info["san"],
+                        "fen": board.fen(),
+                        "wdl": wdl,
+                        "dtz": move_info.get("dtz"),
+                        "dtm": dtm,
+                        "zeroing": move_info["zeroing"],
+                        "capture": "x" in move_info["san"],
+                        "checkmate": move_info["checkmate"],
+                        "stalemate": move_info["stalemate"],
+                        "insufficient_material": move_info["insufficient_material"],
+                        "badge": badge,
+                    }
+                )
+            finally:
+                board.pop()
 
     # Sort winning moves.
     grouped_moves[-2].sort(key=lambda move: move["uci"])
     grouped_moves[-2].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
-    grouped_moves[-2].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+    grouped_moves[-2].sort(
+        key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True
+    )
     grouped_moves[-2].sort(key=lambda move: move["zeroing"], reverse=True)
     grouped_moves[-2].sort(key=lambda move: move["capture"], reverse=True)
     grouped_moves[-2].sort(key=lambda move: move["checkmate"], reverse=True)
@@ -500,7 +521,9 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     # Sort moves leading to cursed wins.
     grouped_moves[-1].sort(key=lambda move: move["uci"])
     grouped_moves[-1].sort(key=lambda move: (move["dtm"] is None, move["dtm"]))
-    grouped_moves[-1].sort(key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True)
+    grouped_moves[-1].sort(
+        key=lambda move: (move["dtz"] is None, move["dtz"]), reverse=True
+    )
     grouped_moves[-1].sort(key=lambda move: move["zeroing"], reverse=True)
     grouped_moves[-1].sort(key=lambda move: move["capture"], reverse=True)
     render["cursed_moves"] = grouped_moves[-1]
