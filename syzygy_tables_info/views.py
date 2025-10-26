@@ -245,6 +245,11 @@ def xhr_probe(render: Render) -> Frag:
                 h("span", klass="icon icon-external", aria_hidden="true")(),
                 " lichess.org",
             ),
+            " ",
+            h("a", klass="meta-link", href=f"https://op1-tables.info/?fen={render['fen'].replace(' ', '_')}")(
+                h("span", klass="icon icon-external", aria_hidden="true")(),
+                " op1-tables.info",
+            ),
         ) if not render["illegal"] else None,
 
         # Stats.
