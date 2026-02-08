@@ -1,29 +1,26 @@
-import aiohttp.web
+import configparser
+import datetime
+import itertools
+import logging
+import math
+import os
+import textwrap
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 
+import aiohttp.web
 import cbor2
 import chess
 import chess.pgn
 import chess.syzygy
 
-import configparser
-import os
-import logging
-import datetime
-import itertools
-import math
-import textwrap
-
 import syzygy_tables_info.views
-
 from syzygy_tables_info.model import (
     ApiResponse,
+    ColorName,
     Render,
     RenderMove,
     RenderStats,
-    ColorName,
 )
-from typing import Any, Awaitable, Dict, List, Callable, Optional
-
 
 DEFAULT_FEN = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
 
@@ -268,6 +265,7 @@ async def syzygy_vs_syzygy_pgn(
         headers={
             "Accept": "application/cbor",
             "X-Forwarded-For": request.remote,
+            "User-Agent": f"{request.headers.get('User-Agent', '-')} via syzygy-tables.info",
         },
         params={"fen": board.fen()},
     ) as res:
@@ -401,7 +399,11 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         # Query backend.
         async with request.app["session"].get(
             request.app["config"].get("server", "backend"),
-            headers={"Accept": "application/cbor", "X-Forwarded-For": request.remote},
+            headers={
+                "Accept": "application/cbor",
+                "X-Forwarded-For": request.remote,
+                "User-Agent": f"{request.headers.get('User-Agent', '-')} via syzygy-tables.info",
+            },
             params={"fen": board.fen()},
         ) as res:
             if res.status != 200:
