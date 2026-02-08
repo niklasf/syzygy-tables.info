@@ -269,7 +269,7 @@ async def syzygy_vs_syzygy_pgn(
         },
         params={"fen": board.fen()},
     ) as res:
-        if res.status == 404:
+        if res.status != 200:
             result: Dict[str, Any] = {
                 "dtz": None,
                 "mainline": [],
@@ -297,7 +297,9 @@ async def syzygy_vs_syzygy_pgn(
             node.comment = "%s with DTZ %d" % (chess.syzygy.calc_key(board), dtz)
 
     # Final comment.
-    if board.is_checkmate():
+    if res.status not in [200, 404]:
+        node.comment = f"Unexpected internal status code {res.status}"
+    elif board.is_checkmate():
         node.comment = "Checkmate"
     elif board.is_stalemate():
         node.comment = "Stalemate"
