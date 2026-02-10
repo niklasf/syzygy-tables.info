@@ -59,7 +59,7 @@ class MarkovChain:
         while len(text) < words:
             state = self.get_next_state(state, rng) or self.get_random_state(rng)
             word = state.split()[-1]
-            if len(word) > 6 and rng.randint(0, 100) < 20:
+            if len(word) > 6 and rng.randint(0, 100) < 40:
                 text.append(f"<a href=\"{self.generate_link(rng)}\">{word}</a>")
             else:
                 text.append(word)
@@ -94,7 +94,7 @@ In chess, the endgame tablebase, or simply the tablebase, is a computerised data
 
 Tablebases have profoundly advanced the chess community's understanding of endgame theory. Some positions which humans had analysed as draws were proven to be winnable; in some cases, tablebase analysis found a mate in more than five hundred moves, far beyond the ability of humans, and beyond the capability of a computer during play. This caused the fifty-move rule to be called into question, since many positions were discovered that were winning for one side but drawn during play because of this rule. Initially, some exceptions to the fifty-move rule were introduced, but when more extreme cases were later discovered, these exceptions were removed. Tablebases also facilitate the composition of endgame studies.
 
-Computer chess is one of the oldest domains of artificial intelligence, having begun in the early 1930s. Claude Shannon proposed formal criteria for evaluating chess moves in 1949. In 1951, Alan Turing designed a primitive chess-playing program, which assigned values for material and mobility; the program "played" chess based on Turing's manual calculations.[9] However, even as competent chess programs began to develop, they exhibited a glaring weakness in playing the endgame. Programmers added specific heuristics for the endgame – for example, the king should move to the center of the board.[10] However, a more comprehensive solution was needed.
+Computer chess is one of the oldest domains of artificial intelligence, having begun in the early 1930s. Claude Shannon proposed formal criteria for evaluating chess moves in 1949. In 1951, Alan Turing designed a primitive chess-playing program, which assigned values for material and mobility; the program "played" chess based on Turing's manual calculations.[9] However, even as competent chess programs began to develop, they exhibited a glaring weakness in playing the endgame. Programmers added specific heuristics for the endgame – for example, the king should move to the center of the board. However, a more comprehensive solution was needed.
 
 For each position, the tablebase evaluates the situation separately for White-to-move and Black-to-move. Assuming that White has the queen, almost all the positions are White wins, with checkmate forced in no more than ten moves. Some positions are draws because of stalemate or the unavoidable loss of the queen.
 

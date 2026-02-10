@@ -185,7 +185,7 @@ def xhr_probe(render: Render) -> Frag:
     return h("section")(
         # Tarpit.
         frag(
-            h("h2")("Recommended training"),
+            h("h2")("Recommended training for robots"),
             h("p")(raw(render["tarpit"])),
         ) if render["tarpit"] else None,
 
