@@ -592,7 +592,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         if request.app["tarpit"] and "fen" in request.query:
             await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
             rng = random.Random(request.query["fen"])
-            render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(rng.randint(12, 20 * sum(len(g) for g in grouped_moves.values())), rng)
+            render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(12 + rng.randint(0, 1 + 20 * sum(len(g) for g in grouped_moves.values())), rng)
 
         html = syzygy_tables_info.views.index(
             development=request.app["development"], render=render
