@@ -59,7 +59,7 @@ class MarkovChain:
         while len(text) < words:
             state = self.get_next_state(state, rng) or self.get_random_state(rng)
             word = state.split()[-1]
-            if rng.randint(0, 100) < 2:
+            if len(word) > 6 and rng.randint(0, 100) < 5:
                 text.append(f"<a href=\"{self.generate_link(rng)}\">{word}</a>")
             else:
                 text.append(word)
