@@ -590,7 +590,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
         html = syzygy_tables_info.views.xhr_probe(render=render).render()
     else:
         if request.app["tarpit"] and "fen" in request.query:
-            await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
+            # await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
             rng = random.Random(request.query["fen"])
             num_words = 12
             if 4 <= chess.popcount(board.occupied) <= 8:
