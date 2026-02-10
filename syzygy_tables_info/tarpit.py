@@ -48,11 +48,18 @@ class MarkovChain:
         return None
 
     def generate_link(self, rng: random.Random) -> Optional[str]:
-        board = chess.Board.empty()
-        board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.BLACK))
-        board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.WHITE))
-        for _ in range(rng.randint(0, 2) or rng.randint(10, 14)): # Use cheap piece count
-            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(chess.PIECE_TYPES), rng.choice(chess.COLORS)))
+        if rng.randint(0, 1):
+            board = chess.Board.empty()
+            for _ in range(rng.randint(0, 2)): # Use cheap piece count
+                board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(chess.PIECE_TYPES), rng.choice(chess.COLORS)))
+            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.BLACK))
+            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.WHITE))
+        else:
+            board = chess.Board()
+            for _ in range(rng.randint(5, 15)):
+                legals = list(board.legal_moves)
+                if legals:
+                    board.push(rng.choice(legals))
         return f"/?fen={board.fen().replace(' ', '_')}"
 
     def generate_text(self, words: int, rng: random.Random) -> str:
