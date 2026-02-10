@@ -596,7 +596,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             if render["illegal"]:
                 num_words += 200
             else:
-                num_words += rng.randint(0, 1 + 20 * sum(len(g) for g in grouped_moves.values()))
+                num_words += rng.randint(0, 1 + 50 * sum(len(g) for g in grouped_moves.values()))
             render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(num_words, rng)
 
         html = syzygy_tables_info.views.index(
