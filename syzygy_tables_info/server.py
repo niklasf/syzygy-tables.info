@@ -593,9 +593,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
             await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
             rng = random.Random(request.query["fen"])
             num_words = 12
-            if render["illegal"]:
-                num_words += 200
-            else:
+            if 4 <= chess.popcount(board.occupied) <= 8:
                 num_words += rng.randint(0, 1 + 50 * sum(len(g) for g in grouped_moves.values()))
             render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(num_words, rng)
 

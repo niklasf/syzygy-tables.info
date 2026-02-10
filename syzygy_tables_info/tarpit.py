@@ -48,18 +48,18 @@ class MarkovChain:
         return None
 
     def generate_link(self, rng: random.Random) -> Optional[str]:
-        if rng.randint(0, 1):
-            board = chess.Board.empty()
-            for _ in range(rng.randint(0, 2)): # Use cheap piece count
-                board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(chess.PIECE_TYPES), rng.choice(chess.COLORS)))
-            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.BLACK))
-            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.WHITE))
-        else:
-            board = chess.Board()
-            for _ in range(rng.randint(5, 15)):
-                legals = list(board.legal_moves)
-                if legals:
-                    board.push(rng.choice(legals))
+        board = chess.Board.empty()
+        for _ in range(rng.randint(0, 2) or rng.randint(9, 15)): # Use cheap piece count
+            board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(range(1, 6)), rng.choice(chess.COLORS)))
+        for _ in range(20):
+            bk = rng.choice(chess.SQUARES)
+            wk = rng.choice(chess.SQUARES)
+            board.set_piece_at(bk, chess.Piece(chess.KING, chess.BLACK))
+            board.set_piece_at(wk, chess.Piece(chess.KING, chess.WHITE))
+            if board.is_valid():
+                break
+            board.remove_piece_at(wk)
+            board.remove_piece_at(bk)
         return f"/?fen={board.fen().replace(' ', '_')}"
 
     def generate_text(self, words: int, rng: random.Random) -> str:
@@ -68,8 +68,12 @@ class MarkovChain:
         while len(text) < words:
             state = self.get_next_state(state, rng) or self.get_random_state(rng)
             word = state.split()[-1]
-            if len(word) > 5 and rng.randint(0, 100) < 80:
+            if len(word) > 5 and rng.randint(0, 100) < 60:
                 text.append(f"<a href=\"{self.generate_link(rng)}\">{word}</a>")
+            elif rng.randint(0, 100) < 5:
+                text.append(f"<strong>{word}</strong>")
+            elif rng.randint(0, 100) < 5:
+                text.append(f"<em>{word}</em>")
             else:
                 text.append(word)
         text.append(f"<a href=\"{self.generate_link(rng)}\">...</a><br><br>")
