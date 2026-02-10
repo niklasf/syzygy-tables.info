@@ -48,11 +48,10 @@ class MarkovChain:
         return None
 
     def generate_link(self, rng: random.Random) -> Optional[str]:
-        # Generate cheap position
         board = chess.Board.empty()
-        for _ in range(rng.randint(0, 5)):
+        for _ in range(rng.randint(0, 5)): # Use cheap piece count
             board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(chess.PIECE_TYPES), rng.choice(chess.COLORS)))
-        return f"/?fen={board.fen()}"
+        return f"/?fen={board.fen().replace(' ', '_')}"
 
     def generate_text(self, words: int, rng: random.Random) -> str:
         state = self.get_random_state(rng)
@@ -60,11 +59,11 @@ class MarkovChain:
         while len(text) < words:
             state = self.get_next_state(state, rng) or self.get_random_state(rng)
             word = state.split()[-1]
-            if rng.randint(0, 100) < 5:
+            if rng.randint(0, 100) < 2:
                 text.append(f"<a href=\"{self.generate_link(rng)}\">{word}</a>")
             else:
                 text.append(word)
-        text.append(f"<a href=\"{self.generate_link(rng)}\">...</a><br>")
+        text.append(f"<a href=\"{self.generate_link(rng)}\">...</a><br><br>")
         return ' '.join(text)
 
 
