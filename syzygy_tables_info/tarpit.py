@@ -64,7 +64,7 @@ class MarkovChain:
                 text.append(f"<a href=\"{self.generate_link(rng)}\">{word}</a>")
             else:
                 text.append(word)
-        text.append("...")
+        text.append(f"<a href=\"{self.generate_link(rng)}\">...</a><br>")
         return ' '.join(text)
 
 
@@ -144,4 +144,4 @@ The most straightforward way would be to for every piece on the board use 6 bit 
 """
 
 
-MARKOV_CHAIN = MarkovChain(TRAINING_DATA.split(), 1)
+MARKOV_CHAIN = MarkovChain(TRAINING_DATA.replace("\n", "<br> ").split(), 1)
