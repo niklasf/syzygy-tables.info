@@ -1,4 +1,6 @@
+import asyncio
 import configparser
+import random
 import datetime
 import itertools
 import logging
@@ -14,6 +16,7 @@ import chess.pgn
 import chess.syzygy
 
 import syzygy_tables_info.views
+import syzygy_tables_info.tarpit
 from syzygy_tables_info.model import (
     ApiResponse,
     ColorName,
@@ -378,6 +381,7 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["cursed_win"] = False
     render["dtz"] = None
     render["dtm"] = None
+    render["tarpit"] = None
 
     dtz = None
     active_dtz = None
@@ -585,6 +589,11 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     if "xhr" in request.query:
         html = syzygy_tables_info.views.xhr_probe(render=render).render()
     else:
+        if request.app["tarpit"] and "fen" in request.query:
+            await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
+            rng = random.Random(request.query["fen"])
+            render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(rng.randint(10, 120), rng)
+
         html = syzygy_tables_info.views.index(
             development=request.app["development"], render=render
         ).render()
@@ -800,6 +809,7 @@ async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application
     app["session"] = aiohttp.ClientSession()
     app["config"] = config
     app["development"] = config.getboolean("server", "development")
+    app["tarpit"] = config.getboolean("server", "tarpit")
 
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")

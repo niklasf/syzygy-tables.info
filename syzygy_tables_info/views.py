@@ -183,6 +183,12 @@ def xhr_probe(render: Render) -> Frag:
     stats = render["stats"]
 
     return h("section")(
+        # Tarpit.
+        frag(
+            h("h2")("Recommended training"),
+            h("p")(raw(render["tarpit"])),
+        ) if render["tarpit"] else None,
+
         # Status.
         h("h2", id="status", klass=[
             f"{render['winning_side']}-win" if render["winning_side"] else None,

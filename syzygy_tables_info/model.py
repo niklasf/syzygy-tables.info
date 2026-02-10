@@ -141,3 +141,5 @@ class Render(TypedDict, total=False):
     is_table: bool
     deps: List[RenderDep]
     stats: Optional[RenderStats]
+
+    tarpit: Optional[str]
