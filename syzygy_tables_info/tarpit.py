@@ -51,7 +51,7 @@ class MarkovChain:
         board = chess.Board.empty()
         board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.BLACK))
         board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(chess.KING, chess.WHITE))
-        for _ in range(rng.randint(0, 4)): # Use cheap piece count
+        for _ in range(rng.randint(0, 2) or rng.randint(10, 14)): # Use cheap piece count
             board.set_piece_at(rng.choice(chess.SQUARES), chess.Piece(rng.choice(chess.PIECE_TYPES), rng.choice(chess.COLORS)))
         return f"/?fen={board.fen().replace(' ', '_')}"
 
