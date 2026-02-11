@@ -387,8 +387,11 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     active_dtz = None
     precise_dtz = None
 
-    if request.app["tarpit"] and 5 <= chess.popcount(board.occupied) <= 10 and request.headers.get("X-Upstream-Protocol") in ["HTTP/1.0", "HTTP/1.1"]:
+    if request.app["tarpit"] and "fen" in request.query and "xhr" not in request.query and 5 <= chess.popcount(board.occupied) <= 10 and request.headers.get("X-Upstream-Protocol") in ["HTTP/1.0", "HTTP/1.1", None]:
         render["status"] = "Tablebase temporarily unavailable"
+        rng = random.Random(request.query["fen"])
+        num_words = 12 + rng.randint(0, 1 + 50 * board.legal_moves.count())
+        render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(num_words, rng)
     elif not is_valid(board):
         render["status"] = "Invalid position"
         render["illegal"] = True
@@ -591,14 +594,6 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     if "xhr" in request.query:
         html = syzygy_tables_info.views.xhr_probe(render=render).render()
     else:
-        if request.app["tarpit"] and "fen" in request.query:
-            # await asyncio.sleep(min(random.lognormvariate(1.1, 0.4), 9))
-            rng = random.Random(request.query["fen"])
-            num_words = 12
-            if 4 <= chess.popcount(board.occupied) <= 10:
-                num_words += rng.randint(0, 1 + 50 * sum(len(g) for g in grouped_moves.values()))
-            render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(num_words, rng)
-
         html = syzygy_tables_info.views.index(
             development=request.app["development"], render=render
         ).render()
