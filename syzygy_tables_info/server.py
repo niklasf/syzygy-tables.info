@@ -65,7 +65,7 @@ async def trust_x_forwarded_for(
 ) -> aiohttp.web.StreamResponse:
     if request.remote == "127.0.0.1":
         request = request.clone(
-            remote=request.headers.get("X-Forwarded-For", "127.0.0.1")
+            remote=request.headers.get("X-Real-Ip") or request.headers.get("X-Forwarded-For") or "127.0.0.1"
         )
     return await handler(request)
 
