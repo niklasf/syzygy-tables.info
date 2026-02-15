@@ -16,7 +16,6 @@ import chess.pgn
 import chess.syzygy
 
 import syzygy_tables_info.views
-import syzygy_tables_info.tarpit
 from syzygy_tables_info.model import (
     ApiResponse,
     ColorName,
@@ -381,18 +380,12 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["cursed_win"] = False
     render["dtz"] = None
     render["dtm"] = None
-    render["tarpit"] = None
 
     dtz = None
     active_dtz = None
     precise_dtz = None
 
-    if request.app["tarpit"] and "fen" in request.query and "xhr" not in request.query and 5 <= chess.popcount(board.occupied) <= 10 and request.headers.get("X-Upstream-Protocol") in ["HTTP/1.0", "HTTP/1.1", None]:
-        render["status"] = "Tablebase temporarily unavailable"
-        rng = random.Random(request.query["fen"])
-        num_words = 12 + rng.randint(0, 1 + 50 * board.legal_moves.count())
-        render["tarpit"] = syzygy_tables_info.tarpit.MARKOV_CHAIN.generate_text(num_words, rng)
-    elif not is_valid(board):
+    if not is_valid(board):
         render["status"] = "Invalid position"
         render["illegal"] = True
     elif board.is_stalemate():
@@ -809,7 +802,6 @@ async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application
     app["session"] = aiohttp.ClientSession()
     app["config"] = config
     app["development"] = config.getboolean("server", "development")
-    app["tarpit"] = config.getboolean("server", "tarpit")
 
     # Check configured base url.
     assert config.get("server", "base_url").startswith("http")
