@@ -69,6 +69,17 @@ async def trust_x_forwarded_for(
     return await handler(request)
 
 
+@aiohttp.web.middleware
+async def cache_control(
+    request: aiohttp.web.Request,
+    handler: Callable[[aiohttp.web.Request], Awaitable[aiohttp.web.StreamResponse]],
+) -> aiohttp.web.StreamResponse:
+    response = await handler(request)
+    if not request.app["development"]:
+        response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
+
+
 def prepare_stats(
     request: aiohttp.web.Request,
     material: str,
@@ -798,7 +809,7 @@ async def endgames(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 
 async def make_app(config: configparser.ConfigParser) -> aiohttp.web.Application:
-    app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for])
+    app = aiohttp.web.Application(middlewares=[trust_x_forwarded_for, cache_control])
     app["session"] = aiohttp.ClientSession()
     app["config"] = config
     app["development"] = config.getboolean("server", "development")
