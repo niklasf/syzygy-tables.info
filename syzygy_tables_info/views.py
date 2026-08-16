@@ -99,6 +99,12 @@ def index(*, development: bool = True, render: Render) -> Frag:
             ),
             h("nav")(
                 h("div", id="side-to-move-toolbar")(
+                    h("div", klass="btn-group")(
+                        h("button", id="btn-flip-board", klass="btn btn-default", title="Flip board (f)")(
+                            h("span", klass="icon icon-rotate")(),
+                        ),
+                    ),
+                    " ",
                     h("div", id="side-to-move", klass="btn-group", role="group", aria_label="Side to move")(
                         h("a", klass={
                             "btn": True,
@@ -125,12 +131,6 @@ def index(*, development: bool = True, render: Render) -> Frag:
                 spare("white"),
                 h("div", id="board-toolbar", role="toolbar")(
                     h("div", klass="btn-group")(
-                        h("button", id="btn-flip-board", klass="btn btn-default", title="Flip board (f)")(
-                            h("span", klass="icon icon-rotate")(),
-                        ),
-                    ),
-                    " ",
-                    h("div", klass="btn-group")(
                         h("a", id="btn-clear-board", href=fen_url(render["clear_fen"]), klass="btn btn-default", title="Clear board")(
                             h("span", klass="icon icon-eraser")(),
                         ),
@@ -145,6 +145,21 @@ def index(*, development: bool = True, render: Render) -> Frag:
                         ),
                         h("a", id="btn-mirror-vertical", href=fen_url(render["vertical_fen"]), klass="btn btn-default", title="Mirror vertically")(
                             h("span", klass="icon icon-vertical")(),
+                        ),
+                    ),
+                    " ",
+                    h("div", klass="btn-group")(
+                        h("a", id="btn-shift-left", href=fen_url(render["left_fen"]), klass="btn btn-default", title="Shift left")(
+                            h("span", klass="icon icon-left")(),
+                        ),
+                        h("a", id="btn-shift-right", href=fen_url(render["right_fen"]), klass="btn btn-default", title="Shift right")(
+                            h("span", klass="icon icon-right")(),
+                        ),
+                        h("a", id="btn-shift-down", href=fen_url(render["down_fen"]), klass="btn btn-default", title="Shift down")(
+                            h("span", klass="icon icon-down")(),
+                        ),
+                        h("a", id="btn-shift-up", href=fen_url(render["up_fen"]), klass="btn btn-default", title="Shift up")(
+                            h("span", klass="icon icon-up")(),
                         ),
                     ),
                 ),

@@ -121,6 +121,10 @@ class Render(TypedDict, total=False):
     swapped_fen: str
     horizontal_fen: str
     vertical_fen: str
+    left_fen: str
+    right_fen: str
+    up_fen: str
+    down_fen: str
     fen_input: str
 
     status: str

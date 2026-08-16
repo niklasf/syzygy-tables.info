@@ -166,7 +166,7 @@ th {
 .left-side > .inner,
 .right-side > .inner,
 footer > .inner {
-  width: 310px;
+  width: 320px;
   margin: auto;
 }
 
@@ -301,8 +301,8 @@ footer > .inner {
 /* Board */
 
 #board {
-  width: 296px;
-  height: 296px;
+  width: 312px;
+  height: 312px;
   margin: 0 auto;
 }
 .cg-wrap {
@@ -381,6 +381,18 @@ a:has(.icon) {
 .icon-graph:before {
   content: '\e808';
 }
+.icon-left:before {
+  content: '\f177';
+}
+.icon-right:before {
+  content: '\f178';
+}
+.icon-down:before {
+  content: '\f175';
+}
+.icon-up:before {
+  content: '\f176';
+}
 
 /* Form controls */
 
@@ -410,7 +422,7 @@ a:has(.icon) {
   cursor: pointer;
   border: 1px solid transparent;
   white-space: nowrap;
-  padding: 6px 12px;
+  padding: 6px 11px;
   border-radius: 4px;
   text-decoration: none;
   color: var(--body-color) !important;
