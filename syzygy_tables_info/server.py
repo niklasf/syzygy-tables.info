@@ -364,6 +364,10 @@ async def index(request: aiohttp.web.Request) -> aiohttp.web.Response:
     render["turn"] = "white" if board.turn == chess.WHITE else "black"
     render["horizontal_fen"] = board.transform(chess.flip_horizontal).fen()
     render["vertical_fen"] = board.transform(chess.flip_vertical).fen()
+    render["left_fen"] = board.transform(lambda b: ((b & ~chess.BB_FILE_A) >> 1) | ((b & chess.BB_FILE_A) << 7)).fen()
+    render["right_fen"] = board.transform(lambda b: ((b & ~chess.BB_FILE_H) << 1) | ((b & chess.BB_FILE_H) >> 7)).fen()
+    render["down_fen"] = board.transform(lambda b: ((b & ~chess.BB_RANK_1) >> 8) | ((b & chess.BB_RANK_1) << (7 * 8))).fen()
+    render["up_fen"] = board.transform(lambda b: ((b & ~chess.BB_RANK_8) << 8) | ((b & chess.BB_RANK_8) >> (7 * 8))).fen()
     render["swapped_fen"] = with_turn(board, not board.turn).fen()
     render["clear_fen"] = with_turn(chess.Board(DEFAULT_FEN), board.turn).fen()
     render["fen_input"] = "" if board.fen() == DEFAULT_FEN else board.fen()

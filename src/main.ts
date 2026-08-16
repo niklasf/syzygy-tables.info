@@ -9,7 +9,7 @@ import { SquareSet } from 'chessops/squareSet';
 import { Setup, MaterialSide } from 'chessops/setup';
 import { Chess } from 'chessops/chess';
 import { FenError, InvalidFen, makeFen, makeBoardFen, makePocket, parseFen, parseBoardFen } from 'chessops/fen';
-import { transformSetup, flipVertical, flipHorizontal } from 'chessops/transform';
+import { transformSetup, flipVertical, flipHorizontal, shiftLeft, shiftRight, shiftDown, shiftUp } from 'chessops/transform';
 import { chessgroundDests, chessgroundMove } from 'chessops/compat';
 
 import { Mousetrap } from './mousetrap';
@@ -337,15 +337,20 @@ class ToolBarView {
       });
     });
 
-    document.getElementById('btn-mirror-horizontal')!.addEventListener('click', event => {
-      event.preventDefault();
-      controller.push(transformSetup(controller.setup, flipHorizontal));
-    });
-
-    document.getElementById('btn-mirror-vertical')!.addEventListener('click', event => {
-      event.preventDefault();
-      controller.push(transformSetup(controller.setup, flipVertical));
-    });
+    const transformButtons: [string, (s: SquareSet) => SquareSet][] = [
+      ['btn-mirror-horizontal', flipHorizontal],
+      ['btn-mirror-vertical', flipVertical],
+      ['btn-shift-left', shiftLeft],
+      ['btn-shift-right', shiftRight],
+      ['btn-shift-down', shiftDown],
+      ['btn-shift-up', shiftUp],
+    ];
+    for (const [id, transform] of transformButtons) {
+      document.getElementById(id)!.addEventListener('click', event => {
+        event.preventDefault();
+        controller.push(transformSetup(controller.setup, transform));
+      });
+    }
 
     document.getElementById('btn-edit')!.addEventListener('click', () => controller.toggleEditMode());
 
@@ -405,7 +410,7 @@ class TablebaseView {
   private bindMoveLinks() {
     const boardView = this.boardView;
     for (const el of document.querySelectorAll('a.li')) {
-      el.addEventListener('click', function (this: HTMLElement, event: MouseEvent) {
+      el.addEventListener('click', function (this: HTMLElement, event: Event) {
         event.preventDefault();
         controller.pushMove(parseUci(this.getAttribute('data-uci')!)!);
         boardView.unsetHovering();
